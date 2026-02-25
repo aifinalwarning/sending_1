@@ -1,0 +1,2168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planetary Bottlenecks — Benevolence & Security Intelligence</title>
+<meta name="description" content="Research-grade analysis of shared bottlenecks between Musk-company execution and Trump-era federal policy vectors for planetary benevolence and security.">
+
+<!-- Google Fonts: Syne (display) + DM Mono (data) + Crimson Pro (body) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* =====================================================================
+   CSS CUSTOM PROPERTIES — PLANETARY OBSERVATORY PALETTE
+   Deep space base + bioluminescent accents + plasma highlights
+   ===================================================================== */
+:root {
+  --void:       #050810;
+  --deep:       #090d1a;
+  --surface:    #0e1528;
+  --raised:     #141c35;
+  --border:     rgba(100,160,255,0.12);
+  --border-hi:  rgba(100,200,255,0.28);
+
+  /* Accent system: teal (benevolence) / amber (security) / violet (both) */
+  --teal:       #00d4b4;
+  --teal-dim:   rgba(0,212,180,0.15);
+  --teal-glow:  rgba(0,212,180,0.4);
+  --amber:      #ff9d3a;
+  --amber-dim:  rgba(255,157,58,0.15);
+  --amber-glow: rgba(255,157,58,0.4);
+  --violet:     #b06fff;
+  --violet-dim: rgba(176,111,255,0.15);
+  --violet-glow:rgba(176,111,255,0.35);
+  --coral:      #ff5f7e;
+  --ice:        #a8e6ff;
+
+  --text-primary: rgba(220,235,255,0.94);
+  --text-body:    rgba(180,205,240,0.78);
+  --text-muted:   rgba(140,170,210,0.55);
+  --text-faint:   rgba(110,140,185,0.38);
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  --font-display: 'Syne', sans-serif;
+  --font-body:    'Crimson Pro', Georgia, serif;
+  --font-mono:    'DM Mono', 'Courier New', monospace;
+
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-glow: 0 0 40px rgba(0,212,180,0.12), 0 8px 32px rgba(0,0,0,0.6);
+}
+
+/* =====================================================================
+   RESET & BASE
+   ===================================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  background: var(--void);
+  color: var(--text-body);
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  line-height: 1.72;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--deep); }
+::-webkit-scrollbar-thumb { background: var(--teal); border-radius: 3px; }
+
+/* =====================================================================
+   PARTICLE CANVAS — hero background layer
+   ===================================================================== */
+#particle-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+}
+
+/* =====================================================================
+   LAYOUT CONTAINERS
+   ===================================================================== */
+.site-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+section { padding: 5rem 0; }
+
+/* =====================================================================
+   TOP NAV
+   ===================================================================== */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  background: rgba(5,8,16,0.82);
+  backdrop-filter: blur(20px) saturate(1.4);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: var(--transition);
+}
+
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--teal);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.3rem;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  border: 1px solid transparent;
+}
+
+.nav-links a:hover, .nav-links a.active {
+  color: var(--teal);
+  border-color: var(--border-hi);
+  background: var(--teal-dim);
+}
+
+/* =====================================================================
+   HERO
+   ===================================================================== */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding-top: 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Atmospheric radial gradients layered for depth */
+#hero::before {
+  content: '';
+  position: absolute;
+  top: -20%; left: -15%;
+  width: 70vw; height: 70vh;
+  background: radial-gradient(ellipse, rgba(0,212,180,0.06) 0%, transparent 65%);
+  animation: nebula-drift 18s ease-in-out infinite alternate;
+}
+#hero::after {
+  content: '';
+  position: absolute;
+  bottom: -20%; right: -10%;
+  width: 55vw; height: 55vh;
+  background: radial-gradient(ellipse, rgba(176,111,255,0.07) 0%, transparent 60%);
+  animation: nebula-drift 22s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes nebula-drift {
+  0%   { transform: translate(0,0) scale(1); }
+  100% { transform: translate(4%, 3%) scale(1.06); }
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 860px;
+}
+
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 32px; height: 1px;
+  background: var(--teal);
+}
+/* Pulsing live indicator */
+.live-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--teal);
+  display: inline-block;
+  animation: pulse-dot 2.2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--teal-glow); }
+  50%       { opacity: 0.6; box-shadow: 0 0 0 6px transparent; }
+}
+
+h1.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 1.8rem;
+}
+
+h1.hero-title .line-accent {
+  background: linear-gradient(90deg, var(--teal), var(--violet));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-desc {
+  font-size: 1.2rem;
+  color: var(--text-body);
+  max-width: 640px;
+  margin-bottom: 2.4rem;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.hero-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin-bottom: 3rem;
+}
+
+.meta-chip {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.09em;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0.3rem 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.meta-chip .dot-teal  { color: var(--teal); }
+.meta-chip .dot-amber { color: var(--amber); }
+.meta-chip .dot-violet{ color: var(--violet); }
+
+.hero-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.btn {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  padding: 0.75rem 1.8rem;
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.btn-primary {
+  background: var(--teal);
+  color: var(--void);
+  border-color: var(--teal);
+}
+.btn-primary:hover {
+  background: transparent;
+  color: var(--teal);
+  box-shadow: 0 0 24px var(--teal-glow);
+}
+.btn-outline {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: var(--border);
+}
+.btn-outline:hover {
+  color: var(--violet);
+  border-color: var(--violet);
+  background: var(--violet-dim);
+}
+
+/* Scroll hint */
+.scroll-hint {
+  position: absolute;
+  bottom: 2.5rem; left: 0;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  color: var(--text-faint);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.scroll-hint::after {
+  content: '';
+  width: 1px; height: 40px;
+  background: linear-gradient(to bottom, var(--text-faint), transparent);
+  display: inline-block;
+  animation: scroll-line 2.5s ease-in-out infinite;
+}
+@keyframes scroll-line {
+  0%,100% { opacity: 0.4; transform: scaleY(1); }
+  50%      { opacity: 1;   transform: scaleY(1.2); }
+}
+
+/* =====================================================================
+   SECTION HEADERS (shared pattern)
+   ===================================================================== */
+.section-header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+.section-tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 0.8rem;
+  display: block;
+}
+h2.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+.section-lead {
+  max-width: 640px;
+  margin: 0 auto;
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 1.05rem;
+}
+
+/* =====================================================================
+   IMPACT LEGEND
+   ===================================================================== */
+.impact-legend {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+}
+.legend-item {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* =====================================================================
+   BOTTLENECK GRID
+   ===================================================================== */
+.bottleneck-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Each card is a "bottleneck node" in the network */
+.bt-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.8rem;
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition);
+  cursor: default;
+}
+.bt-card::before {
+  /* Ambient corner glow that changes by domain */
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-color,rgba(0,212,180,0.18)) 0%, transparent 70%);
+  pointer-events: none;
+  transition: opacity var(--transition);
+  opacity: 0;
+}
+.bt-card:hover { 
+  border-color: var(--border-hi);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-glow);
+}
+.bt-card:hover::before { opacity: 1; }
+
+/* Domain color encoding */
+.bt-card[data-domain="energy"]   { --accent-color: rgba(0,212,180,0.22); }
+.bt-card[data-domain="permit"]   { --accent-color: rgba(255,157,58,0.2); }
+.bt-card[data-domain="space"]    { --accent-color: rgba(176,111,255,0.2); }
+.bt-card[data-domain="minerals"] { --accent-color: rgba(255,95,126,0.2); }
+.bt-card[data-domain="climate"]  { --accent-color: rgba(0,212,180,0.15); }
+.bt-card[data-domain="trust"]    { --accent-color: rgba(168,230,255,0.18); }
+
+.bt-id {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  color: var(--text-faint);
+  margin-bottom: 0.5rem;
+}
+
+.bt-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.9rem;
+  line-height: 1.3;
+}
+
+.bt-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+.bt-tag {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid;
+}
+.bt-tag.tech     { color: var(--teal);   border-color: var(--teal-glow);   background: var(--teal-dim);  }
+.bt-tag.reg      { color: var(--amber);  border-color: var(--amber-glow);  background: var(--amber-dim); }
+.bt-tag.geo      { color: var(--coral);  border-color: rgba(255,95,126,0.3); background: rgba(255,95,126,0.1); }
+.bt-tag.gov      { color: var(--violet); border-color: var(--violet-glow); background: var(--violet-dim);}
+.bt-tag.social   { color: var(--ice);    border-color: rgba(168,230,255,0.3); background: rgba(168,230,255,0.08); }
+
+.bt-summary {
+  font-size: 0.95rem;
+  color: var(--text-body);
+  margin-bottom: 1.3rem;
+  line-height: 1.65;
+}
+
+/* Impact bars — dual horizontal gauge showing benevolence/security scores */
+.impact-bars {
+  margin-bottom: 1.2rem;
+}
+.impact-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+.impact-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  width: 85px;
+  flex-shrink: 0;
+}
+.impact-track {
+  flex: 1;
+  height: 5px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.impact-fill {
+  height: 100%;
+  border-radius: 3px;
+  transform-origin: left;
+  transform: scaleX(0);
+  animation: bar-grow 1.2s cubic-bezier(0.4,0,0.2,1) forwards;
+  animation-delay: var(--bar-delay, 0.2s);
+}
+@keyframes bar-grow {
+  to { transform: scaleX(1); }
+}
+.fill-benev { background: linear-gradient(90deg, var(--teal), rgba(0,212,180,0.5)); }
+.fill-secur { background: linear-gradient(90deg, var(--amber), rgba(255,157,58,0.5)); }
+.fill-mixed { background: linear-gradient(90deg, var(--violet), rgba(176,111,255,0.5)); }
+
+.impact-verdict {
+  font-family: var(--font-mono);
+  font-size: 0.63rem;
+  width: 42px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.verdict-pos   { color: var(--teal);  }
+.verdict-neg   { color: var(--coral); }
+.verdict-mixed { color: var(--amber); }
+
+/* Mitigation accordion */
+.bt-mitigations {
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+}
+.mitig-heading {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.6rem;
+}
+.mitig-list {
+  list-style: none;
+}
+.mitig-list li {
+  font-size: 0.88rem;
+  color: var(--text-body);
+  padding: 0.3rem 0 0.3rem 1.2rem;
+  position: relative;
+  line-height: 1.5;
+}
+.mitig-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--teal);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+.mitig-list li.policy::before  { color: var(--amber); }
+.mitig-list li.gov::before     { color: var(--violet); }
+
+/* =====================================================================
+   NETWORK DIAGRAM (canvas-based interactive)
+   ===================================================================== */
+#network-section {
+  background: var(--deep);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+#network-canvas {
+  width: 100%;
+  max-width: 900px;
+  display: block;
+  margin: 0 auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  cursor: grab;
+}
+#network-canvas:active { cursor: grabbing; }
+.network-legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+.nl-item {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.nl-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+
+/* =====================================================================
+   POLICY TIMELINE
+   ===================================================================== */
+#timeline-section { padding: 5rem 0; }
+
+.timeline-wrapper {
+  position: relative;
+  padding-left: 80px;
+}
+
+/* Vertical rail */
+.timeline-wrapper::before {
+  content: '';
+  position: absolute;
+  left: 40px; top: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--teal), var(--violet), transparent);
+}
+
+.timeline-year-group {
+  margin-bottom: 2.5rem;
+}
+
+.timeline-year-label {
+  position: absolute;
+  left: 0;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-faint);
+  width: 70px;
+  text-align: right;
+  padding-top: 0.25rem;
+  letter-spacing: 0.05em;
+}
+
+.timeline-events {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.t-event {
+  position: relative;
+  padding: 1.1rem 1.4rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+  opacity: 0;
+  transform: translateX(-20px);
+  animation: slide-in 0.6s ease forwards;
+  animation-play-state: paused; /* triggered by JS intersection observer */
+}
+.t-event.visible {
+  animation-play-state: running;
+}
+@keyframes slide-in {
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Node dot on the rail */
+.t-event::before {
+  content: '';
+  position: absolute;
+  left: -44px; top: 50%;
+  transform: translateY(-50%);
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--teal);
+  border: 2px solid var(--void);
+  box-shadow: 0 0 8px var(--teal-glow);
+}
+.t-event.policy::before  { background: var(--amber); box-shadow: 0 0 8px var(--amber-glow); }
+.t-event.space::before   { background: var(--violet); box-shadow: 0 0 8px var(--violet-glow); }
+.t-event.climate::before { background: var(--teal); }
+
+.t-event:hover {
+  border-color: var(--border-hi);
+  background: var(--raised);
+}
+
+.t-event-date {
+  font-family: var(--font-mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+  margin-bottom: 0.25rem;
+}
+.t-event-title {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+.t-event-desc {
+  font-size: 0.87rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.t-event-type-badge {
+  position: absolute;
+  top: 0.75rem; right: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+.badge-eo    { background: var(--amber-dim);  color: var(--amber);  border: 1px solid var(--amber-glow); }
+.badge-rule  { background: var(--teal-dim);   color: var(--teal);   border: 1px solid var(--teal-glow);  }
+.badge-spd   { background: var(--violet-dim); color: var(--violet); border: 1px solid var(--violet-glow);}
+.badge-event { background: rgba(168,230,255,0.08); color: var(--ice); border: 1px solid rgba(168,230,255,0.25);}
+
+/* =====================================================================
+   IMPACT MATRIX TABLE
+   ===================================================================== */
+#matrix-section {
+  background: var(--deep);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.matrix-scroll {
+  overflow-x: auto;
+  padding-bottom: 1rem;
+}
+.matrix-scroll::-webkit-scrollbar { height: 4px; }
+.matrix-scroll::-webkit-scrollbar-thumb { background: var(--teal); }
+
+table.impact-matrix {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  min-width: 700px;
+}
+table.impact-matrix th,
+table.impact-matrix td {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+table.impact-matrix thead th {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--surface);
+  position: sticky; top: 0;
+}
+table.impact-matrix tbody tr:hover td {
+  background: var(--raised);
+}
+table.impact-matrix td:first-child {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 200px;
+}
+
+.m-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 0.22rem 0.6rem;
+  border-radius: 20px;
+  border: 1px solid;
+}
+.m-pos   { color: var(--teal);   border-color: var(--teal-glow);   background: var(--teal-dim);  }
+.m-neg   { color: var(--coral);  border-color: rgba(255,95,126,0.3); background: rgba(255,95,126,0.1);}
+.m-mixed { color: var(--amber);  border-color: var(--amber-glow);  background: var(--amber-dim); }
+
+/* =====================================================================
+   DEFINITIONS PANEL
+   ===================================================================== */
+.defs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+@media (max-width: 680px) { .defs-grid { grid-template-columns: 1fr; } }
+
+.def-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+.def-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+.def-card.benev::after { background: linear-gradient(90deg, var(--teal), transparent); }
+.def-card.secur::after { background: linear-gradient(90deg, var(--amber), transparent); }
+
+.def-icon {
+  font-size: 2.2rem;
+  margin-bottom: 0.8rem;
+  display: block;
+}
+.def-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.6rem;
+}
+.def-body {
+  font-size: 0.95rem;
+  color: var(--text-body);
+  line-height: 1.65;
+}
+
+/* =====================================================================
+   MITIGATION PLAYBOOK
+   ===================================================================== */
+.playbook-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.2rem;
+}
+.play-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.4rem;
+  transition: var(--transition);
+}
+.play-card:hover {
+  border-color: var(--border-hi);
+  transform: translateY(-2px);
+}
+.play-type {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.play-type.technical { color: var(--teal); }
+.play-type.policy    { color: var(--amber); }
+.play-type.governance{ color: var(--violet); }
+.play-type .icon-sq {
+  width: 7px; height: 7px;
+  border-radius: 1px;
+  background: currentColor;
+}
+.play-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+.play-body {
+  font-size: 0.87rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+/* =====================================================================
+   FILTER BAR
+   ===================================================================== */
+.filter-bar {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+}
+.filter-btn {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  padding: 0.35rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.filter-btn:hover, .filter-btn.active {
+  background: var(--teal-dim);
+  color: var(--teal);
+  border-color: var(--teal-glow);
+}
+
+/* =====================================================================
+   SCHEMA PREVIEW
+   ===================================================================== */
+pre.code-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  color: var(--text-body);
+  max-height: 420px;
+  overflow-y: auto;
+}
+.code-key    { color: var(--teal); }
+.code-str    { color: var(--amber); }
+.code-num    { color: var(--violet); }
+.code-bool   { color: var(--coral); }
+.code-comment{ color: var(--text-faint); font-style: italic; }
+
+/* =====================================================================
+   SITE FOOTER
+   ===================================================================== */
+footer {
+  background: var(--deep);
+  border-top: 1px solid var(--border);
+  padding: 3rem 2rem 2rem;
+}
+.footer-inner {
+  max-width: 1260px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 2rem;
+}
+@media (max-width: 680px) { .footer-inner { grid-template-columns: 1fr; } }
+
+.footer-brand .logo {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--teal);
+  margin-bottom: 0.6rem;
+}
+.footer-brand p {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.footer-zero-harm {
+  background: linear-gradient(135deg, rgba(0,212,180,0.06), rgba(176,111,255,0.06));
+  border: 1px solid var(--border-hi);
+  border-radius: var(--radius-md);
+  padding: 1.2rem 1.5rem;
+}
+.footer-zero-harm h4 {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--teal);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.footer-zero-harm p {
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.footer-bottom {
+  max-width: 1260px;
+  margin: 0 auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-faint);
+  letter-spacing: 0.08em;
+}
+.footer-bottom a { color: var(--text-faint); text-decoration: none; }
+.footer-bottom a:hover { color: var(--teal); }
+
+/* =====================================================================
+   FLOATING TOC (right side)
+   ===================================================================== */
+.toc-float {
+  position: fixed;
+  right: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.6rem;
+  background: rgba(9,13,26,0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+}
+.toc-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  transition: var(--transition);
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  position: relative;
+}
+.toc-dot::after {
+  content: attr(data-label);
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+  background: var(--raised);
+  border: 1px solid var(--border);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.toc-dot:hover::after { opacity: 1; }
+.toc-dot:hover, .toc-dot.active { background: var(--teal); box-shadow: 0 0 8px var(--teal-glow); }
+@media (max-width: 900px) { .toc-float { display: none; } }
+
+/* =====================================================================
+   UTILITY + RESPONSIVE
+   ===================================================================== */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-hi), transparent);
+  margin: 0;
+}
+
+@media (max-width: 680px) {
+  .bottleneck-grid { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .hero-inner { max-width: 100%; }
+}
+
+/* Fade-in for sections via IntersectionObserver */
+.fade-section {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-section.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+</head>
+<body>
+
+<!-- =========================================================
+     PARTICLE FIELD — photorealistic constellation of nodes
+     (Renders in canvas; represents interconnected bottlenecks)
+     ========================================================= -->
+<canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+<!-- =========================================================
+     FLOATING TABLE OF CONTENTS
+     ========================================================= -->
+<nav class="toc-float" aria-label="Page sections">
+  <a href="#hero"      class="toc-dot active" data-label="Overview"></a>
+  <a href="#defs"      class="toc-dot" data-label="Definitions"></a>
+  <a href="#bottlenecks" class="toc-dot" data-label="Bottlenecks"></a>
+  <a href="#network-section" class="toc-dot" data-label="Network"></a>
+  <a href="#timeline-section" class="toc-dot" data-label="Timeline"></a>
+  <a href="#matrix-section" class="toc-dot" data-label="Matrix"></a>
+  <a href="#playbook"  class="toc-dot" data-label="Mitigations"></a>
+  <a href="#schema"    class="toc-dot" data-label="Schema"></a>
+</nav>
+
+<!-- =========================================================
+     TOP NAVIGATION
+     ========================================================= -->
+<nav role="navigation" aria-label="Primary">
+  <a href="#hero" class="nav-logo">Planetary Bottlenecks</a>
+  <ul class="nav-links">
+    <li><a href="#defs">Definitions</a></li>
+    <li><a href="#bottlenecks">Bottlenecks</a></li>
+    <li><a href="#timeline-section">Timeline</a></li>
+    <li><a href="#matrix-section">Impact Matrix</a></li>
+    <li><a href="#playbook">Mitigations</a></li>
+    <li><a href="#schema">Schema</a></li>
+  </ul>
+</nav>
+
+<!-- =========================================================
+     HERO SECTION
+     ========================================================= -->
+<section id="hero">
+  <div class="site-wrap">
+    <div class="hero-inner">
+
+      <p class="hero-eyebrow">
+        <span class="live-dot" aria-hidden="true"></span>
+        Research Intelligence · Snapshot Feb 25, 2026
+      </p>
+
+      <h1 class="hero-title">
+        Shared Bottlenecks:<br>
+        <span class="line-accent">Planetary Benevolence</span><br>
+        &amp; Planetary Security
+      </h1>
+
+      <p class="hero-desc">
+        Mapping where Musk-company execution vectors and Trump-era federal policy share
+        critical chokepoints — and where those chokepoints threaten or enable
+        civilisational wellbeing and catastrophic-risk reduction.
+      </p>
+
+      <div class="hero-meta-row">
+        <span class="meta-chip"><span class="dot-teal">●</span> Benevolence-aligned</span>
+        <span class="meta-chip"><span class="dot-amber">●</span> Security-relevant</span>
+        <span class="meta-chip"><span class="dot-violet">●</span> Both domains</span>
+        <span class="meta-chip">6 bottleneck clusters</span>
+        <span class="meta-chip">2017–2026 policy scope</span>
+      </div>
+
+      <div class="hero-cta-row">
+        <a href="#bottlenecks" class="btn btn-primary">Explore Bottlenecks</a>
+        <a href="#timeline-section" class="btn btn-outline">View Timeline</a>
+        <a href="#schema" class="btn btn-outline">Open Schema</a>
+      </div>
+    </div>
+
+    <p class="scroll-hint">scroll to explore</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- =========================================================
+     DEFINITIONS — Planetary Benevolence & Security
+     ========================================================= -->
+<section id="defs">
+  <div class="site-wrap fade-section">
+    <div class="section-header">
+      <span class="section-tag">Working Definitions</span>
+      <h2 class="section-title">Two Lenses, One Analysis</h2>
+      <p class="section-lead">Each bottleneck is evaluated through both lenses simultaneously — because they frequently diverge, and that divergence is analytically critical.</p>
+    </div>
+
+    <div class="defs-grid">
+      <div class="def-card benev">
+        <span class="def-icon">🌱</span>
+        <h3 class="def-title">Planetary Benevolence</h3>
+        <p class="def-body">
+          Sustained improvement of human wellbeing and capability while maintaining
+          Earth-system stability and minimising irreversible harms. Grounded in
+          <strong>planetary boundaries</strong> and <strong>planetary health</strong> frameworks.
+          Operationally covers: rapid decarbonisation, resilient infrastructure, broad
+          connectivity access, reduced accident/injury burdens, improved health, and
+          transparent governance.
+        </p>
+      </div>
+      <div class="def-card secur">
+        <span class="def-icon">🛡️</span>
+        <h3 class="def-title">Planetary Security</h3>
+        <p class="def-body">
+          Reduction of the probability and severity of global catastrophic harms to
+          human survival, freedom, and long-run potential. Combines the <strong>UNDP
+          human security</strong> notion with <strong>existential / global-catastrophic
+          risk</strong> frameworks. Operationally includes cyber/space resilience,
+          conflict escalation control, deterrence stability, biosecurity, and management
+          of advanced-technology risks — notably AI.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- =========================================================
+     BOTTLENECK CARDS — six primary clusters
+     ========================================================= -->
+<section id="bottlenecks">
+  <div class="site-wrap">
+    <div class="section-header fade-section">
+      <span class="section-tag">Bottleneck Intelligence</span>
+      <h2 class="section-title">Six Crosscutting Chokepoints</h2>
+      <p class="section-lead">Each node represents a cluster where private-sector operational constraints and federal policy vectors intersect to shape planetary outcomes.</p>
+    </div>
+
+    <!-- Domain filter -->
+    <div class="filter-bar fade-section" role="toolbar" aria-label="Filter bottlenecks by domain">
+      <button class="filter-btn active" data-filter="all">All Bottlenecks</button>
+      <button class="filter-btn" data-filter="energy">Energy & Compute</button>
+      <button class="filter-btn" data-filter="permit">Permitting</button>
+      <button class="filter-btn" data-filter="space">Space Domain</button>
+      <button class="filter-btn" data-filter="minerals">Critical Minerals</button>
+      <button class="filter-btn" data-filter="climate">Climate Policy</button>
+      <button class="filter-btn" data-filter="trust">Trust & Polarisation</button>
+    </div>
+
+    <div class="impact-legend fade-section">
+      <span class="legend-item"><span class="legend-dot" style="background:var(--teal)"></span> Benevolence Impact</span>
+      <span class="legend-item"><span class="legend-dot" style="background:var(--amber)"></span> Security Impact</span>
+      <span class="legend-item"><span class="legend-dot" style="background:var(--violet)"></span> Mixed / Both</span>
+    </div>
+
+    <!-- Cards grid — extend data-domain attribute to add new cards -->
+    <div class="bottleneck-grid" id="bt-grid">
+
+      <!-- BT-0001 -->
+      <article class="bt-card" data-domain="energy">
+        <p class="bt-id">BT-0001 / TECHNOLOGICAL · ECONOMIC</p>
+        <h3 class="bt-title">Energy &amp; Compute as a Binding Constraint</h3>
+        <div class="bt-tags">
+          <span class="bt-tag tech">AI infrastructure</span>
+          <span class="bt-tag reg">grid policy</span>
+          <span class="bt-tag geo">emissions risk</span>
+        </div>
+        <p class="bt-summary">
+          xAI's Colossus scales to 200k GPUs while the IEA projects data-centre 
+          electricity demand doubles by 2030. Trump-era EOs push rapid AI data-centre 
+          buildout alongside energy-dominance rhetoric, creating a grid-capacity ceiling 
+          for both AI scaling and electrification.
+        </p>
+        <div class="impact-bars" aria-label="Impact scores">
+          <div class="impact-row">
+            <span class="impact-label">BENEVOLENCE</span>
+            <div class="impact-track"><div class="impact-fill fill-mixed" style="width:60%;--bar-delay:0.3s"></div></div>
+            <span class="impact-verdict verdict-mixed">Mixed</span>
+          </div>
+          <div class="impact-row">
+            <span class="impact-label">SECURITY</span>
+            <div class="impact-track"><div class="impact-fill fill-mixed" style="width:55%;--bar-delay:0.5s"></div></div>
+            <span class="impact-verdict verdict-mixed">Mixed</span>
+          </div>
+        </div>
+        <div class="bt-mitigations">
+          <p class="mitig-heading">Key Mitigations</p>
+          <ul class="mitig-list">
+            <li class="tech">Co-locate data centres with low-carbon firm generation; demand response</li>
+            <li class="policy">Require grid-impact disclosures for GW-scale data centre projects</li>
+            <li class="gov">Treat compute as critical infrastructure with resilience standards</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- BT-0002 -->
+      <article class="bt-card" data-domain="permit">
+        <p class="bt-id">BT-0002 / REGULATORY · GOVERNANCE</p>
+        <h3 class="bt-title">Permitting Throughput &amp; Litigation Risk</h3>
+        <div class="bt-tags">
+          <span class="bt-tag reg">NEPA reform</span>
+          <span class="bt-tag reg">FAA process</span>
+          <span class="bt-tag gov">legitimacy</span>
+        </div>
+        <p class="bt-summary">
+          FAA environmental assessments shape Starship cadence. 2025 EOs target 
+          faster permitting for AI/data centres and rescind CEQ NEPA regulations — 
+          but weakened processes intensify litigation and legitimacy deficits that 
+          ultimately create delay.
+        </p>
+        <div class="impact-bars">
+          <div class="impact-row">
+            <span class="impact-label">BENEVOLENCE</span>
+            <div class="impact-track"><div class="impact-fill fill-mixed" style="width:45%;--bar-delay:0.3s"></div></div>
+            <span class="impact-verdict verdict-neg">Neg</span>
+          </div>
+          <div class="impact-row">
+            <span class="impact-label">SECURITY</span>
+            <div class="impact-track"><div class="impact-fill fill-mixed" style="width:50%;--bar-delay:0.5s"></div></div>
+            <span class="impact-verdict verdict-mixed">Mixed</span>
+          </div>
+        </div>
+        <div class="bt-mitigations">
+          <p class="mitig-heading">Key Mitigations</p>
+          <ul class="mitig-list">
+            <li class="tech">Design-for-disposal satellites; collision-avoidance transparency</li>
+            <li class="policy">Predictable licensing SLAs tied to enforceable sustainability constraints</li>
+            <li class="gov">Independent reporting; shared STM data infrastructure</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- BT-0003 -->
+      <article class="bt-card" data-domain="space">
+        <p class="bt-id">BT-0003 / GOVERNANCE · SECURITY</p>
+        <h3 class="bt-title">Orbital Debris &amp; Space Traffic Management</h3>
+        <div class="bt-tags">
+          <span class="bt-tag gov">ITU coordination</span>
+          <span class="bt-tag tech">STM</span>
+          <span class="bt-tag geo">space commons</span>
+        </div>
+        <p class="bt-summary">
+          Starlink mega-constellation scaling raises congestion and debris stakes. FCC 
+          orbital-debris rules embed a five-year disposal expectation; SPD-3 sets STM 
+          priorities. Peer-reviewed research documents constellation impacts on 
+          astronomy and space-telescope image contamination.
+        </p>
+        <div class="impact-bars">
+          <div class="impact-row">
+            <span class="impact-label">BENEVOLENCE</span>
+            <div class="impact-track"><div class="impact-fill fill-benev" style="width:35%;--bar-delay:0.3s"></div></div>
+            <span class="impact-verdict verdict-neg">Neg</span>
+          </div>
+          <div class="impact-row">
+            <span class="impact-label">SECURITY</span>
+            <div class="impact-track"><div class="impact-fill fill-secur" style="width:75%;--bar-delay:0.5s"></div></div>
+            <span class="impact-verdict verdict-pos">High</span>
+          </div>
+        </div>
+        <div class="bt-mitigations">
+          <p class="mitig-heading">Key Mitigations</p>
+          <ul class="mitig-list">
+            <li class="tech">Interoperable STM data standards; mandatory conjunction reporting</li>
+            <li class="gov">Align domestic rules with ITU; cross-border coordination channels</li>
+            <li class="tech">Brightness mitigation; lower-reflectivity satellite design</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- BT-0004 -->
+      <article class="bt-card" data-domain="minerals">
+        <p class="bt-id">BT-0004 / SUPPLY CHAIN · GEOPOLITICAL</p>
+        <h3 class="bt-title">Critical Minerals &amp; Industrial Base Fragility</h3>
+        <div class="bt-tags">
+          <span class="bt-tag geo">lithium / cobalt</span>
+          <span class="bt-tag reg">tariff policy</span>
+          <span class="bt-tag tech">semiconductors</span>
+        </div>
+        <p class="bt-summary">
+          Tesla's Texas lithium refinery commenced operations Jan 2026, illustrating 
+          vertical integration as a response to IEA-documented supply tightness. 
+          EO 13817 frames minerals as strategic vulnerability; second-term AI-pricing 
+          tools aim to reshape mineral markets.
+        </p>
+        <div class="impact-bars">
+          <div class="impact-row">
+            <span class="impact-label">BENEVOLENCE</span>
+            <div class="impact-track"><div class="impact-fill fill-mixed" style="width:50%;--bar-delay:0.3s"></div></div>
+            <span class="impact-verdict verdict-mixed">Mixed</span>
+          </div>
+          <div class="impact-row">
+            <span class="impact-label">SECURITY</span>
+            <div class="impact-track"><div class="impact-fill fill-secur" style="width:65%;--bar-delay:0.5s"></div></div>
+            <span class="impact-verdict verdict-pos">Pos</span>
+          </div>
+        </div>
+        <div class="bt-mitigations">
+          <p class="mitig-heading">Key Mitigations</p>
+          <ul class="mitig-list">
+            <li class="tech">Design for lower-criticality chemistries; expand secondary supply</li>
+            <li class="policy">Diversify via allied sourcing with transparent environmental standards</li>
+            <li class="gov">Critical minerals provenance metadata for federal procurement</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- BT-0005 -->
+      <article class="bt-card" data-domain="climate">
+        <p class="bt-id">BT-0005 / REGULATORY · ECONOMIC</p>
+        <h3 class="bt-title">Climate-Policy Volatility &amp; Authority Baseline</h3>
+        <div class="bt-tags">
+          <span class="bt-tag reg">EPA rulemaking</span>
+          <span class="bt-tag geo">GHG standards</span>
+          <span class="bt-tag gov">litigation risk</span>
+        </div>
+        <p class="bt-summary">
+          EPA rescinds the 2009 GHG endangerment finding (effective Apr 20, 2026), 
+          removing the Clean Air Act basis for vehicle emissions standards. Tesla's 
+          mission and business model assume policy-driven EV adoption trajectories 
+          that now become state-driven and globally fragmented.
+        </p>
+        <div class="impact-bars">
+          <div class="impact-row">
+            <span class="impact-label">BENEVOLENCE</span>
+            <div class="impact-track"><div class="impact-fill fill-benev" style="width:20%;--bar-delay:0.3s"></div></div>
+            <span class="impact-verdict verdict-neg">Neg</span>
+          </div>
+          <div class="impact-row">
+            <span class="impact-label">SECURITY</span>
+            <div class="impact-track"><div class="impact-fill fill-mixed" style="width:40%;--bar-delay:0.5s"></div></div>
+            <span class="impact-verdict verdict-mixed">Mixed</span>
+          </div>
+        </div>
+        <div class="bt-mitigations">
+          <p class="mitig-heading">Key Mitigations</p>
+          <ul class="mitig-list">
+            <li class="policy">Technology-neutral performance standards enacted through legislation</li>
+            <li class="gov">State–federal compacts to reduce oscillation risk</li>
+            <li class="policy">Transparent cost–benefit and health-impact accounting</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- BT-0006 -->
+      <article class="bt-card" data-domain="trust">
+        <p class="bt-id">BT-0006 / SOCIAL · GOVERNANCE</p>
+        <h3 class="bt-title">Polarisation &amp; Epistemic Bottlenecks</h3>
+        <div class="bt-tags">
+          <span class="bt-tag social">WEF top risk</span>
+          <span class="bt-tag gov">trust deficit</span>
+          <span class="bt-tag geo">coalition fragility</span>
+        </div>
+        <p class="bt-summary">
+          WEF consistently ranks misinformation and societal polarisation as top 
+          near-term risks. Local opposition delays data centres over energy/water 
+          concerns. For benevolence goals requiring durable cooperation — climate, 
+          equitable infrastructure, global coordination — trust deficits behave like 
+          hard technical bottlenecks.
+        </p>
+        <div class="impact-bars">
+          <div class="impact-row">
+            <span class="impact-label">BENEVOLENCE</span>
+            <div class="impact-track"><div class="impact-fill fill-benev" style="width:22%;--bar-delay:0.3s"></div></div>
+            <span class="impact-verdict verdict-neg">Neg</span>
+          </div>
+          <div class="impact-row">
+            <span class="impact-label">SECURITY</span>
+            <div class="impact-track"><div class="impact-fill fill-secur" style="width:25%;--bar-delay:0.5s"></div></div>
+            <span class="impact-verdict verdict-neg">Neg</span>
+          </div>
+        </div>
+        <div class="bt-mitigations">
+          <p class="mitig-heading">Key Mitigations</p>
+          <ul class="mitig-list">
+            <li class="gov">Radical transparency on externalities (grid, emissions, debris)</li>
+            <li class="gov">Participatory planning for high-impact infrastructure</li>
+            <li class="tech">Third-party measurement and open public dashboards</li>
+          </ul>
+        </div>
+      </article>
+
+    </div><!-- /bt-grid -->
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- =========================================================
+     INTERACTIVE NETWORK DIAGRAM
+     ========================================================= -->
+<section id="network-section">
+  <div class="site-wrap fade-section">
+    <div class="section-header">
+      <span class="section-tag">Entity Relationships</span>
+      <h2 class="section-title">Bottleneck Network Map</h2>
+      <p class="section-lead">Interactive node graph. Hover over any node for details; drag to explore connections. Colour encodes domain; line weight encodes coupling strength.</p>
+    </div>
+
+    <canvas id="network-canvas" width="900" height="500" 
+      role="img" 
+      aria-label="Network diagram showing relationships between companies, federal policies, and planetary bottlenecks">
+    </canvas>
+
+    <div class="network-legend">
+      <span class="nl-item"><span class="nl-dot" style="background:var(--teal)"></span> Benevolence vector</span>
+      <span class="nl-item"><span class="nl-dot" style="background:var(--amber)"></span> Policy vector</span>
+      <span class="nl-item"><span class="nl-dot" style="background:var(--violet)"></span> Bottleneck node</span>
+      <span class="nl-item"><span class="nl-dot" style="background:var(--coral)"></span> Risk amplifier</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- =========================================================
+     POLICY TIMELINE
+     ========================================================= -->
+<section id="timeline-section">
+  <div class="site-wrap fade-section">
+    <div class="section-header">
+      <span class="section-tag">Policy Chronology</span>
+      <h2 class="section-title">Milestones Shaping Bottlenecks</h2>
+      <p class="section-lead">Every entry links to a cited primary source. The timeline runs 2017–2026; items are tagged by type and domain.</p>
+    </div>
+
+    <!-- The timeline is constructed via JS below to keep it maintainable;
+         add new entries to the TIMELINE_DATA array in the script section -->
+    <div class="timeline-wrapper" id="timeline-root"></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- =========================================================
+     IMPACT MATRIX TABLE
+     ========================================================= -->
+<section id="matrix-section">
+  <div class="site-wrap fade-section">
+    <div class="section-header">
+      <span class="section-tag">Comparative Assessment</span>
+      <h2 class="section-title">Bottleneck Impact Matrix</h2>
+      <p class="section-lead">Qualitative impact directions across benevolence and security lenses. Confidence reflects evidence quality at snapshot date.</p>
+    </div>
+
+    <div class="matrix-scroll">
+      <table class="impact-matrix" role="table">
+        <thead>
+          <tr>
+            <th scope="col">Bottleneck</th>
+            <th scope="col">Domain(s)</th>
+            <th scope="col">Benevolence</th>
+            <th scope="col">Security</th>
+            <th scope="col">Confidence</th>
+            <th scope="col">Coupling</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Energy &amp; compute constraint</td>
+            <td><span class="bt-tag tech">technological</span></td>
+            <td><span class="m-pill m-mixed">⚡ Mixed</span></td>
+            <td><span class="m-pill m-mixed">⚡ Mixed</span></td>
+            <td><span style="color:var(--text-muted);font-family:var(--font-mono);font-size:.75rem">Medium</span></td>
+            <td><span style="color:var(--teal);font-family:var(--font-mono);font-size:.75rem">★★★★★</span></td>
+          </tr>
+          <tr>
+            <td>Permitting &amp; litigation risk</td>
+            <td><span class="bt-tag reg">regulatory</span></td>
+            <td><span class="m-pill m-neg">↓ Negative</span></td>
+            <td><span class="m-pill m-mixed">⚡ Mixed</span></td>
+            <td><span style="color:var(--text-muted);font-family:var(--font-mono);font-size:.75rem">High</span></td>
+            <td><span style="color:var(--teal);font-family:var(--font-mono);font-size:.75rem">★★★★☆</span></td>
+          </tr>
+          <tr>
+            <td>Orbital debris &amp; STM</td>
+            <td><span class="bt-tag gov">governance</span></td>
+            <td><span class="m-pill m-neg">↓ Negative</span></td>
+            <td><span class="m-pill m-pos">↑ Positive</span></td>
+            <td><span style="color:var(--text-muted);font-family:var(--font-mono);font-size:.75rem">Medium</span></td>
+            <td><span style="color:var(--teal);font-family:var(--font-mono);font-size:.75rem">★★★☆☆</span></td>
+          </tr>
+          <tr>
+            <td>Critical minerals fragility</td>
+            <td><span class="bt-tag geo">supply chain</span></td>
+            <td><span class="m-pill m-mixed">⚡ Mixed</span></td>
+            <td><span class="m-pill m-pos">↑ Positive</span></td>
+            <td><span style="color:var(--text-muted);font-family:var(--font-mono);font-size:.75rem">High</span></td>
+            <td><span style="color:var(--teal);font-family:var(--font-mono);font-size:.75rem">★★★★☆</span></td>
+          </tr>
+          <tr>
+            <td>Climate regulatory reversal</td>
+            <td><span class="bt-tag reg">regulatory</span></td>
+            <td><span class="m-pill m-neg">↓ Negative</span></td>
+            <td><span class="m-pill m-mixed">⚡ Mixed</span></td>
+            <td><span style="color:var(--text-muted);font-family:var(--font-mono);font-size:.75rem">High</span></td>
+            <td><span style="color:var(--teal);font-family:var(--font-mono);font-size:.75rem">★★★★★</span></td>
+          </tr>
+          <tr>
+            <td>Trust &amp; epistemic bottlenecks</td>
+            <td><span class="bt-tag social">social</span></td>
+            <td><span class="m-pill m-neg">↓ Negative</span></td>
+            <td><span class="m-pill m-neg">↓ Negative</span></td>
+            <td><span style="color:var(--text-muted);font-family:var(--font-mono);font-size:.75rem">Medium</span></td>
+            <td><span style="color:var(--teal);font-family:var(--font-mono);font-size:.75rem">★★★☆☆</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- =========================================================
+     MITIGATION PLAYBOOK
+     ========================================================= -->
+<section id="playbook">
+  <div class="site-wrap fade-section">
+    <div class="section-header">
+      <span class="section-tag">Action Framework</span>
+      <h2 class="section-title">High-Leverage Mitigation Playbook</h2>
+      <p class="section-lead">These intervention classes appear consistently across multiple bottlenecks. Each is tagged by type: technical, policy, or governance.</p>
+    </div>
+
+    <div class="playbook-grid">
+      <div class="play-card">
+        <p class="play-type technical"><span class="icon-sq"></span>Technical</p>
+        <h4 class="play-title">Build-to-Audit Architecture</h4>
+        <p class="play-body">Verifiable safety cases, open telemetry feeds, third-party red-teaming, and mandatory incident reporting for critical services. Reduces informational asymmetry across all bottlenecks.</p>
+      </div>
+      <div class="play-card">
+        <p class="play-type policy"><span class="icon-sq"></span>Policy</p>
+        <h4 class="play-title">Permit-to-Standard Governance</h4>
+        <p class="play-body">Predictable licensing timelines tied to measurable environmental and safety performance metrics, rather than open-ended review cycles that invite litigation spirals.</p>
+      </div>
+      <div class="play-card">
+        <p class="play-type governance"><span class="icon-sq"></span>Governance</p>
+        <h4 class="play-title">Space Commons Coordination</h4>
+        <p class="play-body">Interoperable STM + debris + spectrum data-sharing compacts. Multi-stakeholder norms for conjunction reporting and debris-creating test prohibitions.</p>
+      </div>
+      <div class="play-card">
+        <p class="play-type policy"><span class="icon-sq"></span>Policy</p>
+        <h4 class="play-title">Industrial Resilience Compacts</h4>
+        <p class="play-body">Critical-mineral provenance standards, end-of-life recycling mandates, diversified allied sourcing, and alliance-based procurement for defense-relevant materials.</p>
+      </div>
+      <div class="play-card">
+        <p class="play-type governance"><span class="icon-sq"></span>Governance</p>
+        <h4 class="play-title">Conflict-of-Interest Firewalls</h4>
+        <p class="play-body">Independent procurement audits, strict separation of commercial and governmental roles, continuity-of-service requirements for critical services, and contingency planning assuming provider failure.</p>
+      </div>
+      <div class="play-card">
+        <p class="play-type technical"><span class="icon-sq"></span>Technical</p>
+        <h4 class="play-title">Open Externality Dashboards</h4>
+        <p class="play-body">Radical public transparency on grid impacts, emissions, debris risk, and water use. Third-party validated, openly licensed data as an antidote to polarisation-driven trust deficits.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- =========================================================
+     SCHEMA PREVIEW — the data model for extending this repo
+     ========================================================= -->
+<section id="schema">
+  <div class="site-wrap fade-section">
+    <div class="section-header">
+      <span class="section-tag">Data Architecture</span>
+      <h2 class="section-title">Minimal Bottleneck JSON Schema</h2>
+      <p class="section-lead">Each bottleneck page is generated from a structured JSON record. Fork the schema to extend the knowledge base — every field has an inline comment explaining its purpose.</p>
+    </div>
+
+    <!-- Syntax-highlighted JSON preview — colour classes map to CSS vars above -->
+    <pre class="code-block" role="region" aria-label="JSON schema example" tabindex="0"><span class="code-comment">// ─── Bottleneck record ─────────────────────────────────────────────────────
+// Add a file to docs/data/bottlenecks/ using this structure.
+// The build script auto-generates a card and links policy cross-references.</span>
+{
+  <span class="code-key">"id"</span>: <span class="code-str">"BT-0001"</span>,
+  <span class="code-key">"title"</span>: <span class="code-str">"Energy and compute as a binding constraint"</span>,
+  <span class="code-key">"domains"</span>: [<span class="code-str">"technological"</span>, <span class="code-str">"economic/finance"</span>, <span class="code-str">"security/risk"</span>],
+  <span class="code-key">"summary"</span>: <span class="code-str">"AI-scale and electrification are constrained by grid capacity..."</span>,
+  
+  <span class="code-comment">// company_examples: cite primary sources only — no secondary paraphrase</span>
+  <span class="code-key">"company_examples"</span>: [{
+    <span class="code-key">"company"</span>: <span class="code-str">"xAI"</span>,
+    <span class="code-key">"program"</span>: <span class="code-str">"Colossus"</span>,
+    <span class="code-key">"claim"</span>: <span class="code-str">"Scaled to 200k GPUs in &lt;1 year (per xAI)."</span>,
+    <span class="code-key">"sources"</span>: [{
+      <span class="code-key">"type"</span>: <span class="code-str">"primary"</span>,
+      <span class="code-key">"title"</span>: <span class="code-str">"xAI Colossus page"</span>,
+      <span class="code-key">"url"</span>: <span class="code-str">"https://x.ai/colossus"</span>,
+      <span class="code-key">"date"</span>: <span class="code-str">"2026-02-25"</span>
+    }]
+  }],
+
+  <span class="code-comment">// impact_assessment: direction ∈ {positive, negative, mixed, uncertain}</span>
+  <span class="code-key">"impact_assessment"</span>: {
+    <span class="code-key">"planetary_benevolence"</span>: {
+      <span class="code-key">"direction"</span>: <span class="code-str">"mixed"</span>,
+      <span class="code-key">"mechanisms"</span>: [<span class="code-str">"innovation acceleration"</span>, <span class="code-str">"emissions risk"</span>]
+    },
+    <span class="code-key">"planetary_security"</span>: {
+      <span class="code-key">"direction"</span>: <span class="code-str">"mixed"</span>,
+      <span class="code-key">"mechanisms"</span>: [<span class="code-str">"strategic capability"</span>, <span class="code-str">"grid fragility"</span>]
+    }
+  },
+
+  <span class="code-comment">// mitigations: tag each as technical / policy / governance</span>
+  <span class="code-key">"mitigations"</span>: [
+    { <span class="code-key">"type"</span>: <span class="code-str">"technical"</span>,   <span class="code-key">"action"</span>: <span class="code-str">"Adopt compute-efficiency KPIs."</span> },
+    { <span class="code-key">"type"</span>: <span class="code-str">"policy"</span>,     <span class="code-key">"action"</span>: <span class="code-str">"Require grid-impact disclosure."</span> },
+    { <span class="code-key">"type"</span>: <span class="code-str">"governance"</span>, <span class="code-key">"action"</span>: <span class="code-str">"Independent audits for critical AI."</span> }
+  ],
+
+  <span class="code-comment">// confidence ∈ {low, medium, high} — reflects evidence base quality</span>
+  <span class="code-key">"last_updated"</span>: <span class="code-str">"2026-02-25"</span>,
+  <span class="code-key">"confidence"</span>: <span class="code-str">"medium"</span>
+}</pre>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- =========================================================
+     FOOTER
+     ========================================================= -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <p class="logo">PLANETARY BOTTLENECKS</p>
+      <p>A research-grade intelligence snapshot mapping shared chokepoints between private technology execution and federal policy vectors, evaluated through planetary benevolence and planetary security lenses.</p>
+      <p style="margin-top:0.8rem; font-family:var(--font-mono); font-size:0.68rem; color:var(--text-faint); letter-spacing:0.07em;">
+        Snapshot: Feb 25, 2026 &nbsp;·&nbsp; License: MIT (code) + CC BY 4.0 (content) &nbsp;·&nbsp; 
+        No tracking. No telemetry. No ads.
+      </p>
+    </div>
+
+    <!-- Zero Harm & Anti-Coercion note — required, non-negotiable -->
+    <div class="footer-zero-harm">
+      <h4>🛡️ Zero Harm &amp; Anti-Coercion</h4>
+      <p>This tool is designed and maintained to serve public understanding and 
+      constructive policy analysis. It contains no tracking, no hidden telemetry, 
+      no surveillance features, and no manipulative design patterns. 
+      No personal data is collected or stored. All local features are transparent 
+      and resettable. Any content or functionality that could be repurposed for 
+      coercion, harassment, surveillance, or targeted harm has been deliberately 
+      excluded or blunted. When in doubt, this project chooses safety, clarity, 
+      and human wellbeing over power or complexity.</p>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© 2026 Planetary Restoration Archive. Open research, open source.</span>
+    <span>
+      <a href="#hero">Back to top ↑</a>
+      &nbsp;&nbsp;
+      Built with zero external tracking
+    </span>
+  </div>
+</footer>
+
+<!-- =========================================================
+     JAVASCRIPT — particles, network, timeline, animations
+     All logic is inline for offline-first, no external deps.
+     ========================================================= -->
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// 1. PARTICLE SYSTEM
+//    Creates a deep-space constellation effect:
+//    - Nodes represent bottleneck domains (colour-coded)
+//    - Lines represent coupling relationships (opacity = strength)
+//    - Gentle drift + mouse-gravity give the "alive" feeling
+// ─────────────────────────────────────────────────────────────────────────────
+(function initParticles() {
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  let W = window.innerWidth, H = window.innerHeight;
+  let mouse = { x: W / 2, y: H / 2 };
+
+  // Domain-colour mapping for node types
+  const COLOURS = ['#00d4b4','#ff9d3a','#b06fff','#ff5f7e','#a8e6ff','#ffffff'];
+
+  // Particle constructor
+  function makeParticle(i) {
+    const tier = Math.random();
+    const r = tier < 0.1 ? 3.5 + Math.random() * 2   // large hub nodes
+            : tier < 0.3 ? 1.8 + Math.random() * 1.5  // medium nodes
+            : 0.6 + Math.random() * 0.9;               // star field
+    return {
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.18,
+      vy: (Math.random() - 0.5) * 0.18,
+      r,
+      col: COLOURS[Math.floor(Math.random() * COLOURS.length)],
+      baseAlpha: 0.15 + Math.random() * 0.45,
+      alpha: 0,
+      twinkleOffset: Math.random() * Math.PI * 2,
+      twinkleSpeed: 0.008 + Math.random() * 0.018,
+    };
+  }
+
+  const COUNT = Math.min(180, Math.floor(W * H / 8000));
+  let particles = Array.from({ length: COUNT }, makeParticle);
+  let animFrame;
+
+  function resize() {
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W; canvas.height = H;
+  }
+  resize();
+  window.addEventListener('resize', () => { resize(); particles = Array.from({ length: COUNT }, makeParticle); });
+  document.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+  const MAX_DIST = 130; // max distance for drawing connection lines
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const t = performance.now() * 0.001;
+
+    // Draw connections first (under nodes)
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < MAX_DIST) {
+          // Fade line opacity by distance
+          const alpha = (1 - d / MAX_DIST) * 0.12;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(100,180,255,${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Draw and update nodes
+    particles.forEach(p => {
+      // Twinkle animation
+      p.alpha = p.baseAlpha * (0.6 + 0.4 * Math.sin(t * p.twinkleSpeed * 60 + p.twinkleOffset));
+
+      // Very subtle mouse gravity — only for larger nodes
+      if (p.r > 2) {
+        const mdx = mouse.x - p.x, mdy = mouse.y - p.y;
+        const md = Math.sqrt(mdx * mdx + mdy * mdy);
+        if (md < 200) {
+          p.vx += (mdx / md) * 0.002;
+          p.vy += (mdy / md) * 0.002;
+        }
+      }
+
+      // Velocity damping + boundary bounce
+      p.vx *= 0.998; p.vy *= 0.998;
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < -10) p.x = W + 10; if (p.x > W + 10) p.x = -10;
+      if (p.y < -10) p.y = H + 10; if (p.y > H + 10) p.y = -10;
+
+      // Draw glow + core for larger nodes
+      if (p.r > 1.5) {
+        const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+        grd.addColorStop(0, p.col.replace(')', `,${p.alpha * 0.9})`).replace('rgb', 'rgba').replace('#', 'rgba(').replace(/rgba\(([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/, (_, r, g, b) => `rgba(${parseInt(r,16)},${parseInt(g,16)},${parseInt(b,16)}`));
+        grd.addColorStop(1, 'transparent');
+        // Simplified glow
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0,212,180,${p.alpha * 0.06})`;
+        ctx.fill();
+      }
+      // Core dot
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.col + Math.round(p.alpha * 255).toString(16).padStart(2,'0');
+      ctx.fill();
+    });
+
+    animFrame = requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 2. NETWORK DIAGRAM
+//    Force-directed graph on canvas showing entity relationships.
+//    Nodes = companies, policies, bottlenecks
+//    Edges = coupling / dependency
+//    To extend: add entries to NODES/EDGES arrays below
+// ─────────────────────────────────────────────────────────────────────────────
+(function initNetwork() {
+  const canvas = document.getElementById('network-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = 900, H = 500;
+  canvas.width = W; canvas.height = H;
+
+  // Node types: company (teal), policy (amber), bottleneck (violet), risk (coral)
+  const NODES = [
+    // Bottleneck nodes (centre cluster)
+    { id: 'E-COMPUTE',  label: 'Energy &\nCompute',    x: 450, y: 250, r: 22, col: '#b06fff', type: 'bt' },
+    { id: 'PERMITTING', label: 'Permitting',            x: 310, y: 170, r: 18, col: '#b06fff', type: 'bt' },
+    { id: 'ORBITAL',    label: 'Orbital\nDebris',       x: 590, y: 170, r: 18, col: '#b06fff', type: 'bt' },
+    { id: 'MINERALS',   label: 'Critical\nMinerals',    x: 590, y: 330, r: 18, col: '#b06fff', type: 'bt' },
+    { id: 'CLIMATE',    label: 'Climate\nPolicy',       x: 310, y: 330, r: 18, col: '#b06fff', type: 'bt' },
+    { id: 'TRUST',      label: 'Trust &\nPolarisation', x: 450, y: 380, r: 16, col: '#ff5f7e', type: 'risk' },
+
+    // Company nodes
+    { id: 'SPACEX',  label: 'SpaceX',    x: 160, y: 120, r: 14, col: '#00d4b4', type: 'co' },
+    { id: 'TESLA',   label: 'Tesla',     x: 120, y: 250, r: 14, col: '#00d4b4', type: 'co' },
+    { id: 'XAI',     label: 'xAI',       x: 160, y: 380, r: 14, col: '#00d4b4', type: 'co' },
+    { id: 'STARLINK',label: 'Starlink',  x: 730, y: 120, r: 12, col: '#00d4b4', type: 'co' },
+    { id: 'NEURALINK',label:'Neuralink', x: 760, y: 380, r: 10, col: '#00d4b4', type: 'co' },
+
+    // Policy nodes
+    { id: 'NEPA-EO',  label: 'NEPA\nEO 2025',        x: 260, y: 60,  r: 13, col: '#ff9d3a', type: 'pol' },
+    { id: 'AI-EO',    label: 'AI Data\nCenter EO',   x: 640, y: 60,  r: 13, col: '#ff9d3a', type: 'pol' },
+    { id: 'GHG-EPA',  label: 'EPA GHG\nRescission',  x: 140, y: 430, r: 13, col: '#ff9d3a', type: 'pol' },
+    { id: 'SPD3',     label: 'SPD-3\nSTM',            x: 760, y: 250, r: 13, col: '#ff9d3a', type: 'pol' },
+    { id: 'TARIFFS',  label: 'Tariffs\n& Trade',      x: 680, y: 440, r: 12, col: '#ff9d3a', type: 'pol' },
+  ];
+
+  const EDGES = [
+    // Company → Bottleneck
+    ['SPACEX',   'PERMITTING', 0.9],
+    ['SPACEX',   'ORBITAL',    0.85],
+    ['TESLA',    'CLIMATE',    0.9],
+    ['TESLA',    'MINERALS',   0.8],
+    ['XAI',      'E-COMPUTE',  0.95],
+    ['STARLINK', 'ORBITAL',    0.9],
+    ['STARLINK', 'TRUST',      0.5],
+    // Policy → Bottleneck
+    ['NEPA-EO',  'PERMITTING', 0.95],
+    ['AI-EO',    'E-COMPUTE',  0.9],
+    ['GHG-EPA',  'CLIMATE',    0.95],
+    ['SPD3',     'ORBITAL',    0.85],
+    ['TARIFFS',  'MINERALS',   0.8],
+    // Bottleneck ↔ Bottleneck coupling
+    ['E-COMPUTE','PERMITTING', 0.6],
+    ['ORBITAL',  'TRUST',      0.4],
+    ['CLIMATE',  'TRUST',      0.7],
+    ['MINERALS', 'E-COMPUTE',  0.55],
+  ];
+
+  // Build lookup
+  const nodeMap = {};
+  NODES.forEach(n => { nodeMap[n.id] = n; });
+
+  // Hover detection
+  let hoveredNode = null;
+  let isDragging = false, dragNode = null, offsetX = 0, offsetY = 0;
+
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = W / rect.width, scaleY = H / rect.height;
+    const mx = (e.clientX - rect.left) * scaleX;
+    const my = (e.clientY - rect.top) * scaleY;
+    if (isDragging && dragNode) {
+      dragNode.x = mx - offsetX;
+      dragNode.y = my - offsetY;
+      return;
+    }
+    hoveredNode = NODES.find(n => Math.hypot(n.x - mx, n.y - my) < n.r + 4) || null;
+    canvas.style.cursor = hoveredNode ? 'pointer' : 'grab';
+  });
+  canvas.addEventListener('mousedown', e => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = W / rect.width, scaleY = H / rect.height;
+    const mx = (e.clientX - rect.left) * scaleX;
+    const my = (e.clientY - rect.top) * scaleY;
+    dragNode = NODES.find(n => Math.hypot(n.x - mx, n.y - my) < n.r + 4) || null;
+    if (dragNode) { isDragging = true; offsetX = mx - dragNode.x; offsetY = my - dragNode.y; }
+  });
+  canvas.addEventListener('mouseup', () => { isDragging = false; dragNode = null; });
+
+  function drawNetwork() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Background
+    ctx.fillStyle = '#090d1a';
+    ctx.fillRect(0, 0, W, H);
+
+    // Draw edges
+    EDGES.forEach(([a, b, w]) => {
+      const na = nodeMap[a], nb = nodeMap[b];
+      if (!na || !nb) return;
+      const isHovered = hoveredNode && (hoveredNode.id === a || hoveredNode.id === b);
+      const alpha = isHovered ? w * 0.85 : w * 0.22;
+      ctx.beginPath();
+      ctx.moveTo(na.x, na.y);
+      ctx.lineTo(nb.x, nb.y);
+      ctx.strokeStyle = isHovered
+        ? `rgba(0,212,180,${alpha})`
+        : `rgba(100,160,255,${alpha})`;
+      ctx.lineWidth = isHovered ? w * 2.5 : w * 1.2;
+      ctx.stroke();
+    });
+
+    // Draw nodes
+    NODES.forEach(node => {
+      const isHov = hoveredNode && hoveredNode.id === node.id;
+      const glow = isHov ? node.r * 2.5 : node.r * 1.4;
+
+      // Glow ring
+      const grd = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, glow * 2);
+      grd.addColorStop(0, node.col + '30');
+      grd.addColorStop(1, 'transparent');
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, glow * 2, 0, Math.PI * 2);
+      ctx.fillStyle = grd;
+      ctx.fill();
+
+      // Core
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, isHov ? node.r * 1.15 : node.r, 0, Math.PI * 2);
+      ctx.fillStyle = node.col + (isHov ? 'ff' : 'cc');
+      ctx.fill();
+
+      // Border
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, isHov ? node.r * 1.15 : node.r, 0, Math.PI * 2);
+      ctx.strokeStyle = isHov ? '#fff6' : node.col + '50';
+      ctx.lineWidth = isHov ? 2 : 1;
+      ctx.stroke();
+
+      // Label
+      ctx.fillStyle = isHov ? '#fff' : 'rgba(200,220,255,0.8)';
+      ctx.font = `${isHov ? 600 : 400} ${isHov ? 11 : 10}px 'DM Mono', monospace`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const lines = node.label.split('\n');
+      lines.forEach((line, i) => {
+        const yOff = node.r + 12 + i * 13;
+        ctx.fillText(line, node.x, node.y + yOff);
+      });
+    });
+
+    requestAnimationFrame(drawNetwork);
+  }
+  drawNetwork();
+})();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 3. TIMELINE RENDERER
+//    Data-driven: add entries to TIMELINE_DATA to extend the timeline.
+//    Each entry: { year, date, title, desc, type ('policy'|'space'|'climate'|'event'), badge }
+// ─────────────────────────────────────────────────────────────────────────────
+const TIMELINE_DATA = [
+  { year: 2017, date: 'Jun 2017',  title: 'Paris Agreement Withdrawal (First Term)', desc: 'Trump announces intent to withdraw US from Paris climate accord, reducing global coordination on emissions.', type: 'climate', badge: 'event' },
+  { year: 2017, date: 'Aug 2017',  title: 'EO 13807 — Infrastructure Permitting Streamlining', desc: 'Establishes One Federal Decision framework; aims to reduce multi-year environmental review timelines.', type: 'policy', badge: 'eo' },
+  { year: 2018, date: 'May 2018',  title: 'Space Policy Directive-2', desc: 'Directs streamlining of commercial space regulations across FAA, FCC, and Commerce. Direct coupling to Starship cadence.', type: 'space', badge: 'spd' },
+  { year: 2018, date: 'Jun 2018',  title: 'Space Policy Directive-3 — STM Policy', desc: 'Establishes US space traffic management policy; tasks DOD and Commerce with coordination roles.', type: 'space', badge: 'spd' },
+  { year: 2019, date: 'Feb 2019',  title: 'EO 13859 — American AI Initiative', desc: 'First federal AI strategy; directs agencies to prioritise AI R&D, standards development, and workforce training.', type: 'policy', badge: 'eo' },
+  { year: 2020, date: 'Sep 2020',  title: 'Space Policy Directive-5 — Space Cybersecurity', desc: 'Establishes cybersecurity principles for space systems, including protection against cyber incidents targeting critical infrastructure.', type: 'space', badge: 'spd' },
+  { year: 2022, date: 'Mar 2022',  title: 'NASA Awards Starship HLS Long-Term Contract', desc: 'SpaceX receives contract modification for sustained Artemis lunar exploration, deepening public-private coupling.', type: 'event', badge: 'event' },
+  { year: 2024, date: '2024',      title: 'IEA Tracks Accelerating EV Adoption; Constellation Astronomy Concerns Documented', desc: 'IEA notes accelerating global EV adoption. Peer-reviewed research documents satellite constellation impacts on space telescope imaging.', type: 'climate', badge: 'event' },
+  { year: 2025, date: 'Jan 2025',  title: 'EO 14154 — Unleashing American Energy', desc: 'Directs CEQ NEPA regulatory rescission; broad energy-dominance positioning. Shapes permitting surface for all major infrastructure.', type: 'policy', badge: 'eo' },
+  { year: 2025, date: '2025',      title: 'EO — Accelerating Federal Permitting of AI Data Centers', desc: 'Explicitly prioritises rapid AI data-centre and high-voltage transmission buildout by easing regulatory burdens.', type: 'policy', badge: 'eo' },
+  { year: 2025, date: '2025',      title: 'EO — Enabling Competition in Commercial Space', desc: 'Emphasises streamlined commercial space regulations; supports faster launch cadence and constellation expansion.', type: 'space', badge: 'eo' },
+  { year: 2025, date: 'Dec 2025',  title: 'EO — Ensuring American Space Superiority', desc: 'Sets Moon-by-2028 Artemis target in official text; frames assertive space leadership as security and prosperity priority.', type: 'space', badge: 'eo' },
+  { year: 2026, date: 'Jan 2026',  title: 'Tesla Texas Lithium Refinery Commences Operations', desc: 'First in-house lithium refinery opens; illustrates vertical integration strategy as response to supply-chain vulnerability.', type: 'event', badge: 'event' },
+  { year: 2026, date: 'Apr 2026 (eff.)', title: 'EPA Rescinds GHG Endangerment Finding', desc: 'Final rule rescinds the 2009 finding that GHGs endanger public health; removes Clean Air Act basis for vehicle GHG standards. Litigation filed immediately.', type: 'climate', badge: 'rule' },
+  { year: 2026, date: 'Ongoing',   title: 'FAA Tiered EA Processes Continue to Shape Starship Cadence', desc: 'Environmental assessment and return-to-flight determinations remain key rate-limiters for Starship launch frequency.', type: 'space', badge: 'event' },
+];
+
+// Group events by year for visual layout
+(function renderTimeline() {
+  const root = document.getElementById('timeline-root');
+  if (!root) return;
+
+  const byYear = {};
+  TIMELINE_DATA.forEach(e => {
+    if (!byYear[e.year]) byYear[e.year] = [];
+    byYear[e.year].push(e);
+  });
+
+  const BADGE_CLASS = { eo: 'badge-eo', rule: 'badge-rule', spd: 'badge-spd', event: 'badge-event' };
+  const BADGE_LABEL = { eo: 'EO', rule: 'Final Rule', spd: 'SPD', event: 'Event' };
+
+  Object.keys(byYear).sort().forEach((yr, yi) => {
+    const group = document.createElement('div');
+    group.className = 'timeline-year-group';
+    group.style.position = 'relative';
+
+    const yrLabel = document.createElement('p');
+    yrLabel.className = 'timeline-year-label';
+    yrLabel.textContent = yr;
+    group.appendChild(yrLabel);
+
+    const eventsEl = document.createElement('div');
+    eventsEl.className = 'timeline-events';
+
+    byYear[yr].forEach((ev, i) => {
+      const el = document.createElement('div');
+      el.className = `t-event ${ev.type}`;
+      el.style.animationDelay = `${i * 0.12}s`;
+
+      const badge = document.createElement('span');
+      badge.className = `t-event-type-badge ${BADGE_CLASS[ev.badge] || 'badge-event'}`;
+      badge.textContent = BADGE_LABEL[ev.badge] || 'Event';
+
+      const date = document.createElement('p');
+      date.className = 't-event-date';
+      date.textContent = ev.date;
+
+      const title = document.createElement('h4');
+      title.className = 't-event-title';
+      title.textContent = ev.title;
+
+      const desc = document.createElement('p');
+      desc.className = 't-event-desc';
+      desc.textContent = ev.desc;
+
+      el.append(badge, date, title, desc);
+      eventsEl.appendChild(el);
+    });
+
+    group.appendChild(eventsEl);
+    root.appendChild(group);
+  });
+
+  // Intersection observer for staggered reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.t-event').forEach(el => observer.observe(el));
+})();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 4. SCROLL ANIMATIONS — fade-in sections on viewport entry
+// ─────────────────────────────────────────────────────────────────────────────
+const fadeObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in-view'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.fade-section').forEach(el => fadeObserver.observe(el));
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 5. FILTER BAR — show/hide bottleneck cards by domain
+// ─────────────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.dataset.filter;
+    document.querySelectorAll('.bt-card').forEach(card => {
+      card.style.display = (filter === 'all' || card.dataset.domain === filter)
+        ? '' : 'none';
+    });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 6. NAV ACTIVE STATE + TOC DOTS — highlight on scroll
+// ─────────────────────────────────────────────────────────────────────────────
+const sections = ['hero','defs','bottlenecks','network-section','timeline-section','matrix-section','playbook','schema'];
+const tocDots = document.querySelectorAll('.toc-dot');
+
+const navObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      document.querySelectorAll('.nav-links a').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === `#${id}`);
+      });
+      tocDots.forEach(d => {
+        d.classList.toggle('active', d.getAttribute('href') === `#${id}`);
+      });
+    }
+  });
+}, { threshold: 0.35 });
+
+sections.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) navObserver.observe(el);
+});
+</script>
+
+</body>
+</html>
