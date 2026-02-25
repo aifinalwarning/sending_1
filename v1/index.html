@@ -1,0 +1,1997 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Shared Bottlenecks: Planetary Benevolence × Planetary Security (Solutions + Sources)</title>
+  <meta name="description" content="Offline-first, evidence-linked dashboard mapping shared bottlenecks across AI, energy, space, critical minerals, permitting, and trust—plus solutions and implementation playbooks." />
+
+  <style>
+    /* =========================================================================
+       UI TOKENS (tooltip: Design tokens)
+       What: Centralized styling variables for easy theme tweaks.
+       How to extend: Add new CSS variables and reference them in components.
+       Outcome: Consistent visuals + quick theme updates.
+    ========================================================================= */
+    :root{
+      --bg0:#070A12;
+      --bg1:#0B1022;
+      --card:#0E1732CC;
+      --card2:#0B1430CC;
+      --stroke:#22305C;
+      --stroke2:#2F3E73;
+      --text:#EAF0FF;
+      --muted:#AAB7E6;
+      --muted2:#7F8CC5;
+      --good:#48E6B3;
+      --warn:#FFD166;
+      --bad:#FF4D6D;
+      --accent:#8A7DFF;
+      --accent2:#4DD3FF;
+      --shadow:0 10px 40px rgba(0,0,0,.35);
+      --radius:18px;
+      --radius2:26px;
+      --blur:14px;
+      --max:1160px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 10% -10%, rgba(138,125,255,.25), transparent 60%),
+        radial-gradient(900px 700px at 95% 0%, rgba(77,211,255,.20), transparent 60%),
+        radial-gradient(1200px 900px at 60% 110%, rgba(72,230,179,.12), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1) 60%, #070A12 120%);
+      overflow-x:hidden;
+    }
+
+    a{color:var(--accent2); text-decoration:none;}
+    a:hover{text-decoration:underline;}
+    code, pre {font-family:var(--mono);}
+
+    /* =========================================================================
+       SPLASH (tooltip: Splash screen)
+       What: Animated splash shown on first load / until hydrated.
+       How to extend: Update copy, add a progress bar tied to data init steps.
+       Outcome: More “alive” feel + time for offline caches to warm up.
+    ========================================================================= */
+    #splash{
+      position:fixed; inset:0; z-index:9999;
+      display:flex; align-items:center; justify-content:center;
+      background: radial-gradient(900px 700px at 30% 20%, rgba(138,125,255,.25), transparent 55%),
+                  radial-gradient(800px 600px at 80% 30%, rgba(77,211,255,.18), transparent 55%),
+                  linear-gradient(180deg, #050712, #060A18);
+      transition:opacity .45s ease, transform .45s ease;
+    }
+    #splash.hide{opacity:0; transform:translateY(-6px); pointer-events:none;}
+    .splash-card{
+      width:min(820px, calc(100% - 32px));
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(10,14,30,.65);
+      box-shadow:var(--shadow);
+      border-radius:var(--radius2);
+      padding:22px 22px 18px;
+      backdrop-filter: blur(var(--blur));
+      position:relative;
+      overflow:hidden;
+    }
+    .splash-card:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(500px 250px at 20% 10%, rgba(138,125,255,.35), transparent 60%),
+                  radial-gradient(400px 220px at 85% 35%, rgba(77,211,255,.25), transparent 60%),
+                  radial-gradient(420px 260px at 30% 90%, rgba(72,230,179,.18), transparent 60%);
+      filter: blur(18px);
+      opacity:.75;
+    }
+    .splash-inner{position:relative; display:grid; gap:12px;}
+    .splash-title{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .logo{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; letter-spacing:.2px;
+    }
+    .logo .orb{
+      width:14px; height:14px; border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,.35) 45%, rgba(138,125,255,.9));
+      box-shadow: 0 0 16px rgba(138,125,255,.55);
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse{
+      0%,100%{transform:scale(1); filter:saturate(1);}
+      50%{transform:scale(1.2); filter:saturate(1.35);}
+    }
+    .splash-sub{color:var(--muted); line-height:1.45;}
+    .splash-row{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+      color:var(--muted2);
+      font-size:13px;
+    }
+    .pill{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      padding:6px 10px;
+      border-radius:999px;
+    }
+    .loader{
+      height:10px; border-radius:999px;
+      background: rgba(255,255,255,.08);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .loader > i{
+      display:block; height:100%; width:34%;
+      background: linear-gradient(90deg, rgba(138,125,255,.1), rgba(138,125,255,.9), rgba(77,211,255,.9));
+      animation: slide 1.1s linear infinite;
+    }
+    @keyframes slide{
+      0%{transform:translateX(-120%);}
+      100%{transform:translateX(320%);}
+    }
+
+    /* =========================================================================
+       BACKDROP PARALLAX (tooltip: Parallax layers)
+       What: Lightweight parallax illusion with three layers.
+       How to extend: Add additional layers (but keep it light).
+       Outcome: Depth without external libraries.
+    ========================================================================= */
+    .parallax{
+      position:fixed; inset:0; z-index:-2; pointer-events:none;
+      overflow:hidden;
+    }
+    .layer{
+      position:absolute; inset:-10%;
+      background-repeat:no-repeat;
+      opacity:.55;
+      transform:translate3d(0,0,0);
+      will-change: transform;
+      filter: blur(0px);
+    }
+    .layer.l1{
+      background-image:
+        radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,.55), transparent 50%),
+        radial-gradient(2px 2px at 40% 70%, rgba(255,255,255,.45), transparent 50%),
+        radial-gradient(1px 1px at 70% 30%, rgba(255,255,255,.35), transparent 50%),
+        radial-gradient(2px 2px at 85% 60%, rgba(255,255,255,.45), transparent 50%),
+        radial-gradient(1px 1px at 55% 15%, rgba(255,255,255,.25), transparent 50%),
+        radial-gradient(1px 1px at 25% 85%, rgba(255,255,255,.25), transparent 50%);
+      opacity:.40;
+    }
+    .layer.l2{
+      background-image:
+        radial-gradient(520px 360px at 15% 15%, rgba(138,125,255,.18), transparent 65%),
+        radial-gradient(480px 320px at 82% 22%, rgba(77,211,255,.14), transparent 65%),
+        radial-gradient(680px 420px at 55% 88%, rgba(72,230,179,.10), transparent 70%);
+      opacity:.55;
+      filter: blur(2px);
+    }
+    .layer.l3{
+      background-image:
+        linear-gradient(120deg, rgba(138,125,255,.07), transparent 55%),
+        linear-gradient(-130deg, rgba(77,211,255,.05), transparent 55%),
+        radial-gradient(1100px 800px at 55% 40%, rgba(255,255,255,.03), transparent 70%);
+      opacity:.85;
+    }
+
+    /* =========================================================================
+       LAYOUT (tooltip: Page scaffold)
+       What: Sticky header + main container + right HUD panel.
+       How to extend: Add new sections with matching anchors.
+       Outcome: Clean navigation, predictable structure.
+    ========================================================================= */
+    header{
+      position:sticky; top:0; z-index:50;
+      background: rgba(7,10,18,.70);
+      backdrop-filter: blur(var(--blur));
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .topbar{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:12px 14px;
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 260px;
+    }
+    .brand .badge{
+      font-size:12px; color:rgba(255,255,255,.85);
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      padding:5px 9px; border-radius:999px;
+      white-space:nowrap;
+    }
+    .brand h1{
+      margin:0; font-size:14px; line-height:1.1;
+      letter-spacing:.2px;
+    }
+    nav{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;
+    }
+    nav a{
+      font-size:12px;
+      color:rgba(234,240,255,.92);
+      padding:7px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+    }
+    nav a:hover{border-color: rgba(77,211,255,.35); background: rgba(77,211,255,.06); text-decoration:none;}
+
+    .wrap{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:18px 14px 90px;
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap:16px;
+      align-items:start;
+    }
+    @media (max-width: 1000px){
+      .wrap{grid-template-columns: 1fr; }
+      .hud{position:relative; top:auto;}
+      .brand{min-width:auto;}
+    }
+
+    .card{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(14,23,50,.55);
+      box-shadow:var(--shadow);
+      border-radius:var(--radius);
+      backdrop-filter: blur(var(--blur));
+      overflow:hidden;
+    }
+    .card .in{
+      padding:14px;
+    }
+    .card h2, .card h3{
+      margin:0 0 8px 0;
+      letter-spacing:.2px;
+    }
+    .card h2{font-size:18px;}
+    .card h3{font-size:14px; color:rgba(234,240,255,.95);}
+    .muted{color:var(--muted); line-height:1.5;}
+    .small{font-size:12px; color:var(--muted2); line-height:1.45;}
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 720px){
+      .grid2{grid-template-columns: 1fr;}
+    }
+
+    .kpi{
+      display:flex; gap:12px; align-items:center;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      border-radius:14px;
+      padding:10px 10px;
+    }
+    .kpi b{font-size:14px;}
+    .dot{
+      width:10px; height:10px; border-radius:50%;
+      background: var(--accent2);
+      box-shadow: 0 0 14px rgba(77,211,255,.35);
+      flex:0 0 auto;
+    }
+    .dot.good{background:var(--good); box-shadow:0 0 14px rgba(72,230,179,.35);}
+    .dot.warn{background:var(--warn); box-shadow:0 0 14px rgba(255,209,102,.35);}
+    .dot.bad{background:var(--bad); box-shadow:0 0 14px rgba(255,77,109,.35);}
+
+    /* =========================================================================
+       DETAILS / ACCORDIONS (tooltip: Collapsible content)
+       What: Uses <details> for accessibility-friendly collapsibles.
+       How to extend: Add more details blocks, keep summaries short.
+       Outcome: Long-form, scannable, print-friendly.
+    ========================================================================= */
+    details{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    details + details{margin-top:10px;}
+    summary{
+      cursor:pointer;
+      padding:12px 12px;
+      list-style:none;
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+    }
+    summary::-webkit-details-marker{display:none;}
+    summary .sum{
+      display:flex; flex-direction:column; gap:4px;
+    }
+    summary .sum b{font-size:13.5px;}
+    summary .sum span{font-size:12px; color:var(--muted2); line-height:1.35;}
+    summary .right{
+      display:flex; gap:8px; align-items:center; flex:0 0 auto;
+    }
+    .tag{
+      font-size:11px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.15);
+      padding:4px 8px; border-radius:999px;
+      color: rgba(234,240,255,.9);
+      white-space:nowrap;
+    }
+    .tag.good{border-color: rgba(72,230,179,.35); background: rgba(72,230,179,.08);}
+    .tag.warn{border-color: rgba(255,209,102,.35); background: rgba(255,209,102,.08);}
+    .tag.bad{border-color: rgba(255,77,109,.35); background: rgba(255,77,109,.08);}
+    .body{
+      padding:0 12px 12px 12px;
+      border-top:1px solid rgba(255,255,255,.08);
+      color:var(--muted);
+      line-height:1.55;
+      font-size:13px;
+    }
+    .body ul{margin:10px 0 0 18px;}
+    .body li{margin:6px 0;}
+    .body .cols{
+      display:grid; grid-template-columns: 1fr 1fr; gap:10px;
+      margin-top:10px;
+    }
+    @media (max-width: 720px){ .body .cols{grid-template-columns:1fr;} }
+
+    .btnrow{
+      display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;
+    }
+    button{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(234,240,255,.92);
+      padding:8px 10px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:12px;
+    }
+    button:hover{border-color: rgba(77,211,255,.35); background: rgba(77,211,255,.06);}
+    button:active{transform:translateY(1px);}
+    button.primary{
+      border-color: rgba(138,125,255,.45);
+      background: rgba(138,125,255,.10);
+    }
+    button.danger{
+      border-color: rgba(255,77,109,.45);
+      background: rgba(255,77,109,.10);
+    }
+
+    /* =========================================================================
+       SEARCH (tooltip: Client-side search)
+       What: Filters bottlenecks by keyword + domain tags.
+       How to extend: Add scoring weights per field (title > summary > sources).
+       Outcome: Fast discovery without network.
+    ========================================================================= */
+    .searchbar{
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center;
+      margin-top:10px;
+    }
+    input[type="search"], textarea, input[type="text"]{
+      width:100%;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      color: rgba(234,240,255,.95);
+      padding:10px 12px;
+      border-radius:14px;
+      outline:none;
+      font-size:13px;
+    }
+    input[type="search"]:focus, textarea:focus, input[type="text"]:focus{
+      border-color: rgba(77,211,255,.45);
+      box-shadow: 0 0 0 3px rgba(77,211,255,.08);
+    }
+    .filterbar{
+      display:flex; gap:8px; flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .chip{
+      font-size:11px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      padding:6px 10px;
+      border-radius:999px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .chip.on{
+      border-color: rgba(72,230,179,.42);
+      background: rgba(72,230,179,.10);
+    }
+
+    /* =========================================================================
+       HUD + CONSTELLATION (tooltip: Gamification HUD + constellation visualizer)
+       What: Tracks progress and renders nodes on canvas.
+       How to extend: Add quests, streaks, or exportable “runs”.
+       Outcome: Motivation + quick “system map” at a glance.
+    ========================================================================= */
+    .hud{
+      position:sticky; top:74px;
+      border-radius:var(--radius);
+    }
+    .hud .in{display:grid; gap:12px;}
+    .hud .row{
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+    }
+    .hud .meter{
+      height:10px; border-radius:999px;
+      background: rgba(255,255,255,.08);
+      overflow:hidden; border:1px solid rgba(255,255,255,.10);
+    }
+    .hud .meter > i{
+      display:block; height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(72,230,179,.85), rgba(77,211,255,.85), rgba(138,125,255,.85));
+    }
+    .hud canvas{
+      width:100%; height:210px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.16);
+    }
+    .hud .kv{
+      display:grid; grid-template-columns: 1fr auto;
+      gap:6px 10px; font-size:12px; color:var(--muted);
+    }
+    .hud .kv b{color:rgba(234,240,255,.92); font-weight:700;}
+    .mono{font-family:var(--mono);}
+
+    /* =========================================================================
+       FOOTER + PRINT (tooltip: Print stylesheet)
+       What: Makes the doc printable and reduces heavy visuals.
+       How to extend: Hide additional UI-only elements in @media print.
+       Outcome: Submission-ready print/PDF.
+    ========================================================================= */
+    footer{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:18px 14px 30px;
+      color:var(--muted2);
+      font-size:12px;
+      line-height:1.5;
+    }
+    .footbox{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      border-radius:14px;
+      padding:12px;
+    }
+    .hr{height:1px; background:rgba(255,255,255,.10); margin:14px 0;}
+    .noscript{
+      margin:12px 0;
+      border:1px solid rgba(255,209,102,.35);
+      background: rgba(255,209,102,.08);
+      border-radius:14px;
+      padding:10px 12px;
+      color: rgba(255,239,205,.95);
+      font-size:12px;
+      line-height:1.5;
+    }
+
+    @media print{
+      header, .hud, #splash, .parallax {display:none !important;}
+      body{background:white; color:#111;}
+      .card, details{break-inside:avoid; box-shadow:none; background:white; border-color:#ddd;}
+      a{color:#0645AD; text-decoration:underline;}
+      .wrap{grid-template-columns:1fr; max-width:none; padding:0;}
+      footer{color:#333;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="parallax" aria-hidden="true">
+    <div class="layer l1" id="pl1"></div>
+    <div class="layer l2" id="pl2"></div>
+    <div class="layer l3" id="pl3"></div>
+  </div>
+
+  <div id="splash" role="dialog" aria-label="Loading dashboard">
+    <div class="splash-card">
+      <div class="splash-inner">
+        <div class="splash-title">
+          <div class="logo">
+            <span class="orb"></span>
+            <span>Shared Bottlenecks Dashboard</span>
+          </div>
+          <span class="pill mono" id="splashStatus">hydrating…</span>
+        </div>
+        <div class="splash-sub">
+          A weird little truth-engine: bottlenecks mapped, sources linked, solutions baked in. Offline-first. No telemetry. 🌌
+        </div>
+        <div class="splash-row">
+          <span class="pill">Searchable</span>
+          <span class="pill">Collapsible long-form</span>
+          <span class="pill">Local-only notes</span>
+          <span class="pill">Constellation map</span>
+          <span class="pill">Print-ready</span>
+        </div>
+        <div class="loader" aria-hidden="true"><i></i></div>
+        <div class="small">Tip: After first load, this page should work offline (service worker + IndexedDB cache).</div>
+      </div>
+    </div>
+  </div>
+
+  <noscript>
+    <div class="noscript">
+      <b>Noscript mode:</b> This page still contains the full written content and source links, but interactive search,
+      offline caching, the constellation visualizer, and progress tracking require JavaScript.
+    </div>
+  </noscript>
+
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" title="Tooltip: Brand mark — purely local UI, no tracking.">
+          <span class="orb"></span>
+          <h1>Shared Bottlenecks: Benevolence × Security</h1>
+        </div>
+        <span class="badge" id="buildBadge">Baseline: 2026-02-25</span>
+      </div>
+
+      <nav aria-label="Primary">
+        <a href="#start">Start</a>
+        <a href="#bottlenecks">Bottlenecks</a>
+        <a href="#solutions">Solutions Playbook</a>
+        <a href="#sources">Primary Sources</a>
+        <a href="#repo">Repo Blueprint</a>
+        <a href="#notes">Local Notes</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- ===================== LEFT COLUMN ===================== -->
+    <section>
+      <div class="card" id="start">
+        <div class="in">
+          <h2>What this is (and what it isn’t) 🧭</h2>
+          <p class="muted">
+            This is a <b>solution-linked bottleneck map</b> built from the earlier “Shared Bottlenecks” write-up:
+            it distills the recurring choke points that show up across
+            <b>AI compute + energy</b>, <b>permitting</b>, <b>space governance</b>, <b>critical minerals</b>,
+            <b>cyber resilience</b>, and <b>social trust</b>.
+          </p>
+          <div class="grid2" style="margin-top:10px;">
+            <div class="kpi" title="Tooltip: Working definitions that keep us honest and avoid vibe-only analysis.">
+              <span class="dot"></span>
+              <div>
+                <b>Planetary benevolence</b>
+                <div class="small">Wellbeing within planetary limits (planetary boundaries + planetary health).</div>
+              </div>
+            </div>
+            <div class="kpi" title="Tooltip: Security here includes human security + global catastrophic risk management.">
+              <span class="dot warn"></span>
+              <div>
+                <b>Planetary security</b>
+                <div class="small">Lowering civilization-scale risk (infrastructure, conflict, tech risk).</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <details open id="execSummary" title="Tooltip: Executive summary — compact scan of the whole landscape.">
+            <summary>
+              <div class="sum">
+                <b>Executive summary (fast scan)</b>
+                <span>Six repeating bottleneck patterns + why they matter.</span>
+              </div>
+              <div class="right"><span class="tag">overview</span></div>
+            </summary>
+            <div class="body">
+              <ul>
+                <li><b>Energy + compute</b> is becoming a binding constraint for AI and electrification (grid, water, siting). (See: IEA “Energy and AI”, xAI Colossus, White House data-center permitting EO.)</li>
+                <li><b>Permitting throughput</b> is a cross-sector choke; “fast” processes can trigger backlash and litigation if legitimacy collapses.</li>
+                <li><b>Space governance</b> (debris, STM, spectrum, cyber) is a shared commons bottleneck as mega-constellations scale.</li>
+                <li><b>Critical minerals + industrial base</b> (lithium/nickel/rare earths/semiconductors) gate both clean transition and national capability.</li>
+                <li><b>Private leverage in public systems</b> creates continuity + conflict-of-interest risks when critical functions depend on a few firms.</li>
+                <li><b>Trust + polarization</b> acts like a “soft bottleneck” that behaves hard: it delays projects, fractures coalitions, and increases reversal risk.</li>
+              </ul>
+
+              <div class="cols">
+                <div>
+                  <div class="small"><b>High-leverage mitigation theme:</b> “build-to-audit” systems (verifiable safety cases, incident reporting, independent evaluation).</div>
+                </div>
+                <div>
+                  <div class="small"><b>High-leverage governance theme:</b> “permit-to-standard” (predictable timelines tied to measurable performance + accountability).</div>
+                </div>
+              </div>
+
+              <div class="btnrow">
+                <button class="primary" id="btnMarkReadSummary" title="Tooltip: Progress is local-only and feeds the HUD XP.">Mark summary as read (+XP)</button>
+                <button id="btnPrint" title="Tooltip: Uses print stylesheet to create a clean PDF.">Print / Save PDF</button>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="card" id="bottlenecks" style="margin-top:16px;">
+        <div class="in">
+          <h2>Shared bottlenecks (with baked-in solutions) 🧩</h2>
+          <p class="muted">
+            Search + filter the bottlenecks below. Each card includes:
+            <b>what it is</b>, <b>why it matters</b>, <b>solution playbook</b>, and <b>primary sources</b>.
+          </p>
+
+          <div class="searchbar" title="Tooltip: Search is local-only; input is sanitized and rate-limited.">
+            <input id="q" type="search" placeholder="Search: energy, NEPA, debris, critical minerals, cyber, trust…" autocomplete="off" />
+          </div>
+          <div class="filterbar" id="filterbar" aria-label="Filters"></div>
+
+          <div id="bottleneckList" style="margin-top:12px;"></div>
+        </div>
+      </div>
+
+      <div class="card" id="solutions" style="margin-top:16px;">
+        <div class="in">
+          <h2>Solutions playbook (cross-cutting) 🧠🔧</h2>
+          <p class="muted">
+            These are the “works across domains” interventions—designed so you can hand them to policymakers,
+            engineers, or program managers without rewriting the universe.
+          </p>
+
+          <details title="Tooltip: Build-to-audit — treat high-impact systems like aircraft: evidence, testing, traceability.">
+            <summary>
+              <div class="sum">
+                <b>1) Build-to-audit (safety cases, incident reporting, independent evaluation)</b>
+                <span>Make claims verifiable, failures observable, and accountability routine.</span>
+              </div>
+              <div class="right"><span class="tag good">high leverage</span></div>
+            </summary>
+            <div class="body">
+              <ul>
+                <li><b>Safety case</b>: a structured argument linking evidence → claim (“this won’t fail in known ways”).</li>
+                <li><b>Mandatory incident reporting</b> for critical networks (space/communications/large AI infrastructure).</li>
+                <li><b>Independent audits / red teams</b> for systems that could cause broad harm (critical AI, space cyber, implanted devices).</li>
+                <li><b>Versioned change-management</b> with rollback + “blast radius” containment.</li>
+              </ul>
+              <div class="small">
+                External anchors: NIST AI RMF (risk management framing) and SPD-5 (space cybersecurity principles).
+              </div>
+              <div class="btnrow">
+                <button class="primary" data-quest="build-to-audit">Create a Build-to-Audit checklist (+XP)</button>
+              </div>
+            </div>
+          </details>
+
+          <details title="Tooltip: Permit-to-standard — faster doesn’t mean sloppy; speed comes from predictable rules + measurable thresholds.">
+            <summary>
+              <div class="sum">
+                <b>2) Permit-to-standard (predictable timelines tied to measurable performance)</b>
+                <span>Replace ad-hoc fights with clear thresholds + enforceable mitigation.</span>
+              </div>
+              <div class="right"><span class="tag good">high leverage</span></div>
+            </summary>
+            <div class="body">
+              <ul>
+                <li>Pre-define performance metrics (noise, water use, emissions, debris disposal probability).</li>
+                <li>Issue <b>time-boxed reviews</b> with escalation rules (approve, approve with mitigations, deny with reasons).</li>
+                <li>Publish <b>monitoring dashboards</b> (local consent improves when externalities are measurable).</li>
+                <li>Use <b>reversibility</b>: pilot deployments + staged scale-up to preserve legitimacy.</li>
+              </ul>
+              <div class="btnrow">
+                <button class="primary" data-quest="permit-to-standard">Draft a “Permit-to-Standard” template (+XP)</button>
+              </div>
+            </div>
+          </details>
+
+          <details title="Tooltip: Space commons — STM + debris + spectrum coordination need shared data rails.">
+            <summary>
+              <div class="sum">
+                <b>3) Space commons coordination (STM + debris + spectrum + transparency)</b>
+                <span>Shared data rails reduce collision risk and strategic ambiguity.</span>
+              </div>
+              <div class="right"><span class="tag warn">fragile commons</span></div>
+            </summary>
+            <div class="body">
+              <ul>
+                <li>Interoperable <b>space traffic management</b> data standards + conjunction reporting norms.</li>
+                <li>Enforceable <b>deorbit/disposal</b> expectations + liability clarity for debris externalities.</li>
+                <li>Transparent <b>spectrum coordination</b> pathways aligned with ITU processes.</li>
+                <li>Cyber baselines for space systems and ground infrastructure (assume dual-use).</li>
+              </ul>
+              <div class="btnrow">
+                <button class="primary" data-quest="space-commons">Sketch a Space Commons “minimum viable treaty” outline (+XP)</button>
+              </div>
+            </div>
+          </details>
+
+          <details title="Tooltip: Industrial resilience compacts — avoid ‘single mineral = single point of failure’ outcomes.">
+            <summary>
+              <div class="sum">
+                <b>4) Industrial resilience compacts (critical minerals + recycling + allied sourcing)</b>
+                <span>Stabilize inputs for both clean transition and security needs.</span>
+              </div>
+              <div class="right"><span class="tag warn">supply risk</span></div>
+            </summary>
+            <div class="body">
+              <ul>
+                <li>Diversify sourcing (geography + vendors), and formalize shared procurement with allies.</li>
+                <li>Scale <b>secondary supply</b>: recycling, remanufacturing, recovery, substitution.</li>
+                <li>Require provenance metadata for sensitive supply chains (defense + critical infrastructure).</li>
+                <li>Prefer predictable, targeted incentives over broad shocks that inflate costs system-wide.</li>
+              </ul>
+              <div class="btnrow">
+                <button class="primary" data-quest="resilience-compact">Make a Critical Minerals Resilience scorecard (+XP)</button>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="card" id="sources" style="margin-top:16px;">
+        <div class="in">
+          <h2>Primary sources (direct links) 📚</h2>
+          <p class="muted">
+            These are the core “load-bearing” references used in the analysis (official docs first, then major syntheses).
+            All links are optional to open; the page remains usable offline.
+          </p>
+
+          <details open title="Tooltip: Government primary sources — executive orders, Federal Register, agency docs.">
+            <summary>
+              <div class="sum">
+                <b>U.S. government primary sources</b>
+                <span>Presidential actions, Federal Register, and agency policy pages.</span>
+              </div>
+              <div class="right"><span class="tag">primary</span></div>
+            </summary>
+            <div class="body" id="govSources"></div>
+          </details>
+
+          <details title="Tooltip: Standards & synthesis sources — frameworks and global reports that summarize evidence.">
+            <summary>
+              <div class="sum">
+                <b>Standards + synthesis sources</b>
+                <span>IEA, IPCC, NIST, RAND, WEF, UNDP, planetary boundaries.</span>
+              </div>
+              <div class="right"><span class="tag">synthesis</span></div>
+            </summary>
+            <div class="body" id="synthSources"></div>
+          </details>
+
+          <details title="Tooltip: Company primary sources — mission pages, filings, program pages.">
+            <summary>
+              <div class="sum">
+                <b>Company primary sources</b>
+                <span>Mission pages, filings, and program updates.</span>
+              </div>
+              <div class="right"><span class="tag">primary</span></div>
+            </summary>
+            <div class="body" id="companySources"></div>
+          </details>
+        </div>
+      </div>
+
+      <div class="card" id="repo" style="margin-top:16px;">
+        <div class="in">
+          <h2>Repo blueprint (ready to paste into GitHub) 🗂️</h2>
+          <p class="muted">
+            This is the “actionable repository scaffold” from the write-up, adapted into a copyable structure.
+            The goal: make this dashboard regenerate from structured JSON entries over time.
+          </p>
+
+          <details open title="Tooltip: Directory layout — separates docs/data/tools so it stays maintainable.">
+            <summary>
+              <div class="sum">
+                <b>Directory structure</b>
+                <span>Docs + data + schemas + scripts + GitHub templates.</span>
+              </div>
+              <div class="right"><span class="tag">blueprint</span></div>
+            </summary>
+            <div class="body">
+              <pre style="white-space:pre-wrap; background:rgba(0,0,0,.18); padding:10px; border-radius:14px; border:1px solid rgba(255,255,255,.10);">
+planetary-benevolence-security-bottlenecks/
+  README.md
+  LICENSE-CODE
+  LICENSE-CONTENT
+  CODE_OF_CONDUCT.md
+  CONTRIBUTING.md
+  SECURITY.md
+  CITATION_POLICY.md
+
+  docs/
+    index.html
+    data/
+      bottlenecks/
+        BT-0001-energy-compute.json
+        BT-0002-permitting-throughput.json
+        BT-0003-space-commons.json
+        BT-0004-critical-minerals.json
+        BT-0005-private-leverage.json
+        BT-0006-trust-polarization.json
+      sources/
+        primary/
+        synthesis/
+      stakeholders/
+    diagrams/
+      entity-relationships.mmd
+      timeline.mmd
+
+  tools/
+    schema/
+      bottleneck.schema.json
+      evidence.schema.json
+      stakeholder.schema.json
+    scripts/
+      validate.js
+      build-index.js
+      link-check.js
+
+  .github/
+    ISSUE_TEMPLATE/
+      new-bottleneck.yml
+      add-evidence.yml
+      policy-update.yml
+    PULL_REQUEST_TEMPLATE.md
+              </pre>
+              <div class="small">
+                License suggestion: <b>MIT</b> for code + <b>CC BY 4.0</b> for content (common “code vs research” split).
+              </div>
+            </div>
+          </details>
+
+          <details title="Tooltip: Schema idea — structured bottlenecks become cards automatically.">
+            <summary>
+              <div class="sum">
+                <b>Minimal bottleneck JSON schema (example)</b>
+                <span>Use this pattern to keep evidence and mitigations machine-readable.</span>
+              </div>
+              <div class="right"><span class="tag">data</span></div>
+            </summary>
+            <div class="body">
+              <pre style="white-space:pre-wrap; background:rgba(0,0,0,.18); padding:10px; border-radius:14px; border:1px solid rgba(255,255,255,.10);">
+{
+  "id": "BT-0001",
+  "title": "Energy and compute as a binding constraint",
+  "domains": ["technological", "economic/finance", "security/risk"],
+  "summary": "AI-scale and electrification are constrained by grid capacity, permitting, and energy supply mix.",
+  "policy_examples": [
+    {
+      "title": "Accelerating Federal Permitting of Data Center Infrastructure",
+      "type": "Executive Order",
+      "date": "2025-07-23",
+      "url": "https://www.whitehouse.gov/presidential-actions/2025/07/accelerating-federal-permitting-of-data-center-infrastructure/"
+    }
+  ],
+  "mitigations": [
+    {"type":"technical","action":"Compute-efficiency KPIs + demand-response integration"},
+    {"type":"policy","action":"Grid-impact disclosure + mitigation plans for GW-scale projects"},
+    {"type":"governance","action":"Independent audits for critical infrastructure AI"}
+  ],
+  "confidence": "medium",
+  "last_updated": "2026-02-25"
+}
+              </pre>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="card" id="notes" style="margin-top:16px;">
+        <div class="in">
+          <h2>Local-only notes (no telemetry) 📝</h2>
+          <p class="muted">
+            Keep implementation notes here. Everything saves to your device via IndexedDB.
+            Export/import available for manual backup.
+          </p>
+
+          <div class="grid2">
+            <div>
+              <label class="small" for="noteTitle"><b>Note title</b></label>
+              <input type="text" id="noteTitle" placeholder="e.g., ‘Grid-impact disclosure template’" maxlength="120" />
+              <div style="height:10px"></div>
+              <label class="small" for="noteBody"><b>Note body</b></label>
+              <textarea id="noteBody" rows="6" placeholder="Write steps, decisions, risks, links, TODOs… (local-only)" maxlength="4000"></textarea>
+              <div class="btnrow">
+                <button class="primary" id="btnSaveNote" title="Tooltip: Sanitizes input and rate-limits saves to avoid abuse.">Save note</button>
+                <button id="btnClearNote">Clear editor</button>
+              </div>
+            </div>
+
+            <div>
+              <div class="row" style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <div class="small"><b>Saved notes</b></div>
+                  <div class="small">Searchable and exportable.</div>
+                </div>
+                <div class="btnrow" style="margin-top:0;">
+                  <button id="btnExport" title="Tooltip: Exports JSON you can store anywhere.">Export</button>
+                  <button id="btnImport" title="Tooltip: Imports JSON you previously exported.">Import</button>
+                  <input type="file" id="importFile" accept="application/json" style="display:none" />
+                </div>
+              </div>
+
+              <input type="search" id="noteSearch" placeholder="Search notes…" autocomplete="off" style="margin-top:10px;" />
+              <div id="noteList" style="margin-top:10px; display:grid; gap:10px;"></div>
+
+              <div class="btnrow">
+                <button class="danger" id="btnWipeAll" title="Tooltip: Deletes local data (notes + progress).">Reset local data</button>
+              </div>
+              <div class="small">Reset is irreversible (on this device). No hidden backups exist.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== RIGHT COLUMN (HUD) ===================== -->
+    <aside class="card hud" aria-label="Gamification HUD">
+      <div class="in">
+        <h3>HUD: progress + constellation 🌠</h3>
+        <div class="small">All stats are local-only. No analytics. No auto-send.</div>
+
+        <div class="row">
+          <div class="small"><b>XP</b> <span class="mono" id="xp">0</span></div>
+          <div class="small"><b>Streak</b> <span class="mono" id="streak">0</span> days</div>
+        </div>
+        <div class="meter" aria-label="Completion meter"><i id="meterFill"></i></div>
+        <div class="kv">
+          <span>Read sections</span><b class="mono" id="readCount">0</b>
+          <span>Implemented actions</span><b class="mono" id="doneCount">0</b>
+          <span>Bottlenecks tracked</span><b class="mono" id="btCount">0</b>
+          <span>Offline ready</span><b class="mono" id="offlineReady">…</b>
+        </div>
+
+        <canvas id="sky" width="640" height="420" title="Tooltip: Constellation visualizer — nodes = bottlenecks; glow = status."></canvas>
+
+        <div class="btnrow">
+          <button id="btnFocusTop" title="Tooltip: Jump to top quickly (small quality-of-life).">Back to top</button>
+          <button id="btnToggleGlow" title="Tooltip: Reduces motion/glow if you want a calmer UI.">Reduce effects</button>
+        </div>
+
+        <div class="small">
+          Quests: mark solutions “implemented” inside any bottleneck card to earn XP. 🧪
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    <div class="footbox">
+      <div><b>Attributions & licensing</b></div>
+      <div class="small">
+        This page summarizes and links to external documents (official government pages, standards bodies, and major synthesis reports).
+        Suggested repo licensing pattern: <b>MIT</b> for code + <b>CC BY 4.0</b> for original written content and diagrams (separate license files).
+      </div>
+      <div class="hr"></div>
+      <div><b>Zero-Harm & Anti-Inversion note</b> 🕊️</div>
+      <div class="small">
+        This dashboard is intended to improve safety, legitimacy, and measurable wellbeing. It avoids operational instructions for wrongdoing,
+        coercion, surveillance abuse, or sabotage. Keep implementations consent-forward and auditable.
+      </div>
+      <div class="small" style="margin-top:8px;">
+        Local-only storage: IndexedDB (notes, preferences, HUD stats). Optional offline caching via service worker. No external dependencies.
+      </div>
+    </div>
+
+    <!--
+      Zero-Harm & Anti-Inversion note:
+      - No hidden telemetry.
+      - No auto-send features.
+      - No secrets, keys, or private data embedded.
+      - Inputs sanitized + gently rate-limited.
+      - Avoids content that could be repurposed for harm or coercion.
+    -->
+  </footer>
+
+  <script>
+    /* =========================================================================
+       SAFETY GUARDRAILS (tooltip: Input sanitization + gentle rate limits)
+       What: Basic defenses against injection and runaway writes.
+       How to extend: Add stricter schemas or markdown filtering as needed.
+       Outcome: Safer local-only app behavior.
+    ========================================================================= */
+    const Safe = (() => {
+      const escMap = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
+      const escapeHTML = (s) => String(s).replace(/[&<>"']/g, ch => escMap[ch]);
+      const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+      let last = new Map();
+      const rateLimit = (key, ms) => {
+        const now = Date.now();
+        const prev = last.get(key) || 0;
+        if (now - prev < ms) return false;
+        last.set(key, now);
+        return true;
+      };
+      const safeUrl = (u) => {
+        try{
+          const url = new URL(u);
+          if (!/^https?:$/.test(url.protocol)) return null;
+          return url.toString();
+        }catch(e){ return null; }
+      };
+      return { escapeHTML, clamp, rateLimit, safeUrl };
+    })();
+
+    /* =========================================================================
+       DATA MODEL (tooltip: Bottleneck dataset)
+       What: Compact structured data powering rendering + constellation nodes.
+       How to extend: Add fields (stakeholders, scoring, timeline entries).
+       Outcome: Content stays organized and regenerable.
+    ========================================================================= */
+    const DATA = {
+      meta: {
+        baseline: "2026-02-25",
+        title: "Shared bottlenecks between Musk-company execution and Trump-era federal policy vectors",
+      },
+      filters: [
+        "technological","regulatory/legal","economic/finance","supply chains/materials",
+        "governance/coordination","social/ethical/public acceptance","security/risk"
+      ],
+      bottlenecks: [
+        {
+          id:"BT-0001",
+          title:"Energy & compute as a binding constraint",
+          domains:["technological","economic/finance","security/risk"],
+          impact:{benevolence:"mixed", security:"mixed"},
+          why:"AI scaling and electrification depend on constrained grids, water, siting, and reliable generation. Grid scarcity becomes a strategic vulnerability when compute becomes critical infrastructure.",
+          solutions:{
+            technical:[
+              "Co-locate data centers with low-carbon firm power; integrate demand-response; prioritize hardware + model efficiency KPIs.",
+              "Waste-heat reuse + water stewardship plans as default, not afterthoughts."
+            ],
+            policy:[
+              "Require grid-impact disclosure + mitigation plans for GW-scale data centers; accelerate interconnection while preserving safeguards.",
+              "Treat compute-energy nodes as critical infrastructure with resilience standards (N-1, cyber baselines)."
+            ],
+            governance:[
+              "Independent audits for critical infrastructure AI; mandatory incident reporting for major outages/near-misses."
+            ]
+          },
+          sources:[
+            {label:"IEA – Energy and AI (data-centre demand)", url:"https://www.iea.org/reports/energy-and-ai/energy-demand-from-ai", kind:"synthesis"},
+            {label:"xAI – Colossus program page", url:"https://x.ai/colossus", kind:"primary"},
+            {label:"White House – EO on data center permitting", url:"https://www.whitehouse.gov/presidential-actions/2025/07/accelerating-federal-permitting-of-data-center-infrastructure/", kind:"primary"}
+          ],
+          quickActions:[
+            {key:"bt1-grid-template", label:"Draft grid-impact disclosure template"},
+            {key:"bt1-efficiency-kpis", label:"Define compute efficiency KPIs"},
+            {key:"bt1-incident-policy", label:"Adopt incident reporting policy"}
+          ]
+        },
+        {
+          id:"BT-0002",
+          title:"Permitting throughput & legitimacy (NEPA + beyond)",
+          domains:["regulatory/legal","governance/coordination","social/ethical/public acceptance"],
+          impact:{benevolence:"mixed", security:"mixed"},
+          why:"Permitting delays can stall launch sites, transmission, mines, and data centers. But ‘speed at any cost’ increases backlash, litigation, and reversal risk—often slowing outcomes overall.",
+          solutions:{
+            technical:[
+              "Design projects for measurability: publish noise/water/emissions monitoring; build staged pilots to prove impacts.",
+              "Use reversibility: incremental deployment with stop-rules and rollback capacity."
+            ],
+            policy:[
+              "Adopt permit-to-standard: pre-defined thresholds, time-boxed review, enforceable mitigations, transparent decision criteria.",
+              "Clarify agency roles + timelines; publish SLA-like targets for common project classes."
+            ],
+            governance:[
+              "Participatory planning for high-impact facilities; third-party verification of externalities and compliance."
+            ]
+          },
+          sources:[
+            {label:"Federal Register – EO 13807 (permitting discipline, 2017)", url:"https://www.federalregister.gov/documents/2017/08/24/2017-18134/establishing-discipline-and-accountability-in-the-environmental-review-and-permitting-process-for", kind:"primary"},
+            {label:"Federal Register – Unleashing American Energy (2025)", url:"https://www.federalregister.gov/documents/2025/01/29/2025-01956/unleashing-american-energy", kind:"primary"},
+            {label:"White House – EO on data center permitting", url:"https://www.whitehouse.gov/presidential-actions/2025/07/accelerating-federal-permitting-of-data-center-infrastructure/", kind:"primary"}
+          ],
+          quickActions:[
+            {key:"bt2-permit-template", label:"Create Permit-to-Standard template"},
+            {key:"bt2-dashboard", label:"Publish externalities dashboard spec"},
+            {key:"bt2-pilot-plan", label:"Write staged pilot plan with stop-rules"}
+          ]
+        },
+        {
+          id:"BT-0003",
+          title:"Orbital debris + space traffic management (STM) + spectrum",
+          domains:["governance/coordination","security/risk","technological"],
+          impact:{benevolence:"warn", security:"warn"},
+          why:"Space is a shared commons. Congestion and debris can degrade Earth observation, science, and connectivity, while increasing strategic ambiguity and vulnerability for national-security space assets.",
+          solutions:{
+            technical:[
+              "Design-for-disposal satellites; publish conjunction data; collision avoidance transparency.",
+              "Brightness mitigation and astronomy impact reporting (iterative improvements)."
+            ],
+            policy:[
+              "Enforceable disposal expectations (e.g., post-mission deorbit timelines) + liability clarity for debris externalities.",
+              "Align national rules with ITU coordination processes; streamline spectrum filings without skipping safety obligations."
+            ],
+            governance:[
+              "Interoperable STM data standards; shared ‘risk-reduction infrastructure’ (norms, reporting, incident review)."
+            ]
+          },
+          sources:[
+            {label:"Trump WH Archives – SPD-3 (Space Traffic Management)", url:"https://trumpwhitehouse.archives.gov/presidential-actions/space-policy-directive-3-national-space-traffic-management-policy/", kind:"primary"},
+            {label:"Federal Register – FCC orbital debris rule (2024)", url:"https://www.federalregister.gov/documents/2024/08/09/2024-17093/space-innovation-mitigation-of-orbital-debris-in-the-new-space-age", kind:"primary"},
+            {label:"ITU – Space services FAQ (coordination context)", url:"https://www.itu.int/en/ITU-R/space/Pages/FAQspace.aspx", kind:"primary"}
+          ],
+          quickActions:[
+            {key:"bt3-stm-standards", label:"Draft STM data standard checklist"},
+            {key:"bt3-deorbit-metrics", label:"Define disposal / deorbit metrics"},
+            {key:"bt3-spectrum-map", label:"Map spectrum coordination workflow"}
+          ]
+        },
+        {
+          id:"BT-0004",
+          title:"Critical minerals + semiconductor / networking industrial base",
+          domains:["supply chains/materials","economic/finance","security/risk"],
+          impact:{benevolence:"mixed", security:"mixed"},
+          why:"Electrification and AI hardware depend on concentrated supply chains. De-risking can improve resilience but also raise costs and increase geopolitical friction if handled bluntly.",
+          solutions:{
+            technical:[
+              "Materials substitution and design for recyclability; expand secondary supply (recycling, recovery, remanufacture).",
+              "Multi-vendor modularity (avoid single choke suppliers)."
+            ],
+            policy:[
+              "Allied sourcing compacts with transparent environmental/social standards; targeted incentives over broad shocks.",
+              "Provenance metadata requirements for sensitive procurement."
+            ],
+            governance:[
+              "Strategic stockpiles with clear drawdown criteria; public reporting on concentration risks and mitigations."
+            ]
+          },
+          sources:[
+            {label:"Federal Register – EO 13817 (critical minerals strategy, 2017)", url:"https://www.federalregister.gov/documents/2017/12/26/2017-27899/a-federal-strategy-to-ensure-secure-and-reliable-supplies-of-critical-minerals", kind:"primary"},
+            {label:"IEA – Global Critical Minerals Outlook 2025", url:"https://www.iea.org/reports/global-critical-minerals-outlook-2025", kind:"synthesis"},
+            {label:"NIST – AI Risk Management Framework (risk framing)", url:"https://www.nist.gov/itl/ai-risk-management-framework", kind:"synthesis"}
+          ],
+          quickActions:[
+            {key:"bt4-scorecard", label:"Build critical minerals resilience scorecard"},
+            {key:"bt4-provenance", label:"Draft provenance metadata fields"},
+            {key:"bt4-recycling", label:"Outline recycling & secondary supply plan"}
+          ]
+        },
+        {
+          id:"BT-0005",
+          title:"Public-private dependency + continuity-of-service governance",
+          domains:["governance/coordination","security/risk","economic/finance"],
+          impact:{benevolence:"warn", security:"warn"},
+          why:"When government functions rely on privately controlled launch/satellite/AI infrastructure, continuity, conflicts of interest, transparency, and democratic oversight become systemic risks.",
+          solutions:{
+            technical:[
+              "Design graceful degradation + offline failover for critical networks; segmented architecture to limit blast radius.",
+              "Formal change-control and rollback for core services."
+            ],
+            policy:[
+              "Continuity-of-service requirements in contracts (SLAs, audit rights, incident reporting, escrow/contingency plans).",
+              "Diversify providers for critical lanes; require interoperability where feasible."
+            ],
+            governance:[
+              "Independent procurement audits; strict conflict-of-interest firewalls; publish risk registers for critical dependencies."
+            ]
+          },
+          sources:[
+            {label:"Trump WH Archives – SPD-5 (space cybersecurity principles)", url:"https://trumpwhitehouse.archives.gov/presidential-actions/memorandum-space-policy-directive-5-cybersecurity-principles-space-systems/", kind:"primary"},
+            {label:"RAND – Global catastrophic risk assessment (context)", url:"https://www.rand.org/pubs/research_reports/RRA2981-1.html", kind:"synthesis"},
+            {label:"White House – Ensuring American Space Superiority (2025)", url:"https://www.whitehouse.gov/presidential-actions/2025/12/ensuring-american-space-superiority/", kind:"primary"}
+          ],
+          quickActions:[
+            {key:"bt5-continuity", label:"Write continuity-of-service contract clause pack"},
+            {key:"bt5-interoperability", label:"List interoperability requirements"},
+            {key:"bt5-risk-register", label:"Start a dependency risk register"}
+          ]
+        },
+        {
+          id:"BT-0006",
+          title:"Trust, polarization, and epistemic stability",
+          domains:["social/ethical/public acceptance","governance/coordination","security/risk"],
+          impact:{benevolence:"bad", security:"bad"},
+          why:"Low trust makes coalitions brittle. It increases delay, litigation, reversal risk, and vulnerability to information operations—blocking both climate/health progress and crisis stability.",
+          solutions:{
+            technical:[
+              "Radical transparency dashboards: publish externalities, incidents, mitigations, and uncertainty honestly.",
+              "Third-party measurement and public reporting for high-impact projects."
+            ],
+            policy:[
+              "Participatory processes for siting decisions; protect consent and rights; codify anti-coercion protections in sensitive domains (e.g., neurotech).",
+              "Stabilize policy signals where possible to reduce whiplash (multi-level compacts)."
+            ],
+            governance:[
+              "Evidence QA: require primary + independent synthesis sources for consequential claims; keep facts separate from interpretation.",
+              "Crisis comms protocols that reduce rumor spread and improve verification speed."
+            ]
+          },
+          sources:[
+            {label:"WEF – Global Risks Report 2025 (misinfo/polarization)", url:"https://www.weforum.org/press/2025/01/global-risks-report-2025-conflict-environment-and-disinformation-top-threats/", kind:"synthesis"},
+            {label:"UNDP – Human Development Report 1994 (human security)", url:"https://hdr.undp.org/content/human-development-report-1994", kind:"synthesis"},
+            {label:"Planetary Health Alliance – What is planetary health?", url:"https://planetaryhealthalliance.org/what-is-planetary-health/", kind:"synthesis"}
+          ],
+          quickActions:[
+            {key:"bt6-evidence-qa", label:"Adopt evidence QA policy (primary + synthesis)"},
+            {key:"bt6-dashboard", label:"Publish transparency dashboard template"},
+            {key:"bt6-crisis-comms", label:"Write crisis verification protocol"}
+          ]
+        },
+      ],
+      sources: {
+        government: [
+          {label:"White House – EO: Accelerating Federal Permitting of Data Center Infrastructure (2025-07-23)", url:"https://www.whitehouse.gov/presidential-actions/2025/07/accelerating-federal-permitting-of-data-center-infrastructure/"},
+          {label:"Federal Register – EO 13807 (2017-08-24) permitting discipline/accountability", url:"https://www.federalregister.gov/documents/2017/08/24/2017-18134/establishing-discipline-and-accountability-in-the-environmental-review-and-permitting-process-for"},
+          {label:"Federal Register – Unleashing American Energy (2025-01-29)", url:"https://www.federalregister.gov/documents/2025/01/29/2025-01956/unleashing-american-energy"},
+          {label:"Federal Register – FCC orbital debris mitigation rule (2024-08-09)", url:"https://www.federalregister.gov/documents/2024/08/09/2024-17093/space-innovation-mitigation-of-orbital-debris-in-the-new-space-age"},
+          {label:"Trump WH Archives – SPD-3 Space Traffic Management", url:"https://trumpwhitehouse.archives.gov/presidential-actions/space-policy-directive-3-national-space-traffic-management-policy/"},
+          {label:"Trump WH Archives – SPD-5 Space cybersecurity principles", url:"https://trumpwhitehouse.archives.gov/presidential-actions/memorandum-space-policy-directive-5-cybersecurity-principles-space-systems/"},
+          {label:"ITU – Space services FAQ (international coordination context)", url:"https://www.itu.int/en/ITU-R/space/Pages/FAQspace.aspx"}
+        ],
+        synthesis: [
+          {label:"IEA – Energy and AI (data-centre electricity demand)", url:"https://www.iea.org/reports/energy-and-ai/energy-demand-from-ai"},
+          {label:"IEA – Global Critical Minerals Outlook 2025", url:"https://www.iea.org/reports/global-critical-minerals-outlook-2025"},
+          {label:"NIST – AI Risk Management Framework (AI RMF)", url:"https://www.nist.gov/itl/ai-risk-management-framework"},
+          {label:"IPCC AR6 WGIII press release (mitigation urgency context)", url:"https://www.ipcc.ch/2022/04/04/ipcc-ar6-wgiii-pressrelease/"},
+          {label:"WEF – Global Risks Report 2025 press release", url:"https://www.weforum.org/press/2025/01/global-risks-report-2025-conflict-environment-and-disinformation-top-threats/"},
+          {label:"UNDP – Human Development Report 1994 (human security)", url:"https://hdr.undp.org/content/human-development-report-1994"},
+          {label:"Planetary Health Alliance – Planetary health definition", url:"https://planetaryhealthalliance.org/what-is-planetary-health/"},
+          {label:"Rockström et al. 2009 (Nature) – Planetary boundaries", url:"https://www.nature.com/articles/461472a"},
+          {label:"Steffen et al. 2015 (Science) – Planetary boundaries update", url:"https://www.science.org/doi/10.1126/science.1259855"},
+          {label:"RAND – Global catastrophic risk assessment report", url:"https://www.rand.org/pubs/research_reports/RRA2981-1.html"}
+        ],
+        companies: [
+          {label:"SpaceX – Mission", url:"https://www.spacex.com/mission/"},
+          {label:"Tesla – Mission (Accelerate sustainable energy)", url:"https://www.tesla.com/about"},
+          {label:"xAI – Colossus", url:"https://x.ai/colossus"},
+          {label:"Neuralink – PRIME Study (FDA IDE context)", url:"https://neuralink.com/patient-registry/"}
+        ]
+      }
+    };
+
+    /* =========================================================================
+       INDEXEDDB (tooltip: Offline-first storage)
+       What: Stores prefs, HUD stats, and notes locally.
+       How to extend: Add stores for bottleneck status history or timeline edits.
+       Outcome: Reliable offline persistence without external services.
+    ========================================================================= */
+    const DB = (() => {
+      const DB_NAME = "shared_bottlenecks_db_v1";
+      const DB_VER = 1;
+      let _db = null;
+
+      function open(){
+        return new Promise((resolve,reject)=>{
+          const req = indexedDB.open(DB_NAME, DB_VER);
+          req.onupgradeneeded = (ev) => {
+            const db = req.result;
+            if(!db.objectStoreNames.contains("kv")) db.createObjectStore("kv");
+            if(!db.objectStoreNames.contains("notes")) {
+              const s = db.createObjectStore("notes", {keyPath:"id"});
+              s.createIndex("t","t",{unique:false});
+              s.createIndex("ts","ts",{unique:false});
+            }
+          };
+          req.onsuccess = () => { _db = req.result; resolve(_db); };
+          req.onerror = () => reject(req.error);
+        });
+      }
+
+      function tx(store, mode="readonly"){
+        return _db.transaction(store, mode).objectStore(store);
+      }
+
+      function getKV(key){
+        return new Promise((resolve,reject)=>{
+          const r = tx("kv").get(key);
+          r.onsuccess=()=>resolve(r.result);
+          r.onerror=()=>reject(r.error);
+        });
+      }
+      function setKV(key, val){
+        return new Promise((resolve,reject)=>{
+          const r = tx("kv","readwrite").put(val, key);
+          r.onsuccess=()=>resolve(true);
+          r.onerror=()=>reject(r.error);
+        });
+      }
+
+      function putNote(note){
+        return new Promise((resolve,reject)=>{
+          const r = tx("notes","readwrite").put(note);
+          r.onsuccess=()=>resolve(true);
+          r.onerror=()=>reject(r.error);
+        });
+      }
+      function delNote(id){
+        return new Promise((resolve,reject)=>{
+          const r = tx("notes","readwrite").delete(id);
+          r.onsuccess=()=>resolve(true);
+          r.onerror=()=>reject(r.error);
+        });
+      }
+      function getAllNotes(){
+        return new Promise((resolve,reject)=>{
+          const r = tx("notes").getAll();
+          r.onsuccess=()=>resolve(r.result || []);
+          r.onerror=()=>reject(r.error);
+        });
+      }
+
+      async function wipeAll(){
+        await setKV("hud", null);
+        await setKV("prefs", null);
+        await new Promise((resolve,reject)=>{
+          const t = _db.transaction("notes","readwrite");
+          t.objectStore("notes").clear().onsuccess=()=>resolve(true);
+          t.onerror=()=>reject(t.error);
+        });
+      }
+
+      return { open, getKV, setKV, putNote, delNote, getAllNotes, wipeAll };
+    })();
+
+    /* =========================================================================
+       SERVICE WORKER (tooltip: Offline caching)
+       What: Registers a tiny SW from a Blob (no extra files).
+       How to extend: Add stale-while-revalidate or cache versioning.
+       Outcome: Offline availability after first load.
+    ========================================================================= */
+    async function registerSW(){
+      if(!("serviceWorker" in navigator)) return {ok:false, reason:"no-sw"};
+      try{
+        const swCode = `
+          const CACHE = "shared-bottlenecks-cache-v1";
+          self.addEventListener("install", (e) => {
+            e.waitUntil((async()=> {
+              const cache = await caches.open(CACHE);
+              // Cache the page itself (same URL) for offline reload.
+              try { await cache.add(self.location.href); } catch (e) {}
+              self.skipWaiting();
+            })());
+          });
+          self.addEventListener("activate", (e) => {
+            e.waitUntil((async()=> {
+              const keys = await caches.keys();
+              await Promise.all(keys.map(k => (k===CACHE)?null:caches.delete(k)));
+              self.clients.claim();
+            })());
+          });
+          self.addEventListener("fetch", (e) => {
+            const req = e.request;
+            // Only GET.
+            if(req.method !== "GET") return;
+            e.respondWith((async()=> {
+              const cache = await caches.open(CACHE);
+              const cached = await cache.match(req);
+              if(cached) return cached;
+              try{
+                const fresh = await fetch(req);
+                // Cache successful same-origin responses.
+                if(fresh && fresh.ok && new URL(req.url).origin === self.location.origin){
+                  cache.put(req, fresh.clone());
+                }
+                return fresh;
+              }catch(err){
+                // Fallback to cached main page.
+                const fallback = await cache.match(self.location.href);
+                return fallback || new Response("Offline and no cache yet.", {status:503});
+              }
+            })());
+          });
+        `;
+        const blob = new Blob([swCode], {type:"text/javascript"});
+        const url = URL.createObjectURL(blob);
+        const reg = await navigator.serviceWorker.register(url, {scope:"./"});
+        return {ok:true, reg};
+      }catch(e){
+        return {ok:false, reason:String(e)};
+      }
+    }
+
+    /* =========================================================================
+       HUD STATE (tooltip: Gamification mechanics)
+       What: XP + streak + done actions + read markers.
+       How to extend: Add quests, badges, weekly cycles, exports.
+       Outcome: Motivation with minimal complexity.
+    ========================================================================= */
+    const HUD = (() => {
+      const todayKey = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+      };
+
+      const defaultState = () => ({
+        xp: 0,
+        streak: 0,
+        lastDay: null,
+        read: {},      // sectionKey -> timestamp
+        done: {},      // actionKey -> timestamp
+        reduceFx: false
+      });
+
+      function bumpStreak(state){
+        const t = todayKey();
+        if(state.lastDay === t) return state;
+        const y = new Date(); y.setDate(y.getDate()-1);
+        const yKey = `${y.getFullYear()}-${String(y.getMonth()+1).padStart(2,"0")}-${String(y.getDate()).padStart(2,"0")}`;
+        state.streak = (state.lastDay === yKey) ? (state.streak + 1) : 1;
+        state.lastDay = t;
+        return state;
+      }
+
+      function addXP(state, amt){
+        state.xp = Safe.clamp((state.xp||0) + amt, 0, 9e9);
+        bumpStreak(state);
+        return state;
+      }
+
+      function markRead(state, key){
+        if(!state.read[key]){
+          state.read[key] = Date.now();
+          addXP(state, 10);
+        }
+        return state;
+      }
+
+      function markDone(state, key){
+        if(!state.done[key]){
+          state.done[key] = Date.now();
+          addXP(state, 25);
+        }
+        return state;
+      }
+
+      return { defaultState, addXP, markRead, markDone, todayKey };
+    })();
+
+    /* =========================================================================
+       RENDERING (tooltip: UI rendering)
+       What: Converts DATA into DOM content.
+       How to extend: Add more sections, or render timelines/graphs.
+       Outcome: Data-driven UI without frameworks.
+    ========================================================================= */
+    function el(tag, attrs={}, html=""){
+      const n = document.createElement(tag);
+      for(const [k,v] of Object.entries(attrs||{})){
+        if(k==="class") n.className = v;
+        else if(k==="dataset") Object.assign(n.dataset, v);
+        else if(k.startsWith("on") && typeof v==="function") n.addEventListener(k.slice(2), v);
+        else n.setAttribute(k, v);
+      }
+      if(html !== undefined && html !== null) n.innerHTML = html;
+      return n;
+    }
+
+    function linkList(items){
+      const ul = el("ul");
+      items.forEach(it=>{
+        const safe = Safe.safeUrl(it.url);
+        const li = el("li");
+        if(safe){
+          li.innerHTML = `<a href="${safe}" target="_blank" rel="noopener noreferrer">${Safe.escapeHTML(it.label)}</a>`;
+        }else{
+          li.textContent = it.label;
+        }
+        ul.appendChild(li);
+      });
+      return ul;
+    }
+
+    function domainChips(filters){
+      const fb = document.getElementById("filterbar");
+      fb.innerHTML = "";
+      filters.forEach(f=>{
+        const c = el("div", {class:"chip", dataset:{key:f}}, Safe.escapeHTML(f));
+        c.addEventListener("click", () => {
+          c.classList.toggle("on");
+          renderBottlenecks();
+        });
+        fb.appendChild(c);
+      });
+    }
+
+    function activeFilters(){
+      return [...document.querySelectorAll(".chip.on")].map(x=>x.dataset.key);
+    }
+
+    function impactTag(v){
+      const cls = v==="good" ? "good" : (v==="bad" ? "bad" : (v==="warn" ? "warn" : "warn"));
+      const label = v==="good" ? "positive" : (v==="bad" ? "negative" : "mixed/fragile");
+      return `<span class="tag ${cls}">${label}</span>`;
+    }
+
+    function renderBottlenecks(){
+      const list = document.getElementById("bottleneckList");
+      const query = (document.getElementById("q").value || "").trim().toLowerCase();
+      const filters = activeFilters();
+
+      const hits = DATA.bottlenecks.filter(b=>{
+        const blob = [
+          b.id, b.title, b.domains.join(" "),
+          b.why,
+          ...b.solutions.technical, ...b.solutions.policy, ...b.solutions.governance,
+          ...(b.sources||[]).map(s=>s.label + " " + s.url)
+        ].join(" ").toLowerCase();
+
+        const qok = query ? blob.includes(query) : true;
+        const fok = filters.length ? filters.some(f=>b.domains.includes(f)) : true;
+        return qok && fok;
+      });
+
+      list.innerHTML = "";
+
+      hits.forEach(b=>{
+        const d = el("details", {dataset:{id:b.id}, title:"Tooltip: Bottleneck card — includes why + solutions + sources + local actions."});
+        const summary = el("summary");
+        summary.innerHTML = `
+          <div class="sum">
+            <b>${Safe.escapeHTML(b.title)}</b>
+            <span>${Safe.escapeHTML(b.id)} • ${Safe.escapeHTML(b.domains.join(" • "))}</span>
+          </div>
+          <div class="right">
+            ${impactTag(b.impact.benevolence)} ${impactTag(b.impact.security)}
+          </div>
+        `;
+        const body = el("div", {class:"body"});
+
+        const sources = (b.sources||[]).map(s=>{
+          const u = Safe.safeUrl(s.url);
+          const kind = Safe.escapeHTML(s.kind || "source");
+          if(!u) return `<li>${Safe.escapeHTML(s.label)} <span class="tag">${kind}</span></li>`;
+          return `<li><a href="${u}" target="_blank" rel="noopener noreferrer">${Safe.escapeHTML(s.label)}</a> <span class="tag">${kind}</span></li>`;
+        }).join("");
+
+        const sol = (arr)=>arr.map(x=>`<li>${Safe.escapeHTML(x)}</li>`).join("");
+
+        const actionButtons = (b.quickActions||[]).map(a=>{
+          return `<button class="primary" data-done="${Safe.escapeHTML(a.key)}">${Safe.escapeHTML(a.label)} (+XP)</button>`;
+        }).join("");
+
+        body.innerHTML = `
+          <div class="small"><b>Why this bottleneck exists</b></div>
+          <div>${Safe.escapeHTML(b.why)}</div>
+
+          <div class="hr"></div>
+          <div class="small"><b>Solutions (baked in)</b></div>
+          <div class="cols">
+            <div>
+              <div class="small"><b>Technical</b></div>
+              <ul>${sol(b.solutions.technical||[])}</ul>
+            </div>
+            <div>
+              <div class="small"><b>Policy & governance</b></div>
+              <ul>${sol([...(b.solutions.policy||[]), ...(b.solutions.governance||[])])}</ul>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+          <div class="small"><b>Primary / synthesis sources</b></div>
+          <ul>${sources}</ul>
+
+          <div class="btnrow" style="margin-top:12px;">
+            <button data-read="read:${Safe.escapeHTML(b.id)}">Mark as reviewed (+XP)</button>
+            ${actionButtons}
+          </div>
+        `;
+
+        d.appendChild(summary);
+        d.appendChild(body);
+        list.appendChild(d);
+      });
+
+      // Update HUD count
+      document.getElementById("btCount").textContent = String(DATA.bottlenecks.length);
+
+      // Wire events
+      list.querySelectorAll("button[data-read]").forEach(btn=>{
+        btn.addEventListener("click", async () => {
+          await stateMarkRead(btn.dataset.read);
+        });
+      });
+      list.querySelectorAll("button[data-done]").forEach(btn=>{
+        btn.addEventListener("click", async () => {
+          await stateMarkDone(btn.dataset.done);
+        });
+      });
+    }
+
+    function renderSources(){
+      document.getElementById("govSources").innerHTML = "";
+      document.getElementById("govSources").appendChild(linkList(DATA.sources.government));
+
+      document.getElementById("synthSources").innerHTML = "";
+      document.getElementById("synthSources").appendChild(linkList(DATA.sources.synthesis));
+
+      document.getElementById("companySources").innerHTML = "";
+      document.getElementById("companySources").appendChild(linkList(DATA.sources.companies));
+    }
+
+    /* =========================================================================
+       NOTES (tooltip: Local notes CRUD)
+       What: Save/search/delete notes in IndexedDB.
+       How to extend: Add tags, attachments, or per-bottleneck linking.
+       Outcome: Practical “implementation notebook” offline.
+    ========================================================================= */
+    function makeId(){
+      return "N-" + Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
+    }
+
+    async function refreshNotes(){
+      const q = (document.getElementById("noteSearch").value||"").trim().toLowerCase();
+      const notes = await DB.getAllNotes();
+      notes.sort((a,b)=> (b.ts||0) - (a.ts||0));
+
+      const filtered = q ? notes.filter(n=>{
+        const blob = (n.t + "\n" + n.b).toLowerCase();
+        return blob.includes(q);
+      }) : notes;
+
+      const list = document.getElementById("noteList");
+      list.innerHTML = "";
+      if(!filtered.length){
+        list.appendChild(el("div", {class:"small"}, "No notes yet."));
+        return;
+      }
+      filtered.forEach(n=>{
+        const wrap = el("details");
+        const sum = el("summary");
+        sum.innerHTML = `
+          <div class="sum">
+            <b>${Safe.escapeHTML(n.t||"(untitled)")}</b>
+            <span>${new Date(n.ts).toLocaleString()}</span>
+          </div>
+          <div class="right"><span class="tag">note</span></div>
+        `;
+        const body = el("div", {class:"body"});
+        body.innerHTML = `
+          <div style="white-space:pre-wrap;">${Safe.escapeHTML(n.b||"")}</div>
+          <div class="btnrow">
+            <button data-load="${Safe.escapeHTML(n.id)}">Load into editor</button>
+            <button class="danger" data-del="${Safe.escapeHTML(n.id)}">Delete</button>
+          </div>
+        `;
+        wrap.appendChild(sum); wrap.appendChild(body);
+        list.appendChild(wrap);
+      });
+
+      list.querySelectorAll("button[data-load]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id = btn.dataset.load;
+          const all = await DB.getAllNotes();
+          const n = all.find(x=>x.id===id);
+          if(!n) return;
+          document.getElementById("noteTitle").value = n.t || "";
+          document.getElementById("noteBody").value = n.b || "";
+          await stateMarkRead("read:notes-load");
+        });
+      });
+
+      list.querySelectorAll("button[data-del]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          if(!confirm("Delete this note? (local-only)")) return;
+          await DB.delNote(btn.dataset.del);
+          await refreshNotes();
+          await stateMarkDone("note:delete");
+        });
+      });
+    }
+
+    /* =========================================================================
+       STATE (tooltip: App state + persistence)
+       What: Loads/saves HUD + preferences.
+       How to extend: Add per-bottleneck statuses and history.
+       Outcome: Consistent experience across reloads.
+    ========================================================================= */
+    let APP = {
+      hud: HUD.defaultState(),
+      prefs: { }
+    };
+
+    async function loadState(){
+      const hud = await DB.getKV("hud");
+      APP.hud = hud && typeof hud === "object" ? hud : HUD.defaultState();
+      const prefs = await DB.getKV("prefs");
+      APP.prefs = prefs && typeof prefs === "object" ? prefs : {};
+      return APP;
+    }
+
+    async function saveState(){
+      await DB.setKV("hud", APP.hud);
+      await DB.setKV("prefs", APP.prefs);
+    }
+
+    async function stateMarkRead(key){
+      if(!Safe.rateLimit("read", 250)) return;
+      APP.hud = HUD.markRead(APP.hud, key);
+      await saveState();
+      updateHUD();
+      drawSky();
+    }
+
+    async function stateMarkDone(key){
+      if(!Safe.rateLimit("done", 250)) return;
+      APP.hud = HUD.markDone(APP.hud, key);
+      await saveState();
+      updateHUD();
+      drawSky();
+    }
+
+    /* =========================================================================
+       HUD UPDATE + CONSTELLATION DRAW (tooltip: Visualization)
+       What: Renders a small network map of bottlenecks with glow by status.
+       How to extend: Add edges (relations) and hover tooltips.
+       Outcome: Quick cognitive map.
+    ========================================================================= */
+    function updateHUD(){
+      const h = APP.hud || HUD.defaultState();
+      document.getElementById("xp").textContent = String(h.xp||0);
+      document.getElementById("streak").textContent = String(h.streak||0);
+      const readCount = Object.keys(h.read||{}).length;
+      const doneCount = Object.keys(h.done||{}).length;
+      document.getElementById("readCount").textContent = String(readCount);
+      document.getElementById("doneCount").textContent = String(doneCount);
+
+      // Completion estimate: read markers + done actions vs max target
+      const target = (DATA.bottlenecks.length * 2) + 8;
+      const prog = Safe.clamp((readCount + doneCount) / Math.max(1,target), 0, 1);
+      document.getElementById("meterFill").style.width = (prog*100).toFixed(1) + "%";
+
+      // Effects toggle
+      document.body.style.setProperty("--shadow", h.reduceFx ? "0 0 0 rgba(0,0,0,0)" : "0 10px 40px rgba(0,0,0,.35)");
+      document.querySelectorAll(".layer").forEach(L=>{
+        L.style.opacity = h.reduceFx ? "0.18" : "";
+      });
+    }
+
+    function drawSky(){
+      const c = document.getElementById("sky");
+      const ctx = c.getContext("2d");
+      const w = c.width, h = c.height;
+      ctx.clearRect(0,0,w,h);
+
+      // Background stars
+      ctx.fillStyle = "rgba(255,255,255,0.08)";
+      for(let i=0;i<90;i++){
+        const x = (i*37 % w) + (i%3)*2;
+        const y = (i*83 % h) + ((i+1)%4)*2;
+        ctx.fillRect(x,y,1,1);
+      }
+
+      const reduce = !!APP.hud.reduceFx;
+
+      // Nodes for each bottleneck
+      const nodes = DATA.bottlenecks.map((b, idx)=>{
+        const angle = (idx / DATA.bottlenecks.length) * Math.PI*2;
+        const radius = Math.min(w,h)*0.28;
+        return {
+          id: b.id,
+          x: w*0.50 + Math.cos(angle)*radius,
+          y: h*0.55 + Math.sin(angle)*radius*0.78,
+          benev: b.impact.benevolence,
+          sec: b.impact.security
+        };
+      });
+
+      // Edges (simple ring)
+      ctx.strokeStyle = "rgba(138,125,255,0.12)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      nodes.forEach((n,i)=>{
+        const nn = nodes[(i+1)%nodes.length];
+        ctx.moveTo(n.x,n.y);
+        ctx.lineTo(nn.x,nn.y);
+      });
+      ctx.stroke();
+
+      // Status glow based on read/done
+      nodes.forEach(n=>{
+        const read = !!(APP.hud.read && APP.hud.read["read:"+n.id]);
+        const doneAny = !!(APP.hud.done && Object.keys(APP.hud.done).some(k=>k.startsWith(n.id.toLowerCase()) || k.includes(n.id.toLowerCase())));
+        // Better: treat reviewed as bright, implemented as brighter.
+        const level = doneAny ? 2 : (read ? 1 : 0);
+
+        // Color by “worst” impact signal
+        const worst = (n.benev==="bad" || n.sec==="bad") ? "bad" : ((n.benev==="warn" || n.sec==="warn") ? "warn" : "good");
+        const col = worst==="bad" ? "255,77,109" : (worst==="warn" ? "255,209,102" : "72,230,179");
+
+        // Glow
+        const glow = reduce ? 0 : (level===2 ? 18 : (level===1 ? 10 : 4));
+        ctx.shadowBlur = glow;
+        ctx.shadowColor = `rgba(${col},0.45)`;
+
+        // Node
+        ctx.fillStyle = level===0 ? `rgba(${col},0.35)` : `rgba(${col},0.85)`;
+        ctx.beginPath();
+        ctx.arc(n.x,n.y, level===2 ? 7 : (level===1 ? 6 : 5), 0, Math.PI*2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Label (tiny)
+        ctx.fillStyle = "rgba(234,240,255,0.70)";
+        ctx.font = "10px ui-monospace, Menlo, Consolas, monospace";
+        ctx.fillText(n.id.replace("BT-",""), n.x+9, n.y+3);
+      });
+    }
+
+    /* =========================================================================
+       PARALLAX (tooltip: Motion effect)
+       What: Mouse-based parallax. Reduced when user toggles reduceFx.
+       How to extend: Add scroll coupling if desired (keep it gentle).
+       Outcome: Depth, not dizziness.
+    ========================================================================= */
+    function setupParallax(){
+      const l1 = document.getElementById("pl1");
+      const l2 = document.getElementById("pl2");
+      const l3 = document.getElementById("pl3");
+      let raf = null;
+      let mx = 0, my = 0;
+
+      window.addEventListener("mousemove", (e)=>{
+        if(APP.hud.reduceFx) return;
+        mx = (e.clientX / window.innerWidth) * 2 - 1;
+        my = (e.clientY / window.innerHeight) * 2 - 1;
+        if(raf) return;
+        raf = requestAnimationFrame(()=>{
+          raf = null;
+          l1.style.transform = `translate3d(${mx*8}px, ${my*6}px, 0)`;
+          l2.style.transform = `translate3d(${mx*16}px, ${my*12}px, 0)`;
+          l3.style.transform = `translate3d(${mx*26}px, ${my*18}px, 0)`;
+        });
+      });
+    }
+
+    /* =========================================================================
+       BOOTSTRAP (tooltip: App initialization)
+       What: Opens DB, loads state, renders UI, registers SW, hides splash.
+       How to extend: Add versioned migrations or remote refresh (optional).
+       Outcome: Deterministic startup.
+    ========================================================================= */
+    async function boot(){
+      document.getElementById("splashStatus").textContent = "opening IndexedDB…";
+      await DB.open();
+
+      document.getElementById("splashStatus").textContent = "loading state…";
+      await loadState();
+
+      document.getElementById("splashStatus").textContent = "rendering…";
+      domainChips(DATA.filters);
+      renderBottlenecks();
+      renderSources();
+      updateHUD();
+      drawSky();
+      setupParallax();
+
+      // Search handling (rate-limited)
+      const q = document.getElementById("q");
+      q.addEventListener("input", ()=>{
+        if(!Safe.rateLimit("search", 60)) return;
+        renderBottlenecks();
+      });
+
+      // Notes wiring
+      document.getElementById("btnSaveNote").addEventListener("click", async ()=>{
+        if(!Safe.rateLimit("saveNote", 650)) return;
+        const t = (document.getElementById("noteTitle").value||"").trim().slice(0,120);
+        const b = (document.getElementById("noteBody").value||"").trim().slice(0,4000);
+        if(!t && !b) return;
+        const note = {id: makeId(), t, b, ts: Date.now()};
+        await DB.putNote(note);
+        document.getElementById("noteTitle").value = "";
+        document.getElementById("noteBody").value = "";
+        await refreshNotes();
+        await stateMarkDone("note:save");
+      });
+      document.getElementById("btnClearNote").addEventListener("click", ()=>{
+        document.getElementById("noteTitle").value = "";
+        document.getElementById("noteBody").value = "";
+      });
+      document.getElementById("noteSearch").addEventListener("input", ()=>{
+        if(!Safe.rateLimit("noteSearch", 80)) return;
+        refreshNotes();
+      });
+      await refreshNotes();
+
+      // Export / import
+      document.getElementById("btnExport").addEventListener("click", async ()=>{
+        const payload = {
+          meta: {exportedAt: new Date().toISOString(), baseline: DATA.meta.baseline},
+          hud: APP.hud,
+          prefs: APP.prefs,
+          notes: await DB.getAllNotes()
+        };
+        const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `shared-bottlenecks-export-${DATA.meta.baseline}.json`;
+        a.click();
+        await stateMarkDone("export:json");
+      });
+
+      document.getElementById("btnImport").addEventListener("click", ()=>{
+        document.getElementById("importFile").click();
+      });
+      document.getElementById("importFile").addEventListener("change", async (e)=>{
+        const file = e.target.files && e.target.files[0];
+        if(!file) return;
+        try{
+          const txt = await file.text();
+          const obj = JSON.parse(txt);
+          if(obj && obj.notes && Array.isArray(obj.notes)){
+            // merge notes
+            for(const n of obj.notes){
+              if(n && typeof n.id==="string" && typeof n.ts==="number"){
+                await DB.putNote({id:n.id, t:String(n.t||"").slice(0,120), b:String(n.b||"").slice(0,4000), ts:n.ts});
+              }
+            }
+          }
+          if(obj && obj.hud && typeof obj.hud==="object"){
+            APP.hud = obj.hud;
+            await saveState();
+          }
+          await refreshNotes();
+          updateHUD();
+          drawSky();
+          await stateMarkDone("import:json");
+        }catch(err){
+          alert("Import failed: " + err);
+        }finally{
+          e.target.value = "";
+        }
+      });
+
+      document.getElementById("btnWipeAll").addEventListener("click", async ()=>{
+        if(!confirm("Reset local data? This deletes notes + progress on this device.")) return;
+        await DB.wipeAll();
+        APP.hud = HUD.defaultState();
+        APP.prefs = {};
+        await saveState();
+        await refreshNotes();
+        updateHUD();
+        drawSky();
+      });
+
+      // Misc buttons
+      document.getElementById("btnPrint").addEventListener("click", ()=>window.print());
+      document.getElementById("btnFocusTop").addEventListener("click", ()=>window.scrollTo({top:0, behavior:"smooth"}));
+      document.getElementById("btnToggleGlow").addEventListener("click", async ()=>{
+        APP.hud.reduceFx = !APP.hud.reduceFx;
+        await saveState();
+        updateHUD();
+        drawSky();
+      });
+
+      // Summary read
+      document.getElementById("btnMarkReadSummary").addEventListener("click", async ()=>{
+        await stateMarkRead("read:execSummary");
+      });
+
+      // Quest buttons in solutions playbook
+      document.querySelectorAll("button[data-quest]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          await stateMarkDone("quest:"+btn.dataset.quest);
+        });
+      });
+
+      // Mark read when opening details (lightweight)
+      document.querySelectorAll("details").forEach(d=>{
+        d.addEventListener("toggle", async ()=>{
+          if(d.open){
+            const id = d.dataset && d.dataset.id ? d.dataset.id : d.id;
+            if(id) await stateMarkRead("open:"+id);
+          }
+        });
+      });
+
+      // Offline readiness
+      document.getElementById("splashStatus").textContent = "arming offline cache…";
+      const sw = await registerSW();
+      document.getElementById("offlineReady").textContent = sw.ok ? "yes" : "no";
+      await stateMarkRead("read:boot");
+
+      // Hide splash
+      setTimeout(()=>{
+        document.getElementById("splash").classList.add("hide");
+      }, 250);
+
+      // Badge
+      document.getElementById("buildBadge").textContent = "Baseline: " + DATA.meta.baseline;
+    }
+
+    boot();
+  </script>
+</body>
+</html>
