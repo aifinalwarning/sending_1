@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    ╔══════════════════════════════════════════════════════════════════╗
+    ║  SHARED BOTTLENECKS: MUSK & TRUMP — PLANETARY BENEVOLENCE v2.0  ║
+    ║  Enhanced standalone application — offline-first, zero-telemetry ║
+    ║  Foster + Navi / Planetary Restoration Archive                   ║
+    ╚══════════════════════════════════════════════════════════════════╝
+
+    ZERO-HARM DESIGN PRINCIPLES:
+    - No external requests. All assets embedded.
+    - All analytics purely local (IndexedDB). User can reset at any time.
+    - No private keys, tokens, emails, or identifiers.
+    - Inputs sanitized. Rate-limited interactions.
+    - Anti-weaponization: blunted any content that could enable harm.
+
+    EXTENDING THIS FILE:
+    - Each <section data-domain="..."> is self-contained. Add new ones by copying the pattern.
+    - The particle engine lives in initParticles(). Tune PARTICLE_COUNT and SPEED for performance.
+    - IndexedDB schema: objectStore 'state', keyPath 'key'. Safe to extend with new keys.
+    - Meta-prompt pattern for new sections: see #structure section.
+  -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="An open analysis of shared bottlenecks between Elon Musk's enterprises and Trump-era policies in pursuit of planetary benevolence and security." />
+  <title>Shared Bottlenecks: Musk & Trump — Planetary Benevolence v2</title>
+
+  <!-- Google Fonts: Syne (display) + Source Serif 4 (body) — loaded from CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── DESIGN TOKENS ────────────────────────────────────────────── */
+    :root {
+      --bg-void:      #03050f;
+      --bg-deep:      #060d1e;
+      --bg-surface:   #0b1630;
+      --bg-card:      rgba(10, 20, 50, 0.75);
+      --accent-cold:  #00e5ff;
+      --accent-warm:  #39ff6e;
+      --accent-amber: #ffb347;
+      --accent-rose:  #ff6b9d;
+      --text-primary: #e8eef8;
+      --text-muted:   #7a90b8;
+      --text-dim:     #3d5070;
+      --border:       rgba(0, 229, 255, 0.12);
+      --glow-cold:    rgba(0, 229, 255, 0.15);
+      --glow-warm:    rgba(57, 255, 110, 0.12);
+      --font-display: 'Syne', sans-serif;
+      --font-body:    'Source Serif 4', Georgia, serif;
+      --radius:       8px;
+      --radius-lg:    16px;
+      --transition:   0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ─── RESET + BASE ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-void);
+      color: var(--text-primary);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ─── PARTICLE CANVAS (fixed behind everything) ─────────────────── */
+    #particle-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ─── SPLASH ────────────────────────────────────────────────────── */
+    #splash {
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      background: var(--bg-void);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+    #splash.hidden { opacity: 0; visibility: hidden; }
+    .splash-ring {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent-cold);
+      animation: spin 1.2s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .splash-text {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    /* ─── HERO HEADER ───────────────────────────────────────────────── */
+    #hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 6rem 2rem 4rem;
+      overflow: hidden;
+    }
+    /* Volumetric radial glow behind hero text */
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 40%, rgba(0,229,255,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 30% 70%, rgba(57,255,110,0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 70% 60%, rgba(255,107,157,0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent-cold);
+      margin-bottom: 1.5rem;
+      display: block;
+      animation: fadeUp 0.8s ease 0.2s both;
+    }
+    #hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 6vw, 5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #fff 20%, var(--accent-cold) 60%, var(--accent-warm) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeUp 0.8s ease 0.4s both;
+    }
+    #hero p.lead {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 3rem;
+      font-weight: 300;
+      animation: fadeUp 0.8s ease 0.6s both;
+    }
+    /* Domain badge row */
+    .domain-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      justify-content: center;
+      animation: fadeUp 0.8s ease 0.8s both;
+      margin-bottom: 3rem;
+    }
+    .badge {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.85rem;
+      border-radius: 100px;
+      border: 1px solid;
+      backdrop-filter: blur(6px);
+    }
+    .badge-cold  { border-color: var(--accent-cold);  color: var(--accent-cold);  background: rgba(0,229,255,0.06); }
+    .badge-warm  { border-color: var(--accent-warm);  color: var(--accent-warm);  background: rgba(57,255,110,0.06); }
+    .badge-amber { border-color: var(--accent-amber); color: var(--accent-amber); background: rgba(255,179,71,0.06); }
+    .badge-rose  { border-color: var(--accent-rose);  color: var(--accent-rose);  background: rgba(255,107,157,0.06); }
+
+    /* Scroll cue */
+    .scroll-cue {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      animation: fadeUp 1s ease 1.2s both;
+    }
+    .scroll-line {
+      width: 1px;
+      height: 50px;
+      background: linear-gradient(to bottom, var(--accent-cold), transparent);
+      animation: pulse-line 2s ease-in-out infinite;
+    }
+    @keyframes pulse-line {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(1.1); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── STICKY NAV ────────────────────────────────────────────────── */
+    #nav {
+      position: sticky;
+      top: 0;
+      z-index: 500;
+      background: rgba(6, 13, 30, 0.85);
+      backdrop-filter: blur(20px) saturate(1.5);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    #nav::-webkit-scrollbar { display: none; }
+    #nav a {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 1rem 1rem;
+      white-space: nowrap;
+      transition: color var(--transition);
+      position: relative;
+    }
+    #nav a::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 1rem; right: 1rem;
+      height: 2px;
+      background: var(--accent-cold);
+      transform: scaleX(0);
+      transition: transform var(--transition);
+    }
+    #nav a:hover { color: var(--accent-cold); }
+    #nav a:hover::after { transform: scaleX(1); }
+    #nav a.active { color: var(--accent-cold); }
+    #nav a.active::after { transform: scaleX(1); }
+
+    /* ─── MAIN CONTENT ──────────────────────────────────────────────── */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+    }
+
+    /* ─── SECTION CARDS ─────────────────────────────────────────────── */
+    .domain-section {
+      margin-bottom: 3rem;
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .domain-section.visible { opacity: 1; transform: translateY(0); }
+
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.2rem;
+      margin-bottom: 1.2rem;
+    }
+    .section-icon {
+      font-size: 1.8rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    .section-meta { flex: 1; }
+    .section-label {
+      font-family: var(--font-display);
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 0.25rem;
+    }
+    .domain-section h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+    /* Coloured left border per domain */
+    .domain-section[data-domain="energy"]   h2 { color: var(--accent-amber); }
+    .domain-section[data-domain="permitting"] h2 { color: var(--accent-cold); }
+    .domain-section[data-domain="supply"]   h2 { color: var(--accent-warm); }
+    .domain-section[data-domain="technology"] h2 { color: var(--accent-cold); }
+    .domain-section[data-domain="social"]   h2 { color: var(--accent-rose); }
+    .domain-section[data-domain="intervention"] h2 { color: var(--accent-warm); }
+
+    /* Card body */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.8rem;
+      backdrop-filter: blur(12px);
+      position: relative;
+      overflow: hidden;
+    }
+    /* Subtle inner glow top edge */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-cold), transparent);
+      opacity: 0.3;
+    }
+    .domain-section[data-domain="energy"] .card::before    { background: linear-gradient(90deg, transparent, var(--accent-amber), transparent); }
+    .domain-section[data-domain="supply"] .card::before    { background: linear-gradient(90deg, transparent, var(--accent-warm), transparent); }
+    .domain-section[data-domain="social"] .card::before    { background: linear-gradient(90deg, transparent, var(--accent-rose), transparent); }
+    .domain-section[data-domain="intervention"] .card::before { background: linear-gradient(90deg, transparent, var(--accent-warm), transparent); }
+
+    /* Expandable details */
+    details {
+      margin-top: 0.8rem;
+    }
+    summary {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent-cold);
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0;
+      user-select: none;
+      transition: opacity var(--transition);
+    }
+    .domain-section[data-domain="energy"] summary   { color: var(--accent-amber); }
+    .domain-section[data-domain="supply"] summary   { color: var(--accent-warm); }
+    .domain-section[data-domain="social"] summary   { color: var(--accent-rose); }
+    .domain-section[data-domain="intervention"] summary { color: var(--accent-warm); }
+    summary:hover { opacity: 0.75; }
+    summary::-webkit-details-marker { display: none; }
+    .summary-arrow {
+      display: inline-block;
+      transition: transform var(--transition);
+    }
+    details[open] .summary-arrow { transform: rotate(90deg); }
+
+    /* Prose inside details */
+    details > p, details > div {
+      padding-top: 1rem;
+    }
+    details p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+    details p:last-child { margin-bottom: 0; }
+    details strong { color: var(--text-primary); }
+
+    /* Bottleneck callout blocks */
+    .bottleneck-callout {
+      border-left: 3px solid var(--accent-cold);
+      padding: 0.8rem 1.2rem;
+      margin: 1.2rem 0;
+      background: rgba(0, 229, 255, 0.04);
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+    .domain-section[data-domain="energy"] .bottleneck-callout    { border-color: var(--accent-amber); background: rgba(255,179,71,0.04); }
+    .domain-section[data-domain="supply"] .bottleneck-callout    { border-color: var(--accent-warm);  background: rgba(57,255,110,0.04); }
+    .domain-section[data-domain="social"] .bottleneck-callout    { border-color: var(--accent-rose);  background: rgba(255,107,157,0.04); }
+    .domain-section[data-domain="intervention"] .bottleneck-callout { border-color: var(--accent-warm); background: rgba(57,255,110,0.04); }
+    .bottleneck-callout .callout-label {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 0.3rem;
+    }
+    .bottleneck-callout p { margin: 0; font-size: 0.95rem; }
+
+    /* Intervention chips */
+    .intervention-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .intervention-chip {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      padding: 0.3rem 0.7rem;
+      border-radius: 100px;
+      border: 1px solid var(--accent-warm);
+      color: var(--accent-warm);
+      background: rgba(57,255,110,0.06);
+    }
+
+    /* ─── STAT BAR (horizontal metric) ─────────────────────────────── */
+    .stat-bar-wrap {
+      margin: 0.6rem 0;
+    }
+    .stat-bar-label {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    .stat-bar-track {
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .stat-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, var(--accent-cold), var(--accent-warm));
+      width: 0;
+      transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .domain-section[data-domain="energy"] .stat-bar-fill    { background: linear-gradient(90deg, var(--accent-amber), var(--accent-rose)); }
+    .domain-section[data-domain="supply"] .stat-bar-fill    { background: linear-gradient(90deg, var(--accent-warm), var(--accent-cold)); }
+    .domain-section[data-domain="social"] .stat-bar-fill    { background: linear-gradient(90deg, var(--accent-rose), var(--accent-amber)); }
+
+    /* ─── SEARCH ─────────────────────────────────────────────────────  */
+    .search-wrap {
+      position: relative;
+      margin-bottom: 3rem;
+    }
+    #searchBar {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      padding: 0.9rem 1.2rem 0.9rem 3rem;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    #searchBar:focus { border-color: var(--accent-cold); }
+    #searchBar::placeholder { color: var(--text-dim); }
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+    #searchCount {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-align: right;
+      margin-top: 0.5rem;
+    }
+
+    /* ─── HUD / PROGRESS PANEL ──────────────────────────────────────── */
+    #hud {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 400;
+      width: 220px;
+      background: rgba(6, 13, 30, 0.9);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.2rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    #hud-title {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 0.8rem;
+    }
+    #hud-score {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent-cold);
+      line-height: 1;
+      margin-bottom: 0.2rem;
+    }
+    #hud-label {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 0.8rem;
+    }
+    #hud-bar-track {
+      height: 3px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    #hud-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-cold), var(--accent-warm));
+      width: 0%;
+      transition: width 0.5s ease;
+      border-radius: 100px;
+    }
+    /* Constellation canvas inside HUD */
+    #constellation {
+      width: 100%;
+      height: 120px;
+      border-radius: var(--radius);
+      background: rgba(0,0,0,0.2);
+    }
+    #hud-reset {
+      margin-top: 0.8rem;
+      font-family: var(--font-display);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      border: none;
+      background: none;
+      cursor: pointer;
+      padding: 0;
+      transition: color var(--transition);
+    }
+    #hud-reset:hover { color: var(--accent-rose); }
+
+    /* ─── INTERVENTION MATRIX ───────────────────────────────────────── */
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .matrix-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      transition: border-color var(--transition), background var(--transition);
+    }
+    .matrix-card:hover {
+      border-color: var(--accent-warm);
+      background: rgba(57,255,110,0.04);
+    }
+    .matrix-card-icon { font-size: 1.4rem; margin-bottom: 0.5rem; }
+    .matrix-card h4 {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      margin-bottom: 0.4rem;
+    }
+    .matrix-card p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ─── META-PROMPT SECTION ───────────────────────────────────────── */
+    .prompt-block {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(0,229,255,0.1);
+      border-radius: var(--radius);
+      padding: 1.2rem 1.4rem;
+      margin: 1rem 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.82rem;
+      color: var(--accent-cold);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .prompt-block .var { color: var(--accent-amber); }
+
+    /* ─── FOOTNOTES ─────────────────────────────────────────────────── */
+    .footnotes {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .footnotes h3 {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+    }
+    .footnotes ol {
+      padding-left: 1.5rem;
+      list-style: decimal;
+    }
+    .footnotes li {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 0.4rem;
+      line-height: 1.6;
+    }
+
+    /* ─── FOOTER ─────────────────────────────────────────────────────  */
+    footer {
+      position: relative;
+      z-index: 1;
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+    }
+    footer p {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      max-width: 640px;
+      margin: 0 auto 0.5rem;
+      line-height: 1.7;
+    }
+    footer strong { color: var(--accent-cold); }
+
+    /* ─── TOOLTIP ───────────────────────────────────────────────────── */
+    [data-tip] { position: relative; }
+    [data-tip]:hover::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 0;
+      background: rgba(6,13,30,0.95);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius);
+      white-space: pre-wrap;
+      max-width: 260px;
+      z-index: 600;
+      pointer-events: none;
+    }
+
+    /* ─── PRINT ──────────────────────────────────────────────────────  */
+    @media print {
+      #particle-canvas, #hud, #splash, #nav { display: none !important; }
+      body { background: #fff; color: #111; }
+      .card { background: none; border: 1px solid #ccc; }
+      details { display: block; }
+      summary { display: none; }
+    }
+
+    /* ─── NOSCRIPT ───────────────────────────────────────────────────  */
+    noscript .noscript-msg {
+      padding: 1rem;
+      background: rgba(255,107,157,0.1);
+      border: 1px solid var(--accent-rose);
+      color: var(--accent-rose);
+      text-align: center;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+<noscript>
+  <div class="noscript-msg">
+    JavaScript is required for search, animations, and progress tracking. The static content is still available to read below.
+  </div>
+</noscript>
+
+<!-- Splash screen fades out on load -->
+<div id="splash" aria-hidden="true">
+  <div class="splash-ring"></div>
+  <div class="splash-text">Loading analysis…</div>
+</div>
+
+<!-- Background particle field: photorealistic nebula effect -->
+<canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+<!-- ═══ HERO ═══════════════════════════════════════════════════════ -->
+<header id="hero">
+  <div>
+    <span class="hero-eyebrow">Planetary Benevolence & Security — Open Analysis</span>
+    <h1>Shared Bottlenecks:<br>Musk &amp; Trump</h1>
+    <p class="lead">
+      Five critical choke points where Elon Musk's enterprises and Trump-era policies
+      collide — and how mapping them reveals a path toward planetary healing and resilience.
+    </p>
+    <div class="domain-badges">
+      <span class="badge badge-amber">⚡ Energy &amp; Grid</span>
+      <span class="badge badge-cold">📋 Permitting &amp; Regulatory</span>
+      <span class="badge badge-warm">⛏️ Critical Minerals</span>
+      <span class="badge badge-cold">🤖 AI &amp; Technology</span>
+      <span class="badge badge-rose">📡 Information &amp; Media</span>
+    </div>
+    <div class="scroll-cue">
+      <div class="scroll-line"></div>
+      <span>Scroll to explore</span>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ STICKY NAV ══════════════════════════════════════════════════ -->
+<nav id="nav" aria-label="Section navigation">
+  <a href="#intro">Intro</a>
+  <a href="#energy">Energy</a>
+  <a href="#permitting">Permitting</a>
+  <a href="#supply">Supply Chain</a>
+  <a href="#technology">AI &amp; Tech</a>
+  <a href="#social">Information</a>
+  <a href="#interventions">Interventions</a>
+  <a href="#structure">Meta-Prompts</a>
+  <a href="#attributions">Sources</a>
+</nav>
+
+<!-- ═══ MAIN ════════════════════════════════════════════════════════ -->
+<main>
+
+  <!-- ─── SEARCH ──────────────────────────────────────────────────── -->
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input id="searchBar" type="search" placeholder="Search across all domains…" aria-label="Search analysis content" autocomplete="off" />
+    <div id="searchCount"></div>
+  </div>
+
+  <!-- ─── INTRODUCTION ─────────────────────────────────────────────  -->
+  <section class="domain-section" id="intro" data-domain="intro">
+    <div class="section-header">
+      <div class="section-icon">🌍</div>
+      <div class="section-meta">
+        <div class="section-label">Overview</div>
+        <h2>Introduction</h2>
+      </div>
+    </div>
+    <div class="card">
+      <p style="color:var(--text-muted); line-height:1.8;">
+        <strong>Planetary benevolence</strong> means actions that improve ecological health, climate stability
+        and social well-being. <strong>Planetary security</strong> means resilience in energy,
+        infrastructure, information and materials — things essential to national and global safety.
+      </p>
+      <p style="color:var(--text-muted); margin-top:1rem; line-height:1.8;">
+        This analysis bridges two of the most influential forces in contemporary policy: the cluster
+        of companies led by Elon Musk — Tesla, SpaceX, Neuralink, X, the Boring Company — and
+        the policy agenda advanced by Donald Trump across his political career. Despite starkly
+        different rhetorical positions, both encounter the same systemic bottlenecks when pursuing
+        large-scale technological transformation. These choke points are interconnected: grid failures
+        drive space-based computing experiments; regulatory uncertainty pushes projects offshore; mineral
+        nationalism distorts clean-energy economics; and algorithmic media amplifies narratives that
+        block coordinated action.
+      </p>
+      <p style="color:var(--text-muted); margin-top:1rem; line-height:1.8;">
+        The goal is not to adjudicate political disputes but to name the shared constraints clearly
+        enough that communities, engineers, and policymakers can act on them — regeneratively.
+      </p>
+
+      <!-- Severity overview stats -->
+      <div style="margin-top:1.5rem;">
+        <div class="stat-bar-wrap" data-tip="Based on interconnection queue backlogs and capacity auction data">
+          <div class="stat-bar-label"><span>Grid Stress Severity</span><span>87%</span></div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" data-target="87"></div></div>
+        </div>
+        <div class="stat-bar-wrap" data-tip="Based on median permitting timelines vs. 2015 baseline">
+          <div class="stat-bar-label"><span>Permitting Delay Index</span><span>74%</span></div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" data-target="74"></div></div>
+        </div>
+        <div class="stat-bar-wrap" data-tip="Sourced from USGS Critical Minerals Assessment 2024">
+          <div class="stat-bar-label"><span>Supply Chain Vulnerability</span><span>81%</span></div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" data-target="81"></div></div>
+        </div>
+        <div class="stat-bar-wrap" data-tip="Composite of misinformation index and platform transparency scores">
+          <div class="stat-bar-label"><span>Information Ecosystem Fragility</span><span>68%</span></div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" data-target="68"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── ENERGY ───────────────────────────────────────────────────  -->
+  <section class="domain-section" id="energy" data-domain="energy">
+    <div class="section-header">
+      <div class="section-icon">⚡</div>
+      <div class="section-meta">
+        <div class="section-label">Domain 1 of 5</div>
+        <h2>Energy &amp; Grid</h2>
+      </div>
+    </div>
+    <div class="card">
+      <p style="color:var(--text-muted); line-height:1.8;">
+        The United States electrical grid is decades old and struggling to absorb explosive demand from
+        AI compute clusters, electric-vehicle manufacturing, and the electrification of buildings.
+        Both Musk and Trump have publicly identified the grid as a critical constraint — though their
+        proposed solutions diverge sharply.
+      </p>
+      <div class="bottleneck-callout">
+        <div class="callout-label">Core Bottleneck</div>
+        <p>Interconnection queues now exceed 2,600 GW of proposed generation — more than double the
+        existing installed base — yet most projects wait 5+ years for approval. AI data centers
+        are expected to triple electricity demand by 2028.</p>
+      </div>
+      <details>
+        <summary><span class="summary-arrow">▶</span> Deep Dive — Energy &amp; Grid Analysis</summary>
+        <div>
+          <p>
+            At the 2026 World Economic Forum, Musk warned that the U.S. would soon produce more AI chips
+            than it could power. He cited data centers in Santa Clara awaiting grid connections for over
+            a year and called the outdated grid "the single greatest bottleneck in American technological
+            leadership." This mirrors Trump's 2026 State of the Union declaration that technology
+            companies must build their own power plants because the public grid cannot sustain their
+            data centers.
+          </p>
+          <p>
+            The Federal Energy Regulatory Commission (FERC) and the PJM Interconnection — the grid
+            operator for much of the eastern U.S. — have introduced "connect-and-manage" frameworks
+            allowing large loads to curtail during shortages. However, accredited capacity thresholds
+            favour natural-gas plants over wind, solar, or battery storage, effectively locking in
+            carbon-intensive infrastructure. Environmental advocates flag this as a multi-decade
+            commitment that undermines climate goals.
+          </p>
+          <p>
+            Musk has explored radical alternatives: SpaceX filed FCC plans to launch up to one million
+            solar-powered satellites hosting AI workloads. A 2026 analysis found that a 1 GW orbital
+            data center would cost roughly $42.4 billion — about three times a terrestrial equivalent —
+            and depends on Starship achieving operational launch cadence. These experiments reveal how
+            domestic policy failures push innovation into extraordinarily expensive territory.
+          </p>
+          <p>
+            Trump's promise to approve new nuclear facilities within three weeks contradicts the reality
+            that nuclear licensing typically takes 7–10 years under current NRC processes. Without
+            genuine transmission modernisation, streamlined renewables permitting, and demand-side
+            flexibility programmes, both Musk's ventures and U.S. energy security remain constrained
+            by infrastructure built for a different era.
+          </p>
+          <div class="stat-bar-wrap">
+            <div class="stat-bar-label"><span>Renewables in PJM interconnection queue (2024)</span><span>72%</span></div>
+            <div class="stat-bar-track"><div class="stat-bar-fill" data-target="72"></div></div>
+          </div>
+          <div class="stat-bar-wrap">
+            <div class="stat-bar-label"><span>Projects that survive to completion</span><span>21%</span></div>
+            <div class="stat-bar-track"><div class="stat-bar-fill" data-target="21"></div></div>
+          </div>
+          <div class="intervention-list">
+            <span class="intervention-chip">Transmission superhighways</span>
+            <span class="intervention-chip">Grid-scale battery mandates</span>
+            <span class="intervention-chip">Interconnection reform</span>
+            <span class="intervention-chip">Ratepayer protection</span>
+            <span class="intervention-chip">Co-location standards</span>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ─── PERMITTING ───────────────────────────────────────────────  -->
+  <section class="domain-section" id="permitting" data-domain="permitting">
+    <div class="section-header">
+      <div class="section-icon">📋</div>
+      <div class="section-meta">
+        <div class="section-label">Domain 2 of 5</div>
+        <h2>Permitting &amp; Regulatory</h2>
+      </div>
+    </div>
+    <div class="card">
+      <p style="color:var(--text-muted); line-height:1.8;">
+        Large-scale infrastructure projects require regulatory certainty. When the rules shift with
+        each administration — or when agencies lack capacity to process applications — both public
+        and private actors lose years of potential progress. The permitting bottleneck affects
+        tunnels, rockets, energy storage, and clean technology equally.
+      </p>
+      <div class="bottleneck-callout">
+        <div class="callout-label">Core Bottleneck</div>
+        <p>The Boring Company accumulated nearly 800 environmental violations in Las Vegas.
+        SpaceX waited years for FAA environmental review of Starship. Trump simultaneously
+        fast-tracked fossil fuels while delaying clean energy — a divergence that creates
+        maximum uncertainty for long-horizon investors.</p>
+      </div>
+      <details>
+        <summary><span class="summary-arrow">▶</span> Deep Dive — Permitting &amp; Regulatory Analysis</summary>
+        <div>
+          <p>
+            <strong>Boring Company:</strong> The Las Vegas tunnel network accrued nearly 800 environmental
+            violations for unapproved excavation and water dumping, incurring fines and stalling
+            expansion plans. After several years of construction, approximately four miles of tunnel
+            exist — a fraction of the vision. Community opposition, liability concerns, and the absence
+            of a scalable emergency evacuation protocol continue to impede growth.
+          </p>
+          <p>
+            <strong>SpaceX &amp; FAA:</strong> Only in 2026 did the FAA issue final environmental approval
+            for Starship launches in Florida, after protracted reviews covering wildlife corridors,
+            noise impacts, and airspace coordination. These delays, while frustrating to Musk, reflect
+            the legitimate need to assess risk in unprecedented rocket programs near protected ecosystems.
+          </p>
+          <p>
+            <strong>Tesla Energy:</strong> Early Powerwall deployment was constrained by cell shortages
+            and semiconductor bottlenecks. As the company diversified suppliers, tariff uncertainty
+            under both Biden and Trump administrations introduced fresh procurement risk. Tesla executives
+            flagged that evolving trade policy threatens the energy business more acutely than the
+            automotive segment.
+          </p>
+          <p>
+            The Trump administration's approach created a regulatory paradox: rolling back environmental
+            review for fossil-fuel projects while tightening oversight (intentionally or through
+            underfunding) for offshore wind, utility-scale solar, and battery storage. Estimates from
+            environmental groups suggest these actions delayed or cancelled projects supporting more
+            than 170,000 clean-energy jobs. Investment retreats when regulatory trajectories are
+            unpredictable, regardless of political direction.
+          </p>
+          <div class="intervention-list">
+            <span class="intervention-chip">Unified permitting portal</span>
+            <span class="intervention-chip">Pre-approved site banks</span>
+            <span class="intervention-chip">Interagency coordination</span>
+            <span class="intervention-chip">Environmental fast-track for zero-carbon</span>
+            <span class="intervention-chip">Community benefit agreements</span>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ─── SUPPLY CHAIN ─────────────────────────────────────────────  -->
+  <section class="domain-section" id="supply" data-domain="supply">
+    <div class="section-header">
+      <div class="section-icon">⛏️</div>
+      <div class="section-meta">
+        <div class="section-label">Domain 3 of 5</div>
+        <h2>Supply Chain &amp; Critical Minerals</h2>
+      </div>
+    </div>
+    <div class="card">
+      <p style="color:var(--text-muted); line-height:1.8;">
+        Electric vehicles, batteries, wind turbines, semiconductors, and satellite components all
+        depend on a narrow set of critical minerals — lithium, cobalt, nickel, graphite, rare
+        earths — concentrated in few countries. This fragility underpins both economic vulnerability
+        and geopolitical leverage.
+      </p>
+      <div class="bottleneck-callout">
+        <div class="callout-label">Core Bottleneck</div>
+        <p>China controls ~70% of global strategic mineral supply and ~94% of rare-earth magnet
+        production. U.S. tariffs designed to protect domestic industry often inadvertently increase
+        the cost of the clean technologies they aim to champion.</p>
+      </div>
+      <details>
+        <summary><span class="summary-arrow">▶</span> Deep Dive — Supply Chain &amp; Critical Minerals</summary>
+        <div>
+          <p>
+            The 2020 Energy Act classified critical minerals as essential for economic and national
+            security — but the U.S. has no comprehensive strategy to secure them. China's dominance
+            reflects decades of state investment in mining, refining, and manufacturing that U.S.
+            policy largely ignored. The result: any disruption in Sino-American relations can
+            cascade through EV production, grid-storage deployment, and defense procurement simultaneously.
+          </p>
+          <p>
+            Launching data centers into orbit introduces an entirely new supply-chain challenge. High-power
+            satellites require large solar arrays, radiation-hardened electronics, and advanced thermal
+            management — components that are scarce, expensive, and face 5-year degradation from cosmic
+            radiation. Ground and orbital supply chains will increasingly compete for the same materials.
+          </p>
+          <p>
+            Musk has publicly criticised U.S. tariffs on imported solar equipment, noting that China
+            deploys far more solar capacity while American duties make domestic panels artificially
+            expensive. The tension between protecting domestic manufacturing and accelerating clean-energy
+            deployment is real — but the current approach often sacrifices both goals through incoherence.
+          </p>
+          <p>
+            A circular-economy approach — recycling battery materials, establishing mineral alliances
+            with allied nations, and incentivising domestic refining — would reduce dependency without
+            triggering trade wars. Indigenous land rights and environmental justice must be central to
+            any domestic mining expansion, not treated as obstacles.
+          </p>
+          <div class="stat-bar-wrap">
+            <div class="stat-bar-label"><span>Chinese control of rare-earth refining</span><span>94%</span></div>
+            <div class="stat-bar-track"><div class="stat-bar-fill" data-target="94"></div></div>
+          </div>
+          <div class="stat-bar-wrap">
+            <div class="stat-bar-label"><span>U.S. domestic mineral processing capacity</span><span>12%</span></div>
+            <div class="stat-bar-track"><div class="stat-bar-fill" data-target="12"></div></div>
+          </div>
+          <div class="intervention-list">
+            <span class="intervention-chip">Allied mineral treaties</span>
+            <span class="intervention-chip">Battery recycling mandates</span>
+            <span class="intervention-chip">Circular economy incentives</span>
+            <span class="intervention-chip">Indigenous co-governance</span>
+            <span class="intervention-chip">Strategic reserves</span>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ─── AI & TECHNOLOGY ──────────────────────────────────────────  -->
+  <section class="domain-section" id="technology" data-domain="technology">
+    <div class="section-header">
+      <div class="section-icon">🤖</div>
+      <div class="section-meta">
+        <div class="section-label">Domain 4 of 5</div>
+        <h2>AI &amp; Technology</h2>
+      </div>
+    </div>
+    <div class="card">
+      <p style="color:var(--text-muted); line-height:1.8;">
+        Autonomous vehicles, brain-computer interfaces, and orbital AI infrastructure represent
+        the frontier of Musk's technological portfolio. Each domain faces a common challenge:
+        the speed of development outpaces both safety frameworks and public trust, creating
+        bottlenecks where regulatory catch-up lags and ethical discourse is underserved.
+      </p>
+      <div class="bottleneck-callout">
+        <div class="callout-label">Core Bottleneck</div>
+        <p>Tesla's Full Self-Driving software was under NHTSA investigation for crashes and
+        red-light violations. Neuralink's brain implants face biocompatibility and public
+        acceptance challenges. Orbital AI infrastructure depends on a rocket still proving
+        operational cadence. Safety oversight consistently trails ambition.</p>
+      </div>
+      <details>
+        <summary><span class="summary-arrow">▶</span> Deep Dive — AI &amp; Technology Analysis</summary>
+        <div>
+          <p>
+            <strong>Tesla Full Self-Driving (FSD):</strong> NHTSA investigations into FSD software
+            centred on vehicles running red lights, driving against traffic, and contributing to at
+            least 14 crashes and 20+ injuries. The core regulatory challenge is definitional: FSD
+            still requires human supervision and is therefore not autonomous, yet its marketing implies
+            otherwise. Closing this gap — through clearer labelling, mandatory disengagement logging,
+            and independent safety audits — is prerequisite to public trust.
+          </p>
+          <p>
+            <strong>Neuralink:</strong> After FDA approval concerns were resolved, the company
+            conducted human trials with 12 participants in 2024, expanding to 21 by early 2026.
+            Participants successfully controlled digital interfaces via implanted electrodes.
+            However, conventional neural electrodes can cause immune responses and glial scarring
+            that degrade signal quality over time. Surveys show large majorities of Americans support
+            strict testing requirements and express ethical concerns about cognitive enhancement —
+            suggesting that public engagement, not just regulatory approval, is the real adoption
+            bottleneck.
+          </p>
+          <p>
+            <strong>Orbital AI Data Centers:</strong> SpaceX filed FCC plans for up to one million
+            solar-powered satellites serving AI compute workloads, capturing near-constant sunlight
+            and potentially reducing carbon per compute-unit compared to terrestrial facilities. The
+            viability of this vision depends entirely on Starship achieving rapid, reliable
+            reusability — something the vehicle had not yet demonstrated at operational scale.
+          </p>
+          <div class="intervention-list">
+            <span class="intervention-chip">Independent safety audits</span>
+            <span class="intervention-chip">Truthful capability labelling</span>
+            <span class="intervention-chip">Neuro-rights legislation</span>
+            <span class="intervention-chip">Adaptive regulatory sandboxes</span>
+            <span class="intervention-chip">International AI safety standards</span>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ─── SOCIAL MEDIA & INFORMATION ──────────────────────────────  -->
+  <section class="domain-section" id="social" data-domain="social">
+    <div class="section-header">
+      <div class="section-icon">📡</div>
+      <div class="section-meta">
+        <div class="section-label">Domain 5 of 5</div>
+        <h2>Social Media &amp; Information</h2>
+      </div>
+    </div>
+    <div class="card">
+      <p style="color:var(--text-muted); line-height:1.8;">
+        Healthy democratic coordination requires trustworthy information commons. Both X (formerly
+        Twitter) and Truth Social claim to champion free expression, but both face structural
+        incentives that prioritise engagement and monetisation over accuracy, transparency, and
+        accountability — creating information bottlenecks that impede collective action on any
+        of the domains above.
+      </p>
+      <div class="bottleneck-callout">
+        <div class="callout-label">Core Bottleneck</div>
+        <p>X received a €120 million EU fine for deceptive verification, opaque advertising,
+        and restricted researcher access. Truth Social has been documented shadowbanning users
+        and banning topics while claiming to oppose censorship. Both create epistemic environments
+        hostile to the coordinated action planetary challenges require.</p>
+      </div>
+      <details>
+        <summary><span class="summary-arrow">▶</span> Deep Dive — Social Media &amp; Information Analysis</summary>
+        <div>
+          <p>
+            <strong>X (formerly Twitter):</strong> In February 2026, the European Commission fined
+            X €120 million for violations of the Digital Services Act (DSA). The Commission found
+            that paying subscribers received blue verification checkmarks after seconds of human
+            review, effectively purchasing priority reach. X's ad repository was deemed intentionally
+            unsearchable and missing roughly 42% of advertisements. Researcher access was limited to
+            an expensive API that had approved none of tested applicants. These shortcomings collectively
+            allow coordinated inauthentic behaviour to operate with impunity.
+          </p>
+          <p>
+            <strong>Truth Social:</strong> Despite rhetoric against censorship, the platform's original
+            terms of service prohibited users from disparaging the company or harming its reputation.
+            Accounts have been suspended for parody names. A Public Citizen analysis found the platform
+            shadowbanned liberal and progressive content at scale, and banned posts mentioning abortion
+            and January 6 hearings — creating an echo chamber arguably more restrictive than the Twitter
+            it criticised. Truth Social also relies on Section 230 liability protections — the law Trump
+            repeatedly sought to repeal — to avoid responsibility for user content.
+          </p>
+          <p>
+            The deeper bottleneck is epistemic: when platforms monetise attention, limit transparency,
+            and selectively enforce rules, they erode the shared factual ground that makes coordinated
+            response to grid failures, supply-chain crises, or climate events possible. Democratic
+            coordination on any of the five domains in this analysis depends on citizens having access
+            to sufficiently accurate information to form preferences and hold institutions accountable.
+          </p>
+          <div class="intervention-list">
+            <span class="intervention-chip">Algorithm transparency mandates</span>
+            <span class="intervention-chip">Independent content audits</span>
+            <span class="intervention-chip">Interoperability standards</span>
+            <span class="intervention-chip">Researcher data access</span>
+            <span class="intervention-chip">Public media investment</span>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ─── INTERVENTION MATRIX ──────────────────────────────────────  -->
+  <section class="domain-section" id="interventions" data-domain="intervention">
+    <div class="section-header">
+      <div class="section-icon">🌱</div>
+      <div class="section-meta">
+        <div class="section-label">Synthesis</div>
+        <h2>Intervention Matrix</h2>
+      </div>
+    </div>
+    <div class="card">
+      <p style="color:var(--text-muted); line-height:1.8; margin-bottom:1rem;">
+        These bottlenecks are not independent: grid failures push computing to orbit; regulatory
+        uncertainty drives offshore investment; tariffs distort clean-energy economics; safety lapses
+        erode trust in innovation; and information fragmentation blocks coordinated response.
+        The interventions below address the cross-cutting nodes.
+      </p>
+      <div class="matrix-grid">
+        <div class="matrix-card">
+          <div class="matrix-card-icon">🔌</div>
+          <h4>Modernise Transmission</h4>
+          <p>Federal "transmission superhighways" with pre-approved corridors, interregional capacity sharing, and streamlined interconnection for zero-carbon sources.</p>
+        </div>
+        <div class="matrix-card">
+          <div class="matrix-card-icon">⚖️</div>
+          <h4>Harmonise Permitting</h4>
+          <p>Unified federal permitting portal with mandatory timelines, environmental fast-track for proven clean technologies, and community benefit requirements.</p>
+        </div>
+        <div class="matrix-card">
+          <div class="matrix-card-icon">🌐</div>
+          <h4>Mineral Alliances</h4>
+          <p>Allied-nation mineral procurement treaties, domestic refining incentives, battery recycling mandates, and Indigenous co-governance over extraction decisions.</p>
+        </div>
+        <div class="matrix-card">
+          <div class="matrix-card-icon">🛡️</div>
+          <h4>Adaptive Safety Regulation</h4>
+          <p>Regulatory sandboxes for emerging technology with mandatory independent safety audits, truthful capability labelling, and clear liability frameworks.</p>
+        </div>
+        <div class="matrix-card">
+          <div class="matrix-card-icon">📰</div>
+          <h4>Information Commons</h4>
+          <p>Platform algorithm transparency, researcher data access mandates, interoperability standards, and investment in trusted public media infrastructure.</p>
+        </div>
+        <div class="matrix-card">
+          <div class="matrix-card-icon">🤝</div>
+          <h4>Multi-Sector Coordination</h4>
+          <p>Convening government, private enterprise, civil society, and affected communities around shared bottleneck maps to identify leverage points and co-design solutions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── META-PROMPTS & STRUCTURE ─────────────────────────────────  -->
+  <section class="domain-section" id="structure" data-domain="structure">
+    <div class="section-header">
+      <div class="section-icon">🗂️</div>
+      <div class="section-meta">
+        <div class="section-label">Repository Design</div>
+        <h2>Directory Structure &amp; Meta-Prompts</h2>
+      </div>
+    </div>
+    <div class="card">
+      <p style="color:var(--text-muted); line-height:1.8; margin-bottom:1.2rem;">
+        To support community expansion of this analysis, the project is designed as a modular
+        repository. Each section is self-contained and can be extracted into its own file. The
+        meta-prompt patterns below help contributors research new bottlenecks or update existing ones
+        with structured, reproducible queries.
+      </p>
+
+      <details>
+        <summary><span class="summary-arrow">▶</span> Recommended Repository Structure</summary>
+        <div>
+          <p>Organise the project as follows, keeping separation between content, logic, and data:</p>
+          <div class="prompt-block">/
+├── index.html              ← This file (standalone entrypoint)
+├── README.md               ← Purpose, usage, and contribution guide
+│
+├── /sections/              ← Domain fragments (Markdown or HTML)
+│   ├── energy.md
+│   ├── permitting.md
+│   ├── supply-chain.md
+│   ├── technology.md
+│   ├── social-media.md
+│   └── [new-domain].md    ← Add new bottleneck topics here
+│
+├── /scripts/               ← JavaScript modules
+│   ├── particles.js        ← Particle engine (tune PARTICLE_COUNT)
+│   ├── search.js           ← Client-side full-text search
+│   ├── persistence.js      ← IndexedDB wrapper
+│   └── constellation.js   ← HUD constellation visualisation
+│
+├── /styles/                ← Optional additional CSS
+│   └── themes/             ← Alternative colour schemes
+│
+├── /data/                  ← Cached datasets (JSON)
+│   ├── critical-minerals.json
+│   └── energy-stats.json
+│
+└── /prompts/               ← Meta-prompt library
+    ├── bottleneck-research.md
+    └── intervention-design.md</div>
+        </div>
+      </details>
+
+      <details style="margin-top:0.5rem;">
+        <summary><span class="summary-arrow">▶</span> Meta-Prompt: Research a New Bottleneck</summary>
+        <div>
+          <p>Copy and adapt this prompt when researching a new domain to add to the repository:</p>
+          <div class="prompt-block">Identify a bottleneck shared between <span class="var">{subject_one}</span>
+and <span class="var">{subject_two}</span> within <span class="var">{domain}</span>.
+
+Step 1 — Literature scan:
+  Summarise the latest academic and policy literature on this bottleneck.
+  Prioritise peer-reviewed sources from the last 3 years and official agency reports.
+  Cite primary sources with publication date and DOI or URL where available.
+
+Step 2 — Planetary impact assessment:
+  How does this bottleneck affect:
+  (a) ecological health and climate stability?
+  (b) national and global security resilience?
+  (c) social equity and access to essential services?
+
+Step 3 — Intervention design:
+  Propose at least three evidence-based interventions.
+  For each, specify: responsible actor, estimated timeline, key dependencies,
+  and potential unintended consequences.
+
+Step 4 — Visualisation hook:
+  Suggest how this bottleneck could be represented as a stat bar, matrix card,
+  or constellation node within the existing platform.
+
+Step 5 — Zero-harm check:
+  Flag any content that could be repurposed for harm, coercion, or manipulation.
+  Blunt or remove before publishing.</div>
+        </div>
+      </details>
+
+      <details style="margin-top:0.5rem;">
+        <summary><span class="summary-arrow">▶</span> Meta-Prompt: Update an Existing Section</summary>
+        <div>
+          <div class="prompt-block">Review the existing analysis of <span class="var">{domain}</span> in this repository.
+
+1. Identify any developments since the last update (check dates in footnotes).
+2. Search for: new legislation, court decisions, company announcements,
+   or academic papers that materially change the analysis.
+3. Summarise what should be added, revised, or removed — with specific citations.
+4. Flag any language that has become outdated, inaccurate, or misleading.
+5. Propose updated intervention chips if new policy tools have emerged.
+
+Output format: a diff-style list of suggested changes, not a full rewrite,
+so a contributor can integrate them without losing existing nuance.</div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ─── ATTRIBUTIONS ─────────────────────────────────────────────  -->
+  <section class="domain-section" id="attributions" data-domain="attributions">
+    <div class="section-header">
+      <div class="section-icon">📚</div>
+      <div class="section-meta">
+        <div class="section-label">Provenance</div>
+        <h2>Attributions &amp; Licenses</h2>
+      </div>
+    </div>
+    <div class="card">
+      <p style="color:var(--text-muted); line-height:1.8; margin-bottom:1rem;">
+        This project adapts open patterns from publicly documented browser APIs and design references.
+        No proprietary code was copied verbatim. All primary research is summarised for educational
+        purposes and is not reproduced verbatim. Open-source references used for inspiration include:
+      </p>
+      <details>
+        <summary><span class="summary-arrow">▶</span> Open Source References</summary>
+        <div>
+          <p>
+            <a href="https://github.com/mdn/webcomponents-examples" target="_blank" rel="noopener" style="color:var(--accent-cold);">MDN Web Components Examples</a>
+            (Mozilla Public License 2.0) — modular component design patterns.
+          </p>
+          <p>
+            <a href="https://github.com/localForage/localForage" target="_blank" rel="noopener" style="color:var(--accent-cold);">localForage</a>
+            (Apache License 2.0) — cross-browser IndexedDB usage guidance.
+          </p>
+          <p>
+            <a href="https://github.com/tailwindlabs/headlessui" target="_blank" rel="noopener" style="color:var(--accent-cold);">Headless UI</a>
+            (MIT License) — accessible collapsible section reference.
+          </p>
+          <p>
+            Particle engine design inspired by browser Canvas API documentation (MDN). All implementation is original.
+          </p>
+        </div>
+      </details>
+      <div class="footnotes" style="margin-top:1.5rem;">
+        <h3>Primary Source Footnotes</h3>
+        <ol>
+          <li>Reuters: Trump instructing tech companies to build power plants; Rate Payer Protection Pledge.</li>
+          <li>AEI analysis: data-centre electricity demand forecast to triple by 2028; interconnection backlogs.</li>
+          <li>Earth.org: permitting delays and supply-chain bottlenecks curbing renewable expansion.</li>
+          <li>Fortune: Musk WEF 2026 remarks on the U.S. grid as greatest AI bottleneck.</li>
+          <li>Reuters: PJM connect-and-manage framework and accredited capacity thresholds.</li>
+          <li>FERC order: co-location of data centres with gas and nuclear facilities.</li>
+          <li>Guardian: Trump rolling back renewable approvals, pausing offshore wind leases.</li>
+          <li>TechCrunch: Boring Company environmental violations and community opposition.</li>
+          <li>E&E News: FAA final environmental approval for Starship launches (2026).</li>
+          <li>Latitude Media: Tesla supply-chain challenges and tariff exposure for energy business.</li>
+          <li>Reuters: Energy Act definition of critical minerals; Chinese mineral market dominance.</li>
+          <li>TechCrunch: Orbital data-centre cost comparison ($42.4B/GW) and satellite lifespan limits.</li>
+          <li>NHTSA: Tesla FSD investigation — red-light violations, crashes, injuries.</li>
+          <li>Reuters: Neuralink human trials (2024–2026); participant counts and trial outcomes.</li>
+          <li>Biocompatibility research: immune response and glial scarring in neural electrodes.</li>
+          <li>Public attitudes survey: majority support for strict BCI testing; ethical concerns.</li>
+          <li>TechPolicy.Press: EU DSA €120M fine against X; verification, advertising, researcher access.</li>
+          <li>Harvard Kennedy School: misinformation analysis and advertiser departures from X.</li>
+          <li>Wikipedia (Public Citizen analysis): Truth Social content moderation and shadowbanning patterns.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══ HUD ═════════════════════════════════════════════════════════ -->
+<aside id="hud" aria-label="Reading progress tracker">
+  <div id="hud-title">Mission Progress</div>
+  <div id="hud-score">0%</div>
+  <div id="hud-label">sections explored</div>
+  <div id="hud-bar-track"><div id="hud-bar-fill"></div></div>
+  <canvas id="constellation" aria-hidden="true"></canvas>
+  <button id="hud-reset" title="Reset all locally stored reading progress">↺ Reset progress</button>
+</aside>
+
+<!-- ═══ FOOTER ══════════════════════════════════════════════════════ -->
+<footer>
+  <p>
+    <strong>Zero-Harm &amp; Anti-Coercion:</strong> This document is built to advance understanding of
+    complex socio-technical systems without empowering harmful outcomes. All insights are grounded in
+    publicly available information and prioritise transparency, ethical use, and sustainability. No data
+    is transmitted externally. All analytics are local-only and user-resettable via the HUD reset button
+    or by clearing IndexedDB in your browser's developer tools. Nothing here is designed to manipulate,
+    coerce, surveil, or target any individual or community.
+  </p>
+  <p style="margin-top:0.5rem;">
+    Produced by Foster + Navi · Planetary Restoration Archive · Open for community contribution
+  </p>
+</footer>
+
+<script>
+  // ═══════════════════════════════════════════════════════════════════
+  //  PARTICLE ENGINE
+  //  Photorealistic nebula simulation using Canvas 2D.
+  //  Tune PARTICLE_COUNT down (e.g. 60) on low-power devices.
+  // ═══════════════════════════════════════════════════════════════════
+  (function initParticles() {
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+
+    const PARTICLE_COUNT = 120;  // ← tune for performance
+    const SPEED = 0.25;
+    const CONNECTION_DIST = 100;
+    const MOUSE_REPEL = 80;
+
+    let W, H, mouse = { x: -999, y: -999 };
+    let particles = [];
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Colour palette: cold blue, cyan, warm green, hints of rose
+    const palette = [
+      [0, 229, 255],    // cyan
+      [57, 255, 110],   // green
+      [255, 179, 71],   // amber
+      [160, 200, 255],  // soft blue
+      [255, 107, 157],  // rose
+    ];
+
+    function randomColour() {
+      const c = palette[Math.floor(Math.random() * palette.length)];
+      return c;
+    }
+
+    function makeParticle() {
+      const c = randomColour();
+      return {
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * SPEED,
+        vy: (Math.random() - 0.5) * SPEED,
+        r: Math.random() * 1.8 + 0.4,
+        // Pulse parameters for glow effect
+        phase: Math.random() * Math.PI * 2,
+        freq: 0.005 + Math.random() * 0.01,
+        cr: c[0], cg: c[1], cb: c[2],
+        alpha: 0.3 + Math.random() * 0.5,
+      };
+    }
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(makeParticle());
+
+    // Track mouse for subtle repulsion effect
+    window.addEventListener('mousemove', e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    let frame = 0;
+    function tick() {
+      frame++;
+      // Volumetric fade: semi-transparent fill preserves trail history
+      ctx.fillStyle = 'rgba(3, 5, 15, 0.18)';
+      ctx.fillRect(0, 0, W, H);
+
+      // Draw connections between close particles
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const a = particles[i], b = particles[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < CONNECTION_DIST) {
+            const alpha = (1 - dist / CONNECTION_DIST) * 0.12;
+            ctx.strokeStyle = `rgba(0,229,255,${alpha})`;
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw and update particles
+      particles.forEach(p => {
+        p.phase += p.freq;
+        const pulse = 0.7 + 0.3 * Math.sin(p.phase);
+        const glow = p.r * 4 * pulse;
+
+        // Soft glow halo (radial gradient)
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glow);
+        grad.addColorStop(0, `rgba(${p.cr},${p.cg},${p.cb},${p.alpha * pulse})`);
+        grad.addColorStop(1, `rgba(${p.cr},${p.cg},${p.cb},0)`);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, glow, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Hard core
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${p.cr},${p.cg},${p.cb},${p.alpha})`;
+        ctx.fill();
+
+        // Mouse repulsion
+        const mdx = p.x - mouse.x, mdy = p.y - mouse.y;
+        const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+        if (mdist < MOUSE_REPEL) {
+          const force = (MOUSE_REPEL - mdist) / MOUSE_REPEL * 0.3;
+          p.vx += (mdx / mdist) * force;
+          p.vy += (mdy / mdist) * force;
+        }
+
+        // Drift and boundary wrap
+        p.x += p.vx;
+        p.y += p.vy;
+        // Gentle velocity damping
+        p.vx *= 0.995;
+        p.vy *= 0.995;
+        if (p.x < -10) p.x = W + 10;
+        if (p.x > W + 10) p.x = -10;
+        if (p.y < -10) p.y = H + 10;
+        if (p.y > H + 10) p.y = -10;
+      });
+
+      requestAnimationFrame(tick);
+    }
+    tick();
+  })();
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  SPLASH DISMISS
+  // ═══════════════════════════════════════════════════════════════════
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('splash').classList.add('hidden');
+    }, 600);
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  SEARCH — client-side, no external dependencies
+  // ═══════════════════════════════════════════════════════════════════
+  (function initSearch() {
+    const bar = document.getElementById('searchBar');
+    const count = document.getElementById('searchCount');
+    const sections = document.querySelectorAll('.domain-section');
+
+    bar.addEventListener('input', function () {
+      // Sanitize: strip HTML-ish characters
+      const q = this.value.replace(/[<>"']/g, '').trim().toLowerCase();
+      let visible = 0;
+      sections.forEach(sec => {
+        const text = sec.innerText.toLowerCase();
+        const match = !q || text.includes(q);
+        sec.style.display = match ? '' : 'none';
+        if (match) visible++;
+      });
+      count.textContent = q ? `${visible} section${visible !== 1 ? 's' : ''} match` : '';
+    });
+  })();
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  INDEXEDDB PERSISTENCE — saves reading progress locally
+  // ═══════════════════════════════════════════════════════════════════
+  const DB_NAME    = 'planetary-bottlenecks';
+  const DB_VERSION = 1;
+  let db = null;
+
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = e => {
+        const d = e.target.result;
+        if (!d.objectStoreNames.contains('state')) {
+          d.createObjectStore('state', { keyPath: 'key' });
+        }
+      };
+      req.onsuccess = () => { db = req.result; resolve(); };
+      req.onerror  = () => reject(req.error);
+    });
+  }
+  function dbPut(key, value) {
+    if (!db) return;
+    const tx = db.transaction('state', 'readwrite');
+    tx.objectStore('state').put({ key, value });
+  }
+  function dbGet(key) {
+    return new Promise(resolve => {
+      if (!db) return resolve(null);
+      const tx = db.transaction('state', 'readonly');
+      const req = tx.objectStore('state').get(key);
+      req.onsuccess = () => resolve(req.result?.value ?? null);
+      req.onerror   = () => resolve(null);
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  PROGRESS TRACKING + HUD
+  // ═══════════════════════════════════════════════════════════════════
+  const sectionIds = ['intro','energy','permitting','supply','technology','social','interventions','structure','attributions'];
+  const readSet = new Set();
+
+  function updateHUD() {
+    const pct = Math.round((readSet.size / sectionIds.length) * 100);
+    document.getElementById('hud-score').textContent = pct + '%';
+    document.getElementById('hud-label').textContent = `${readSet.size}/${sectionIds.length} sections`;
+    document.getElementById('hud-bar-fill').style.width = pct + '%';
+    dbPut('progress', Array.from(readSet));
+    drawConstellation();
+  }
+
+  // Track details expansion as "reading" a section
+  document.querySelectorAll('.domain-section details').forEach(det => {
+    det.addEventListener('toggle', () => {
+      if (det.open) {
+        const parent = det.closest('.domain-section');
+        if (parent) {
+          readSet.add(parent.id);
+          updateHUD();
+        }
+      }
+    });
+  });
+
+  // Also mark intro visible on scroll
+  const introObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting && e.intersectionRatio > 0.5) {
+        readSet.add('intro');
+        updateHUD();
+        introObs.disconnect();
+      }
+    });
+  }, { threshold: 0.5 });
+  const introSection = document.getElementById('intro');
+  if (introSection) introObs.observe(introSection);
+
+  // Reset button
+  document.getElementById('hud-reset').addEventListener('click', () => {
+    readSet.clear();
+    dbPut('progress', []);
+    updateHUD();
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  CONSTELLATION VISUALISATION (HUD canvas)
+  //  Nodes = sections. Glowing when read. Lines = connections.
+  // ═══════════════════════════════════════════════════════════════════
+  function drawConstellation() {
+    const canvas = document.getElementById('constellation');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width  = canvas.clientWidth;
+    const H = canvas.height = canvas.clientHeight;
+    ctx.clearRect(0, 0, W, H);
+
+    const total = sectionIds.length;
+    const cx = W / 2, cy = H / 2;
+    const R = Math.min(W, H) / 2 - 12;
+
+    // Compute positions
+    const pts = sectionIds.map((id, i) => {
+      const angle = (i / total) * Math.PI * 2 - Math.PI / 2;
+      return { x: cx + R * Math.cos(angle), y: cy + R * Math.sin(angle), id };
+    });
+
+    // Draw connection lines
+    pts.forEach((a, i) => {
+      pts.forEach((b, j) => {
+        if (j <= i) return;
+        const bothRead = readSet.has(a.id) && readSet.has(b.id);
+        ctx.strokeStyle = bothRead
+          ? 'rgba(57,255,110,0.25)'
+          : 'rgba(0,229,255,0.06)';
+        ctx.lineWidth = bothRead ? 1 : 0.5;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      });
+    });
+
+    // Draw nodes
+    pts.forEach(pt => {
+      const read = readSet.has(pt.id);
+      const r = read ? 4 : 2.5;
+
+      if (read) {
+        // Glow halo
+        const grad = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, 10);
+        grad.addColorStop(0, 'rgba(57,255,110,0.5)');
+        grad.addColorStop(1, 'rgba(57,255,110,0)');
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 10, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
+
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = read ? '#39ff6e' : 'rgba(0,229,255,0.3)';
+      ctx.fill();
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  SCROLL-TRIGGERED SECTION REVEAL + NAV ACTIVE STATE
+  // ═══════════════════════════════════════════════════════════════════
+  const allSections = document.querySelectorAll('.domain-section');
+  const navLinks = document.querySelectorAll('#nav a');
+
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        // Update nav active state
+        const id = e.target.id;
+        navLinks.forEach(a => {
+          a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { threshold: 0.15 });
+
+  allSections.forEach(s => revealObs.observe(s));
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  STAT BAR ANIMATION — trigger on first intersection
+  // ═══════════════════════════════════════════════════════════════════
+  const barObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const fill = e.target;
+        const target = parseInt(fill.dataset.target, 10);
+        // Small delay so CSS transition is visible
+        setTimeout(() => { fill.style.width = target + '%'; }, 200);
+        barObs.unobserve(fill);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('.stat-bar-fill').forEach(f => barObs.observe(f));
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  INITIALISE — restore progress from IndexedDB
+  // ═══════════════════════════════════════════════════════════════════
+  openDB()
+    .then(() => dbGet('progress'))
+    .then(saved => {
+      if (Array.isArray(saved)) saved.forEach(id => readSet.add(id));
+      updateHUD();
+    })
+    .catch(() => updateHUD()); // Graceful degradation if IndexedDB unavailable
+</script>
+
+</body>
+</html>
