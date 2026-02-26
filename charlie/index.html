@@ -1,0 +1,1426 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Northbound Benevolence & Security Bottlenecks Atlas (USA ↔ Institutions) | For Canadian Policymakers</title>
+  <meta name="description" content="Offline-first, citation-backed atlas of shared US government + institution bottlenecks affecting planetary benevolence and security—translated into actionable levers for Canadian policymakers and institutional CPOs." />
+  <style>
+    /* =========================================================
+      TOOLTIP: STYLE CORE
+      What: Visual design tokens + layout primitives.
+      How to extend: Add new CSS variables under :root, then use them in components.
+      Outcome: A cohesive, expandable design system with no external deps.
+    ========================================================== */
+    :root{
+      --bg0:#070A12; --bg1:#0B1022; --card:#0E1630cc; --card2:#0F1A38cc;
+      --ink:#EAF0FF; --muted:#A9B5D6; --faint:#7E8AB0;
+      --accent:#7CF7D4; --accent2:#8AA8FF; --warn:#FFC857; --danger:#FF5C7A;
+      --ok:#70FF8B;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --radius: 18px;
+      --max: 1120px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--ink); font-family:var(--sans); background: radial-gradient(1100px 700px at 20% 10%, #1a2a6c22, transparent 55%),
+      radial-gradient(900px 600px at 90% 20%, #00f5d422, transparent 50%),
+      linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+
+    /* Print stylesheet */
+    @media print{
+      body{background:#fff;color:#000}
+      .splash, .hud, .stars, .parallax, .sticky, .btn, .chip, .toast, .constellationWrap{display:none !important}
+      a{color:#000;text-decoration:underline}
+      .card{box-shadow:none;border:1px solid #ddd;background:#fff}
+      details{break-inside:avoid}
+      main{padding:0}
+    }
+
+    a{color:var(--accent2)}
+    a:hover{color:var(--accent)}
+    code,kbd,pre{font-family:var(--mono)}
+    .wrap{max-width:var(--max); margin:0 auto; padding:22px 18px 90px}
+    .srOnly{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+
+    /* =========================================================
+      TOOLTIP: SPLASH SCREEN
+      What: Animated intro overlay, dismisses automatically or via click.
+      How to extend: Edit the keyframes or the progress logic in JS.
+      Outcome: A "ritual entrance" that feels alive without blocking access.
+    ========================================================== */
+    .splash{
+      position:fixed; inset:0; z-index:9999;
+      display:grid; place-items:center;
+      background: radial-gradient(1000px 600px at 50% 40%, #1d2a5fcc, #060814);
+      transition: opacity .5s ease, transform .5s ease;
+    }
+    .splash.hidden{opacity:0; pointer-events:none; transform:scale(1.02)}
+    .splashCard{
+      width:min(760px, 92vw);
+      border:1px solid #ffffff22;
+      background: linear-gradient(180deg, #0b1230cc, #0a0f22cc);
+      box-shadow: var(--shadow);
+      border-radius: 22px;
+      padding: 22px 20px 18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .pulseRing{
+      position:absolute; inset:-60px;
+      background: radial-gradient(circle at 50% 40%, #7cf7d422, transparent 55%);
+      animation: ring 2.8s ease-in-out infinite;
+    }
+    @keyframes ring{
+      0%{transform:scale(1); opacity:.55}
+      50%{transform:scale(1.05); opacity:.85}
+      100%{transform:scale(1); opacity:.55}
+    }
+    .splashTitle{position:relative; display:flex; gap:12px; align-items:center; justify-content:space-between}
+    .sig{font-family:var(--mono); color:var(--muted); font-size:12px}
+    .big{font-size:20px; letter-spacing:.2px; margin:0}
+    .sub{margin:8px 0 0; color:var(--muted); line-height:1.35}
+    .bar{margin-top:14px; height:10px; border-radius:999px; background:#ffffff10; overflow:hidden; border:1px solid #ffffff1a}
+    .bar > i{display:block; height:100%; width:0%; background: linear-gradient(90deg, var(--accent2), var(--accent)); box-shadow:0 0 18px #7cf7d455}
+    .splashRow{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; position:relative}
+    .btn{
+      appearance:none; border:1px solid #ffffff22; background:#0f1a38aa; color:var(--ink);
+      padding:10px 12px; border-radius: 12px; cursor:pointer;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .btn:hover{transform: translateY(-1px); border-color:#ffffff44; background:#12204bcc}
+    .btn:active{transform: translateY(0px)}
+    .btn.primary{border-color:#7cf7d444;background: linear-gradient(90deg, #1b2e66aa, #0e3a3aaa)}
+    .btn.danger{border-color:#ff5c7a44;background: linear-gradient(90deg, #3a0e1faa, #2a1027aa)}
+    .tiny{font-size:12px; color:var(--muted)}
+    .kbd{font-family:var(--mono); font-size:12px; padding:2px 6px; border:1px solid #ffffff2a; border-bottom-color:#ffffff12; border-radius:8px; background:#00000022}
+
+    /* =========================================================
+      TOOLTIP: STICKY NAV + SEARCH
+      What: Always-available navigation + client-side search.
+      How to extend: Add new nav items matching section IDs.
+      Outcome: Fast jumping + scanning, especially for busy policymakers.
+    ========================================================== */
+    .sticky{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, #060814cc, #06081488);
+      border-bottom: 1px solid #ffffff12;
+    }
+    .nav{
+      max-width:var(--max); margin:0 auto;
+      padding: 10px 12px;
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+    }
+    .navLeft{display:flex; gap:10px; align-items:center; min-width:240px}
+    .brand{
+      display:flex; gap:10px; align-items:center; text-decoration:none; color:var(--ink);
+    }
+    .logo{
+      width:34px; height:34px; border-radius:12px;
+      background: radial-gradient(circle at 35% 30%, var(--accent), transparent 55%),
+                  radial-gradient(circle at 70% 70%, var(--accent2), transparent 55%),
+                  linear-gradient(180deg, #0f1a38, #0b1022);
+      border:1px solid #ffffff22;
+      box-shadow:0 10px 35px rgba(0,0,0,.35);
+    }
+    .brandText{display:flex; flex-direction:column; line-height:1.05}
+    .brandText b{font-size:13px; letter-spacing:.2px}
+    .brandText span{font-size:11px; color:var(--muted)}
+    .navLinks{display:flex; gap:8px; flex-wrap:wrap; justify-content:center}
+    .chip{
+      border:1px solid #ffffff22; background:#0f1a38aa; color:var(--muted);
+      padding:8px 10px; border-radius: 999px; text-decoration:none; font-size:12px;
+      transition: border-color .12s ease, transform .12s ease;
+      white-space:nowrap;
+    }
+    .chip:hover{border-color:#ffffff44; transform: translateY(-1px); color:var(--ink)}
+    .navRight{display:flex; gap:8px; align-items:center; min-width:240px; justify-content:flex-end}
+    .search{
+      display:flex; align-items:center; gap:8px;
+      border:1px solid #ffffff22; border-radius:999px;
+      padding:6px 10px; background:#0b1230aa;
+      width:min(420px, 42vw);
+    }
+    .search input{
+      width:100%; border:0; outline:0; background:transparent; color:var(--ink);
+      font-size:13px;
+    }
+    .search input::placeholder{color:#9aa6cc99}
+    .pill{
+      font-family:var(--mono); font-size:11px; color:var(--faint);
+      border:1px solid #ffffff1f; padding:3px 7px; border-radius:999px;
+      background:#00000022;
+    }
+
+    /* =========================================================
+      TOOLTIP: BACKGROUND STARS + PARALLAX
+      What: Lightweight starfield + parallax layers.
+      How to extend: Tune star count in JS and layer gradients in CSS.
+      Outcome: "Cosmic dashboard" vibe without heavy rendering.
+    ========================================================== */
+    .stars{
+      position:fixed; inset:0; z-index:-3; pointer-events:none;
+      opacity:.9;
+    }
+    .parallax{
+      position:fixed; inset:-10vh -10vw; z-index:-4; pointer-events:none;
+      background:
+        radial-gradient(900px 600px at 25% 30%, #8aa8ff14, transparent 55%),
+        radial-gradient(700px 500px at 78% 60%, #7cf7d410, transparent 55%),
+        radial-gradient(600px 450px at 40% 85%, #ffc85710, transparent 50%);
+      transform: translate3d(0,0,0);
+      filter: blur(0px);
+    }
+
+    header.hero{padding:26px 0 10px}
+    .heroGrid{display:grid; grid-template-columns: 1.1fr .9fr; gap:16px}
+    @media (max-width: 980px){ .heroGrid{grid-template-columns:1fr} .navRight{min-width:auto} .navLeft{min-width:auto}}
+    .h1{
+      font-size:28px; margin:0 0 8px; letter-spacing:.2px;
+    }
+    .lead{color:var(--muted); line-height:1.45; margin:0 0 12px}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid #ffffff22; background:#0f1a38aa;
+      border-radius:999px; padding:8px 10px; font-size:12px; color:var(--muted)
+    }
+    .dot{width:8px;height:8px;border-radius:50%}
+    .dot.ok{background:var(--ok); box-shadow:0 0 16px #70ff8b55}
+    .dot.warn{background:var(--warn); box-shadow:0 0 16px #ffc85755}
+    .dot.info{background:var(--accent2); box-shadow:0 0 16px #8aa8ff55}
+
+    .card{
+      border:1px solid #ffffff18;
+      background: linear-gradient(180deg, var(--card), var(--card2));
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 16px 16px 14px;
+    }
+    .card h2{margin:0 0 8px; font-size:18px}
+    .card h3{margin:14px 0 8px; font-size:15px}
+    .card p{margin:0 0 10px; color:var(--muted); line-height:1.5}
+    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+    @media (max-width: 900px){.grid2{grid-template-columns:1fr}}
+    .kpiGrid{display:grid; grid-template-columns: repeat(3, 1fr); gap:10px}
+    @media (max-width: 900px){.kpiGrid{grid-template-columns:1fr}}
+    .kpi{
+      border:1px solid #ffffff18; border-radius:16px; padding:10px 10px 9px;
+      background:#0b1230aa;
+    }
+    .kpi b{display:block; font-size:13px}
+    .kpi span{color:var(--muted); font-size:12px; line-height:1.35; display:block; margin-top:4px}
+    .hr{height:1px;background:#ffffff12;margin:14px 0}
+    details{
+      border:1px solid #ffffff16;
+      background:#0b1230aa;
+      border-radius:16px;
+      padding:10px 10px 8px;
+    }
+    details + details{margin-top:10px}
+    summary{cursor:pointer; list-style:none; display:flex; gap:10px; align-items:flex-start}
+    summary::-webkit-details-marker{display:none}
+    .sumTitle{font-weight:650}
+    .sumMeta{margin-left:auto; color:var(--faint); font-size:12px; font-family:var(--mono)}
+    .callout{
+      border-left:4px solid var(--accent);
+      padding:10px 12px;
+      background: linear-gradient(90deg, #7cf7d412, transparent);
+      border-radius:14px;
+    }
+    .callout b{color:var(--ink)}
+    .list{margin:0; padding-left:18px; color:var(--muted); line-height:1.55}
+    .mono{font-family:var(--mono)}
+    pre{
+      margin:0; padding:12px; border-radius:14px;
+      background:#060814aa; border:1px solid #ffffff12; overflow:auto;
+      color:#dbe6ff;
+    }
+
+    /* =========================================================
+      TOOLTIP: HUD + CONSTELLATION
+      What: Gamification overlay tracking "research actions" locally.
+      How to extend: Add new counters in JS state schema and render function.
+      Outcome: A small dopamine engine that reinforces careful, repeatable work.
+    ========================================================== */
+    .hud{
+      position:fixed; right:12px; bottom:12px; z-index:60;
+      width:min(380px, 92vw);
+      border:1px solid #ffffff1a;
+      background: linear-gradient(180deg, #0b1230dd, #070a12dd);
+      border-radius:20px;
+      box-shadow: var(--shadow);
+      padding:10px;
+      backdrop-filter: blur(10px);
+    }
+    .hudTop{display:flex; align-items:center; justify-content:space-between; gap:10px}
+    .hudTop b{font-size:12px}
+    .hudTop .mini{font-size:11px; color:var(--muted)}
+    .hudGrid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px}
+    .hudTile{
+      border:1px solid #ffffff14; border-radius:14px;
+      padding:8px; background:#00000022;
+    }
+    .hudTile b{display:block; font-size:12px}
+    .hudTile span{display:block; font-size:11px; color:var(--muted); margin-top:4px}
+    .hudBtns{display:flex; gap:8px; margin-top:8px; flex-wrap:wrap}
+    .hudBtns .btn{padding:8px 10px; border-radius:14px; box-shadow:none}
+    .constellationWrap{
+      margin-top:10px;
+      border:1px solid #ffffff14;
+      border-radius:16px;
+      overflow:hidden;
+      background:#050812;
+    }
+    canvas#constellation{display:block; width:100%; height:120px}
+    .toast{
+      position:fixed; left:50%; bottom:86px; transform:translateX(-50%);
+      background:#0b1230ee; border:1px solid #ffffff1a; color:var(--ink);
+      padding:10px 12px; border-radius:14px; box-shadow:var(--shadow);
+      opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease;
+      z-index:70;
+      max-width:min(680px, 92vw);
+    }
+    .toast.show{opacity:1; transform:translateX(-50%) translateY(-2px)}
+    .footer{
+      margin-top:18px; padding:14px 12px; color:var(--muted);
+      border-top:1px solid #ffffff12;
+      font-size:12px;
+    }
+    .footer b{color:var(--ink)}
+    .cols{display:grid; grid-template-columns:1.2fr .8fr; gap:12px}
+    @media (max-width: 900px){.cols{grid-template-columns:1fr}}
+    .tag{display:inline-block; font-family:var(--mono); font-size:11px; color:var(--faint);
+      border:1px solid #ffffff1f; background:#00000022; padding:4px 8px; border-radius:999px; margin:2px 6px 0 0;
+    }
+    .mark{color:var(--ink)}
+  </style>
+</head>
+
+<body>
+  <div class="parallax" id="parallax"></div>
+  <canvas class="stars" id="stars" aria-hidden="true"></canvas>
+
+  <!-- =========================================================
+    TOOLTIP: NOSCRIPT FALLBACK
+    What: Guarantees the doc remains readable without JavaScript.
+    How to extend: Add a plain-text TOC and citations here if needed.
+    Outcome: Accessibility + resilience on locked-down machines.
+  ========================================================== -->
+  <noscript>
+    <div style="padding:14px;font-family:system-ui;background:#fff;color:#000">
+      <b>JavaScript is disabled.</b> This page still contains the full text, but offline storage, search, HUD, and constellation visuals require JS.
+    </div>
+  </noscript>
+
+  <!-- =========================================================
+    TOOLTIP: SPLASH
+    What: Short animated load ritual. No tracking. No external calls.
+    How to extend: Change the progress pacing in JS.
+    Outcome: Polished first impression without dark patterns.
+  ========================================================== -->
+  <section class="splash" id="splash" role="dialog" aria-modal="true" aria-label="Loading">
+    <div class="splashCard">
+      <div class="pulseRing" aria-hidden="true"></div>
+      <div class="splashTitle">
+        <div>
+          <p class="big"><b>Northbound Benevolence & Security Atlas</b> 🧭</p>
+          <div class="sig">offline-first • local-only • citation-backed</div>
+        </div>
+        <div class="sig"><span class="kbd">Esc</span> skip</div>
+      </div>
+      <p class="sub">
+        Mapping shared bottlenecks between <b>U.S. government</b> + <b>institutions</b> that slow planetary benevolence & security—
+        translated into <b>Canadian policy levers</b> and CPO-ready action paths.
+      </p>
+      <div class="bar" aria-label="Loading progress"><i id="splashBar"></i></div>
+      <div class="splashRow">
+        <button class="btn primary" id="enterBtn">Enter Atlas</button>
+        <button class="btn" id="loadLocalBtn" title="Loads your saved notes and preferences from this device only.">Load local state</button>
+        <button class="btn danger" id="resetBtn" title="Clears ONLY local storage for this page on this device.">Reset local data</button>
+        <span class="tiny">No telemetry. No auto-send. Local-only. ✅</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="sticky">
+    <div class="nav">
+      <div class="navLeft">
+        <a class="brand" href="#top">
+          <div class="logo" aria-hidden="true"></div>
+          <div class="brandText">
+            <b>Northbound Atlas</b>
+            <span>USA bottlenecks → Canada levers</span>
+          </div>
+        </a>
+      </div>
+
+      <nav class="navLinks" aria-label="Sections">
+        <a class="chip" href="#directory">Repo Structure</a>
+        <a class="chip" href="#bottlenecks">Shared Bottlenecks</a>
+        <a class="chip" href="#platforms">Action Platforms</a>
+        <a class="chip" href="#prompts">Meta-Prompt Chains</a>
+        <a class="chip" href="#sources">Sources</a>
+      </nav>
+
+      <div class="navRight">
+        <div class="search" role="search" aria-label="Search this page">
+          <span class="pill">Ctrl</span><span class="pill">K</span>
+          <input id="q" type="search" placeholder="Search: permitting, AI, grid, trust, procurement…" autocomplete="off" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="wrap" id="top">
+    <header class="hero">
+      <div class="heroGrid">
+        <section class="card">
+          <h1 class="h1">Shared Bottlenecks (USA Gov + Institutions) that Block Planetary Benevolence & Security 🧠🌍🛡️</h1>
+          <p class="lead">
+            This is a <b>policy-translation engine</b>: we study recurring U.S. implementation chokepoints and convert them into
+            <b>Canadian risk controls</b>, <b>procurement patterns</b>, <b>regulatory designs</b>, and <b>institutional playbooks</b>.
+            Everything here is <b>offline-first</b> and stores only on this device.
+          </p>
+          <div class="row">
+            <span class="badge"><span class="dot ok"></span> Local-only notes + preferences</span>
+            <span class="badge"><span class="dot warn"></span> “Planetary benevolence” = life-supporting outcomes, not vibes</span>
+            <span class="badge"><span class="dot info"></span> Built for Canadian policymakers & CPOs</span>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="kpiGrid" aria-label="Quick frames">
+            <div class="kpi">
+              <b>Implementation > Intent</b>
+              <span>Many systems fail in the “last mile”: permitting, procurement, workforce, trust, and interoperability.</span>
+            </div>
+            <div class="kpi">
+              <b>Infrastructure as security</b>
+              <span>Grid capacity, interconnection queues, and continuity operations become national-security issues under stress.</span>
+            </div>
+            <div class="kpi">
+              <b>AI as amplifier</b>
+              <span>AI accelerates both capability and risk; governance bottlenecks show up in standards, oversight, and adoption.</span>
+            </div>
+          </div>
+        </section>
+
+        <aside class="card">
+          <h2>Canadian “Northbound” Lens 🇨🇦</h2>
+          <p>
+            Canada can’t directly fix U.S. institutional friction—but can <b>design around it</b>:
+            harmonize selectively, build interoperable safeguards, and reduce dependency on U.S. policy volatility.
+          </p>
+
+          <div class="callout">
+            <b>Northbound thesis:</b> every U.S. bottleneck is a <span class="mark">design test</span> for Canadian policy:
+            “If this fails in the U.S., how do we avoid the same failure mode here?”
+          </div>
+
+          <div class="hr"></div>
+
+          <h3>What this file gives you</h3>
+          <ul class="list">
+            <li>A repo directory blueprint for a collection of <span class="mono">index.html</span> platforms</li>
+            <li>A distilled set of shared U.S. bottlenecks with citations</li>
+            <li>Actionable platform modules (ready to split into separate files)</li>
+            <li>Extra-superficial meta-prompts to delegate expansion to other models/teams</li>
+          </ul>
+
+          <div class="hr"></div>
+
+          <button class="btn primary" id="logActionBtn" title="Adds XP locally—no network calls.">Log a policy action (+XP)</button>
+          <button class="btn" id="exportBtn" title="Exports your local notes as JSON.">Export my local notes</button>
+        </aside>
+      </div>
+    </header>
+
+    <!-- =========================================================
+      SECTION: DIRECTORY STRUCTURE
+      Outcome: A GitHub-ready scaffold for multiple index.html platforms.
+    ========================================================== -->
+    <section class="card" id="directory">
+      <h2>1) Repository Directory Structure (collection of actionable platforms) 🗂️</h2>
+      <p>
+        Each module is a standalone <span class="mono">index.html</span> like this one—policy-ready, offline-first, and citation-backed.
+        The goal is to let Canadian institutions/CPOs pick a lane and ship.
+      </p>
+
+      <pre aria-label="Proposed directory structure"><code>northbound_benevolence_security_atlas/
+├─ 00_Orientation_Gateway/
+│  └─ index.html                 # “How to use this atlas” + glossary + risk controls
+├─ 01_Bottleneck_Map_USA/
+│  └─ index.html                 # Shared bottleneck taxonomy + evidence + Canada mapping
+├─ 02_Permitting_Interconnection_Grid/
+│  └─ index.html                 # Permitting + interconnection queue + electricity build speed
+├─ 03_Continuity_Budget_Procurement/
+│  └─ index.html                 # Shutdown/CR shocks + procurement reform + delivery patterns
+├─ 04_Cyber_Workforce_ZeroTrust/
+│  └─ index.html                 # Workforce gaps + zero trust + operational readiness
+├─ 05_AI_Governance_Adoption_Safety/
+│  └─ index.html                 # Standards + oversight + adoption bottlenecks (public/private)
+├─ 06_Trust_Misinformation_Social_License/
+│  └─ index.html                 # Trust collapse + misinformation + institutional legitimacy
+├─ 07_Canada_Policy_Levers_Toolkit/
+│  └─ index.html                 # Concrete levers: procurement, regulation, data, federalism, standards
+├─ 08_CPO_Playbooks/
+│  └─ index.html                 # Board-ready risk registers, KPIs, audit trails, incident playbooks
+├─ 09_CrossBorder_Interoperability/
+│  └─ index.html                 # Where harmonization helps (and where it creates fragility)
+├─ 10_Simulations_and_Scenarios/
+│  └─ index.html                 # Tabletop exercises, scenario cards, “red team” questions
+└─ _assets_local/
+   ├─ citations.json             # Optional: local bibliography for offline browsing
+   ├─ icons.svg                  # No external fonts; local vector icons
+   └─ templates/                 # Reusable UI and policy templates (copy/paste)</code></pre>
+
+      <div class="hr"></div>
+
+      <details open>
+        <summary>
+          <span class="sumTitle">How to split this file into the collection</span>
+          <span class="sumMeta">ops</span>
+        </summary>
+        <p>
+          Copy this <span class="mono">index.html</span> into each folder, then keep only the relevant sections per module.
+          The shared “engine” pieces (offline store, HUD, search, citations) stay identical.
+        </p>
+        <ul class="list">
+          <li>Keep <b>local-only</b> storage for notes and KPIs (no auto-send)</li>
+          <li>Use the “Meta-Prompt Chains” section to delegate expansions</li>
+          <li>Keep citations in a single shared <span class="mono">citations.json</span> if desired</li>
+        </ul>
+      </details>
+    </section>
+
+    <!-- =========================================================
+      SECTION: BOTTLENECKS
+      Outcome: A concise, evidence-backed bottleneck taxonomy.
+    ========================================================== -->
+    <section class="card" id="bottlenecks">
+      <h2>2) Shared Bottlenecks (USA Gov + Institutions) 🧱</h2>
+      <p>
+        These are recurring “system frictions” that show up across climate/security/AI/cyber domains.
+        The trick is that they’re <b>shared</b>—government and institutions both hit them, then blame each other, and the planet loses.
+      </p>
+
+      <details open>
+        <summary>
+          <span class="sumTitle">B1 — Permitting & legal friction (build-speed bottleneck)</span>
+          <span class="sumMeta">infrastructure</span>
+        </summary>
+        <p>
+          Major infrastructure (energy, transmission, pipelines, critical facilities) can stall in multi-agency permitting and litigation-heavy processes.
+          A 2025 National Petroleum Council report frames permitting timelines and litigation dynamics as a core constraint on infrastructure delivery. (NPC report, Dec 2025) <a href="https://www.energy.gov/sites/default/files/2025-12/NPC_Permitting_report_2025-12-3.pdf" target="_blank" rel="noopener">source</a>
+        </p>
+        <div class="callout">
+          <b>Canada lever:</b> pre-clear “priority corridors” with predictable timelines + transparent consultation;
+          do it for transmission, interties, and resilience builds (wildfire hardening, flood protection).
+        </div>
+        <span class="tag">Policy design: timeboxes</span><span class="tag">Public engagement</span><span class="tag">Litigation risk</span>
+      </details>
+
+      <details>
+        <summary>
+          <span class="sumTitle">B2 — Interconnection queues & grid capacity (physics doesn’t negotiate)</span>
+          <span class="sumMeta">electricity</span>
+        </summary>
+        <p>
+          The U.S. power system faces interconnection backlogs; FERC adopted reforms intended to reduce queue delays and improve certainty (FERC interconnection final rule explainer). <a href="https://www.ferc.gov/explainer-interconnection-final-rule" target="_blank" rel="noopener">source</a>
+          Lawrence Berkeley National Lab tracks queue characteristics and highlights the scale/importance of queue reform. <a href="https://emp.lbl.gov/queues" target="_blank" rel="noopener">source</a>
+        </p>
+        <p>
+          Load growth pressure is now tied to AI data-center demand; Reuters notes grid infrastructure bottlenecks threatening AI expansion (Feb 2026). <a href="https://www.reuters.com/markets/commodities/us-ai-boom-faces-electric-shock-2026-02-25/" target="_blank" rel="noopener">source</a>
+        </p>
+        <div class="callout">
+          <b>Canada lever:</b> treat transmission + interconnection as a national-security enabler:
+          queue reform, standardized studies, and accelerated intertie approvals.
+        </div>
+        <span class="tag">Interties</span><span class="tag">Queue reform</span><span class="tag">Reliability</span>
+      </details>
+
+      <details>
+        <summary>
+          <span class="sumTitle">B3 — Budget volatility & continuity shocks (shutdown / CR friction)</span>
+          <span class="sumMeta">governance</span>
+        </summary>
+        <p>
+          Continuing resolutions (CRs) and shutdown dynamics disrupt planning and delivery; CRFB summarizes negative implications of CRs for budgeting efficiency (Jan 2026). <a href="https://www.crfb.org/papers/government-shutdowns-qa-everything-you-should-know" target="_blank" rel="noopener">source</a>
+          Reporting has also highlighted operational constraints during shutdown conditions in continuity-related functions (e.g., FEMA continuity impacts). <a href="https://www.washingtonpost.com/climate-environment/2026/02/23/fema-continuity-shutdown-national-security/" target="_blank" rel="noopener">source</a>
+        </p>
+        <div class="callout">
+          <b>Canada lever:</b> ring-fence “life-supporting operations” budgets (grid reliability, wildfire mitigation, public alerting)
+          with multi-year funding and delivery contracts that survive annual churn.
+        </div>
+        <span class="tag">Multi-year funding</span><span class="tag">Continuity</span><span class="tag">Delivery reliability</span>
+      </details>
+
+      <details>
+        <summary>
+          <span class="sumTitle">B4 — Cyber workforce shortages + operational readiness gaps</span>
+          <span class="sumMeta">cyber</span>
+        </summary>
+        <p>
+          GAO reports on cyber workforce actions needed (Sep 2025) and notes data/information challenges around hiring and workforce management. <a href="https://www.gao.gov/assets/gao-25-107405.pdf" target="_blank" rel="noopener">source</a>
+          Workforce studies (e.g., ISC2 2025) track barriers facing the cybersecurity profession. <a href="https://www.isc2.org/Insights/2025/12/2025-ISC2-Cybersecurity-Workforce-Study" target="_blank" rel="noopener">source</a>
+        </p>
+        <div class="callout">
+          <b>Canada lever:</b> treat cyber staffing like an essential service:
+          standardized roles, national talent pipelines, and procurement requirements for secure-by-default delivery.
+        </div>
+        <span class="tag">Talent pipelines</span><span class="tag">Secure by default</span><span class="tag">Readiness KPIs</span>
+      </details>
+
+      <details>
+        <summary>
+          <span class="sumTitle">B5 — AI governance & adoption friction (standards, oversight, procurement)</span>
+          <span class="sumMeta">AI</span>
+        </summary>
+        <p>
+          The U.S. is pushing AI strategy via federal planning documents (e.g., “America’s AI Action Plan”, Jul 2025). <a href="https://www.whitehouse.gov/wp-content/uploads/2025/07/Americas-AI-Action-Plan.pdf" target="_blank" rel="noopener">source</a>
+          GAO has also examined generative AI use and management challenges at federal agencies. <a href="https://www.gao.gov/products/gao-25-107653" target="_blank" rel="noopener">source</a>
+          International synthesis work on advanced AI risks continues to evolve (International AI Safety Report 2026). <a href="https://internationalaisafetyreport.org/sites/default/files/2026-02/international-ai-safety-report-2026_1.pdf" target="_blank" rel="noopener">source</a>
+        </p>
+        <div class="callout">
+          <b>Canada lever:</b> require model risk management, audit trails, and incident response in procurement—then
+          fund the “boring plumbing”: evaluation, red-teaming, monitoring, and secure deployment.
+        </div>
+        <span class="tag">AI RM</span><span class="tag">Auditability</span><span class="tag">Public procurement</span>
+      </details>
+
+      <details>
+        <summary>
+          <span class="sumTitle">B6 — Trust + misinformation eroding “social license” for action</span>
+          <span class="sumMeta">legitimacy</span>
+        </summary>
+        <p>
+          The U.S. (and many peers) face polarization-linked trust problems; National Academies work discusses trust, polarization, and misinformation about science. <a href="https://www.nationalacademies.org/read/27894/chapter/5" target="_blank" rel="noopener">source</a>
+          (See also the broader publication page.) <a href="https://www.nationalacademies.org/publications/27894" target="_blank" rel="noopener">source</a>
+        </p>
+        <div class="callout">
+          <b>Canada lever:</b> pre-bunking + transparency-by-design:
+          publish assumptions, uncertainty ranges, and “what would change our mind?” triggers in public dashboards.
+        </div>
+        <span class="tag">Prebunking</span><span class="tag">Transparency</span><span class="tag">Trust metrics</span>
+      </details>
+    </section>
+
+    <!-- =========================================================
+      SECTION: ACTION PLATFORMS
+      Outcome: Turn bottlenecks into platform modules Canadian entities can deploy.
+    ========================================================== -->
+    <section class="card" id="platforms">
+      <h2>3) Actionable Index.html Platforms (modules you can ship) 🧰</h2>
+      <p>
+        Think of each platform as a “policy machine”: a small, auditable UI that turns research into repeatable decisions.
+        Below are starter blueprints—each can become its own folder from the directory structure.
+      </p>
+
+      <div class="grid2">
+        <div class="card" style="background:linear-gradient(180deg,#0f1a38cc,#0b1022cc)">
+          <h3>Platform A — <span class="mark">Permitting-to-Delivery</span> Dashboard</h3>
+          <p>
+            Converts permitting friction into measurable delivery speed. Includes:
+            timeline KPIs, consultation checkpoints, litigation risk flags, and “fast-track corridor” templates.
+          </p>
+          <ul class="list">
+            <li>Policy levers: timeboxes, single-window coordination, standardized evidence bundles</li>
+            <li>Institution levers: pre-approved vendor panels, environmental data commons, transparent consultation logs</li>
+            <li>Evidence anchor: NPC permitting blueprint highlights permitting timelines + litigation dynamics (Dec 2025) <a href="https://www.energy.gov/sites/default/files/2025-12/NPC_Permitting_report_2025-12-3.pdf" target="_blank" rel="noopener">source</a></li>
+          </ul>
+          <div class="hr"></div>
+          <button class="btn" data-xp="8">Mark “A” reviewed (+XP)</button>
+        </div>
+
+        <div class="card" style="background:linear-gradient(180deg,#0f1a38cc,#0b1022cc)">
+          <h3>Platform B — <span class="mark">Grid Queue & Intertie</span> Acceleration Board</h3>
+          <p>
+            A queue-reform and intertie acceleration view: where projects stall, why, and what interventions unblock them.
+          </p>
+          <ul class="list">
+            <li>Queue facts: FERC reforms targeting backlog reduction <a href="https://www.ferc.gov/explainer-interconnection-final-rule" target="_blank" rel="noopener">source</a></li>
+            <li>Queue measurement: LBNL queue tracking <a href="https://emp.lbl.gov/queues" target="_blank" rel="noopener">source</a></li>
+            <li>Load pressure: AI/data centers stressing the grid (Reuters Feb 2026) <a href="https://www.reuters.com/markets/commodities/us-ai-boom-faces-electric-shock-2026-02-25/" target="_blank" rel="noopener">source</a></li>
+          </ul>
+          <div class="hr"></div>
+          <button class="btn" data-xp="8">Mark “B” reviewed (+XP)</button>
+        </div>
+
+        <div class="card" style="background:linear-gradient(180deg,#0f1a38cc,#0b1022cc)">
+          <h3>Platform C — <span class="mark">Continuity & Delivery Resilience</span> (Budget/CR/Shock)</h3>
+          <p>
+            Models the operational impact of funding disruptions and creates “continuity minimums” for essential functions.
+          </p>
+          <ul class="list">
+            <li>CR/shutdown implications overview (CRFB Jan 2026) <a href="https://www.crfb.org/papers/government-shutdowns-qa-everything-you-should-know" target="_blank" rel="noopener">source</a></li>
+            <li>Continuity operational constraints reporting (example coverage) <a href="https://www.washingtonpost.com/climate-environment/2026/02/23/fema-continuity-shutdown-national-security/" target="_blank" rel="noopener">source</a></li>
+          </ul>
+          <div class="hr"></div>
+          <button class="btn" data-xp="8">Mark “C” reviewed (+XP)</button>
+        </div>
+
+        <div class="card" style="background:linear-gradient(180deg,#0f1a38cc,#0b1022cc)">
+          <h3>Platform D — <span class="mark">AI & Cyber Procurement Guardrails</span> for CPOs</h3>
+          <p>
+            A procurement-grade checklist system: evaluation, audit trails, incident response, and workforce readiness.
+          </p>
+          <ul class="list">
+            <li>GAO on federal generative AI uses + management challenges <a href="https://www.gao.gov/products/gao-25-107653" target="_blank" rel="noopener">source</a></li>
+            <li>U.S. AI policy direction example (“America’s AI Action Plan”, Jul 2025) <a href="https://www.whitehouse.gov/wp-content/uploads/2025/07/Americas-AI-Action-Plan.pdf" target="_blank" rel="noopener">source</a></li>
+            <li>International synthesis on advanced AI risk (AI Safety Report 2026) <a href="https://internationalaisafetyreport.org/sites/default/files/2026-02/international-ai-safety-report-2026_1.pdf" target="_blank" rel="noopener">source</a></li>
+            <li>Cyber workforce: GAO actions needed (Sep 2025) <a href="https://www.gao.gov/assets/gao-25-107405.pdf" target="_blank" rel="noopener">source</a></li>
+          </ul>
+          <div class="hr"></div>
+          <button class="btn" data-xp="8">Mark “D” reviewed (+XP)</button>
+        </div>
+
+        <div class="card" style="background:linear-gradient(180deg,#0f1a38cc,#0b1022cc)">
+          <h3>Platform E — <span class="mark">Trust, Misinformation, Social License</span></h3>
+          <p>
+            A “credibility engine” for public communication: prebunking, transparent uncertainty, and feedback loops.
+          </p>
+          <ul class="list">
+            <li>National Academies: trust + polarization + misinformation about science <a href="https://www.nationalacademies.org/read/27894/chapter/5" target="_blank" rel="noopener">source</a></li>
+            <li>Publication hub <a href="https://www.nationalacademies.org/publications/27894" target="_blank" rel="noopener">source</a></li>
+          </ul>
+          <div class="hr"></div>
+          <button class="btn" data-xp="8">Mark “E” reviewed (+XP)</button>
+        </div>
+
+        <div class="card" style="background:linear-gradient(180deg,#0f1a38cc,#0b1022cc)">
+          <h3>Platform F — <span class="mark">Cross-Border Interoperability Risk Map</span></h3>
+          <p>
+            A Canada-first map of where harmonizing with U.S. standards helps—and where it imports fragility.
+            Especially relevant for critical infrastructure, AI, and cyber.
+          </p>
+          <ul class="list">
+            <li>Trigger example: U.S. grid bottlenecks affecting AI build-out and infrastructure planning (Reuters Feb 2026) <a href="https://www.reuters.com/markets/commodities/us-ai-boom-faces-electric-shock-2026-02-25/" target="_blank" rel="noopener">source</a></li>
+            <li>Government adoption challenges: GAO generative AI management <a href="https://www.gao.gov/products/gao-25-107653" target="_blank" rel="noopener">source</a></li>
+          </ul>
+          <div class="hr"></div>
+          <button class="btn" data-xp="8">Mark “F” reviewed (+XP)</button>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <details>
+        <summary>
+          <span class="sumTitle">A tiny “Canadian CPO quick-start” checklist</span>
+          <span class="sumMeta">copy/paste</span>
+        </summary>
+        <ul class="list">
+          <li><b>Procurement:</b> require audit logs, incident response, and evaluation artifacts before deployment (especially AI/cyber).</li>
+          <li><b>Delivery:</b> timebox permitting steps; publish “why delayed?” dashboards.</li>
+          <li><b>Workforce:</b> standardize roles; fund pipelines; measure readiness monthly.</li>
+          <li><b>Continuity:</b> ring-fence essential services in multi-year budgets; run tabletop exercises.</li>
+          <li><b>Trust:</b> publish uncertainty ranges; prebunk; show “what would change our mind?”</li>
+        </ul>
+      </details>
+    </section>
+
+    <!-- =========================================================
+      SECTION: META-PROMPTS
+      Outcome: Delegation-ready instructions for teams / other models.
+    ========================================================== -->
+    <section class="card" id="prompts">
+      <h2>4) Extra-Superficial Meta-Prompt Chains (to expand the repo) 🧬</h2>
+      <p>
+        These prompts are intentionally “thin but sharp”: they tell an editor/LLM what to build, what to cite, and how to keep it safe.
+        They’re designed for Canadian policy teams and institutional CPOs to delegate research+drafting without losing rigor.
+      </p>
+
+      <details open>
+        <summary>
+          <span class="sumTitle">Prompt Chain 0 — Repo-wide rules (apply to every module)</span>
+          <span class="sumMeta">foundation</span>
+        </summary>
+        <pre><code>[ROLE]
+You are a policy + systems analyst building a standalone offline-first index.html platform for Canadian policymakers and CPOs.
+
+[NON-NEGOTIABLES]
+- No external JS/CSS/fonts; no tracking; no auto-send.
+- Provide citations for every factual claim that might change over time.
+- Translate U.S. bottlenecks into Canadian levers (procurement, regulation, budget design, standards).
+- Include: glossary, KPIs, risks, mitigations, and “next 10 actions” list.
+
+[OUTPUT]
+- One complete index.html with: sticky nav, collapsibles, client-side search, print stylesheet, local-only storage, and a Sources section with links.</code></pre>
+      </details>
+
+      <details>
+        <summary>
+          <span class="sumTitle">Prompt Chain 1 — Permitting + delivery speed module</span>
+          <span class="sumMeta">02_*</span>
+        </summary>
+        <pre><code>Build 02_Permitting_Interconnection_Grid/index.html.
+
+Include:
+- A “Permitting Timeline Simulator” section (qualitative, not legal advice).
+- A table of failure modes: multi-agency complexity, litigation delays, consultation breakdowns.
+- A Canadian mapping: how to pre-design corridors, timebox reviews, and publish dashboards.
+
+Cite:
+- NPC permitting blueprint (DOE-hosted PDF, Dec 2025).
+- At least one grid/interconnection source (FERC and/or LBNL queues).</code></pre>
+      </details>
+
+      <details>
+        <summary>
+          <span class="sumTitle">Prompt Chain 2 — Continuity, CR/shutdown, and delivery resilience module</span>
+          <span class="sumMeta">03_*</span>
+        </summary>
+        <pre><code>Build 03_Continuity_Budget_Procurement/index.html.
+
+Include:
+- A “Continuity Minimums” checklist (public alerting, grid reliability, disaster logistics).
+- A “Funding Volatility” risk register (CR, shutdown, procurement pause, staff churn).
+- Canadian levers: multi-year appropriations for essentials, contract structures, contingency staffing.
+
+Cite:
+- CRFB explainer on shutdowns/continuing resolutions (Jan 2026).
+- One reporting source illustrating operational constraints during shutdown conditions.</code></pre>
+      </details>
+
+      <details>
+        <summary>
+          <span class="sumTitle">Prompt Chain 3 — AI governance + adoption + safety module</span>
+          <span class="sumMeta">05_*</span>
+        </summary>
+        <pre><code>Build 05_AI_Governance_Adoption_Safety/index.html.
+
+Include:
+- An “AI procurement guardrails” checklist (evaluation, audit logs, incident response).
+- A “Model risk register” and “deployment gating” (pilot → limited → scaled).
+- Canadian mapping: alignment with domestic regulators, cross-border interoperability risks.
+
+Cite:
+- America’s AI Action Plan (White House PDF, Jul 2025).
+- GAO report on generative AI use/management at federal agencies.
+- International AI Safety Report 2026 (Feb 2026).</code></pre>
+      </details>
+
+      <details>
+        <summary>
+          <span class="sumTitle">Prompt Chain 4 — Trust & misinformation module</span>
+          <span class="sumMeta">06_*</span>
+        </summary>
+        <pre><code>Build 06_Trust_Misinformation_Social_License/index.html.
+
+Include:
+- A “Prebunking toolkit” for public comms (what we know, uncertainty, update triggers).
+- A “Trust metrics dashboard” concept (local-only; no personal data).
+- Canadian mapping: how to maintain legitimacy during high-stakes transitions.
+
+Cite:
+- National Academies: Understanding and Addressing Misinformation About Science (trust/polarization chapters).</code></pre>
+      </details>
+
+      <details>
+        <summary>
+          <span class="sumTitle">Prompt Chain 5 — CPO Playbooks module</span>
+          <span class="sumMeta">08_*</span>
+        </summary>
+        <pre><code>Build 08_CPO_Playbooks/index.html.
+
+Include:
+- Board-ready templates: risk register, procurement checklists, incident response flow.
+- KPIs: time-to-deliver, audit coverage, workforce readiness, resilience test cadence.
+- “Red-team questions” that force clarity without paranoia.
+
+Cite:
+- GAO cyber workforce actions needed (Sep 2025).
+- GAO generative AI management report.</code></pre>
+      </details>
+    </section>
+
+    <!-- =========================================================
+      SECTION: SOURCES
+      Outcome: Central bibliography with live links (no dead links intended).
+    ========================================================== -->
+    <section class="card" id="sources">
+      <h2>5) Sources (selected, load-bearing) 📚</h2>
+      <p>
+        Links open in a new tab when online; offline mode keeps everything readable but links obviously won’t fetch.
+      </p>
+
+      <div class="cols">
+        <div>
+          <h3>Infrastructure, permitting, grid</h3>
+          <ul class="list">
+            <li>DOE-hosted NPC report: <i>Bottleneck to Breakthrough: A Permitting Blueprint to Build</i> (Dec 2025) — https://www.energy.gov/sites/default/files/2025-12/NPC_Permitting_report_2025-12-3.pdf</li>
+            <li>FERC: Explainer on the Interconnection Final Rule — https://www.ferc.gov/explainer-interconnection-final-rule</li>
+            <li>LBNL: Queued Up (interconnection queue tracking) — https://emp.lbl.gov/queues</li>
+            <li>Reuters: U.S. AI boom faces electric shock (grid constraints) (Feb 2026) — https://www.reuters.com/markets/commodities/us-ai-boom-faces-electric-shock-2026-02-25/</li>
+          </ul>
+
+          <h3>Budget volatility & continuity</h3>
+          <ul class="list">
+            <li>CRFB: Government shutdowns Q&amp;A (Jan 2026) — https://www.crfb.org/papers/government-shutdowns-qa-everything-you-should-know</li>
+            <li>Washington Post: FEMA continuity constraints during shutdown conditions (Feb 2026) — https://www.washingtonpost.com/climate-environment/2026/02/23/fema-continuity-shutdown-national-security/</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3>AI, cyber, governance</h3>
+          <ul class="list">
+            <li>White House OSTP: <i>America’s AI Action Plan</i> (Jul 2025) — https://www.whitehouse.gov/wp-content/uploads/2025/07/Americas-AI-Action-Plan.pdf</li>
+            <li>GAO: Generative AI Use and Management at Federal Agencies — https://www.gao.gov/products/gao-25-107653</li>
+            <li>GAO: Cyber Workforce — Actions Needed (PDF, Sep 2025) — https://www.gao.gov/assets/gao-25-107405.pdf</li>
+            <li>International AI Safety Report 2026 (Feb 2026) — https://internationalaisafetyreport.org/sites/default/files/2026-02/international-ai-safety-report-2026_1.pdf</li>
+            <li>ISC2: 2025 Cybersecurity Workforce Study (Dec 2025) — https://www.isc2.org/Insights/2025/12/2025-ISC2-Cybersecurity-Workforce-Study</li>
+          </ul>
+
+          <h3>Trust & misinformation</h3>
+          <ul class="list">
+            <li>National Academies (chapter on trust/polarization) — https://www.nationalacademies.org/read/27894/chapter/5</li>
+            <li>National Academies publication hub — https://www.nationalacademies.org/publications/27894</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <details>
+        <summary>
+          <span class="sumTitle">Attributions & Licensing</span>
+          <span class="sumMeta">human-readable</span>
+        </summary>
+        <p>
+          This file is original code and text synthesis. It links to public sources for verification. No proprietary code is copied.
+          If you adapt this repo publicly, add your preferred open-source license and keep citations intact.
+        </p>
+      </details>
+
+      <footer class="footer">
+        <b>Zero-Harm & Anti-Inversion Note:</b> This atlas is built to support life, dignity, and lawful democratic governance.
+        No surveillance tooling, coercion playbooks, or automated targeting is included. Local-only storage, transparent controls, and reset buttons are intentional.
+        <br/><br/>
+        <span class="tiny">Tip: Press <span class="kbd">Ctrl</span>+<span class="kbd">K</span> to search. Press <span class="kbd">Esc</span> to dismiss overlays.</span>
+      </footer>
+
+      <!--
+        Zero-Harm & Anti-Inversion Note (HTML comment):
+        This project is designed to strengthen benevolent, life-supporting outcomes and reduce systemic risks.
+        It avoids surveillance enablement, coercive tactics, hidden telemetry, auto-sending, and any features that could be repurposed for harm.
+        All data is local-only and user-resettable. Input is sanitized and rate-limited gently.
+      -->
+    </section>
+  </main>
+
+  <!-- =========================================================
+    HUD: local-only gamification and state visualizer
+  ========================================================== -->
+  <aside class="hud" aria-label="Local HUD">
+    <div class="hudTop">
+      <div>
+        <b>Local HUD</b> <span class="mini">🛰️ state stays on this device</span>
+      </div>
+      <div class="mini"><span class="pill">XP</span> <b id="xp">0</b></div>
+    </div>
+    <div class="hudGrid" aria-label="Counters">
+      <div class="hudTile"><b>Actions logged</b><span id="actions">0</span></div>
+      <div class="hudTile"><b>Modules reviewed</b><span id="modules">0</span></div>
+      <div class="hudTile"><b>Notes saved</b><span id="notes">0</span></div>
+      <div class="hudTile"><b>Last save</b><span id="lastSave">—</span></div>
+    </div>
+    <div class="hudBtns">
+      <button class="btn" id="addNoteBtn" title="Add a short local note.">Add note (+2 XP)</button>
+      <button class="btn" id="viewNotesBtn" title="View and manage your local notes.">View notes</button>
+      <button class="btn danger" id="wipeBtn" title="Wipes local data for this page only.">Wipe local data</button>
+    </div>
+    <div class="constellationWrap" title="Constellation visualizes your local state (XP, actions, notes).">
+      <canvas id="constellation" width="680" height="240" aria-label="Constellation state visualizer"></canvas>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /* =========================================================
+      TOOLTIP: SECURITY & INPUT HYGIENE
+      What: Minimal sanitization + gentle rate limiting for local inputs.
+      How to extend: Add stricter allowlists per field type.
+      Outcome: Reduces risk of HTML injection and keeps UI stable.
+    ========================================================== */
+    const Rate = (() => {
+      const bucket = new Map();
+      return {
+        ok(key, ms=650){
+          const now = Date.now();
+          const last = bucket.get(key) || 0;
+          if(now - last < ms) return false;
+          bucket.set(key, now);
+          return true;
+        }
+      };
+    })();
+
+    function escapeHTML(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    /* =========================================================
+      TOOLTIP: INDEXEDDB LOCAL STORE
+      What: Offline-first persistence for XP, notes, settings.
+      How to extend: Add new stores/fields in migrate() with version bump.
+      Outcome: State survives refresh without leaking data anywhere.
+    ========================================================== */
+    const DB = {
+      name: "northbound_atlas_db_v1",
+      ver: 1,
+      db: null,
+      async open(){
+        if(this.db) return this.db;
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open(this.name, this.ver);
+          req.onupgradeneeded = (e) => {
+            const db = req.result;
+            if(!db.objectStoreNames.contains("kv")) db.createObjectStore("kv");
+            if(!db.objectStoreNames.contains("notes")) {
+              const s = db.createObjectStore("notes", { keyPath: "id" });
+              s.createIndex("ts", "ts");
+            }
+          };
+          req.onsuccess = () => { this.db = req.result; resolve(this.db); };
+          req.onerror = () => reject(req.error);
+        });
+      },
+      async get(store, key){
+        const db = await this.open();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(store, "readonly");
+          const st = tx.objectStore(store);
+          const req = st.get(key);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      },
+      async set(store, key, val){
+        const db = await this.open();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(store, "readwrite");
+          const st = tx.objectStore(store);
+          const req = st.put(val, key);
+          req.onsuccess = () => resolve(true);
+          req.onerror = () => reject(req.error);
+        });
+      },
+      async addNote(text){
+        const db = await this.open();
+        const note = { id: crypto.randomUUID(), ts: Date.now(), text: String(text).slice(0, 2000) };
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction("notes", "readwrite");
+          const st = tx.objectStore("notes");
+          const req = st.add(note);
+          req.onsuccess = () => resolve(note);
+          req.onerror = () => reject(req.error);
+        });
+      },
+      async listNotes(limit=50){
+        const db = await this.open();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction("notes", "readonly");
+          const st = tx.objectStore("notes");
+          const idx = st.index("ts");
+          const out = [];
+          idx.openCursor(null, "prev").onsuccess = (e) => {
+            const cur = e.target.result;
+            if(cur && out.length < limit){ out.push(cur.value); cur.continue(); }
+            else resolve(out);
+          };
+          tx.onerror = () => reject(tx.error);
+        });
+      },
+      async deleteNote(id){
+        const db = await this.open();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction("notes", "readwrite");
+          const st = tx.objectStore("notes");
+          const req = st.delete(id);
+          req.onsuccess = () => resolve(true);
+          req.onerror = () => reject(req.error);
+        });
+      },
+      async wipeAll(){
+        const db = await this.open();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(["kv","notes"], "readwrite");
+          tx.objectStore("kv").clear();
+          tx.objectStore("notes").clear();
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = () => reject(tx.error);
+        });
+      }
+    };
+
+    /* =========================================================
+      TOOLTIP: APP STATE
+      What: Single source of truth for HUD metrics.
+      How to extend: Add new fields and include in renderHUD + constellation.
+      Outcome: Predictable behavior; easy export/import.
+    ========================================================== */
+    const State = {
+      xp: 0,
+      actions: 0,
+      modules: 0,
+      notes: 0,
+      lastSave: null,
+      async load(){
+        const kv = await DB.get("kv","state");
+        if(kv && typeof kv === "object"){
+          Object.assign(this, kv);
+        }
+        const notes = await DB.listNotes(200);
+        this.notes = notes.length;
+        renderHUD();
+        drawConstellation();
+      },
+      async save(){
+        this.lastSave = Date.now();
+        await DB.set("kv","state", {
+          xp:this.xp, actions:this.actions, modules:this.modules, notes:this.notes, lastSave:this.lastSave
+        });
+        renderHUD();
+        drawConstellation();
+      }
+    };
+
+    function fmtTime(ts){
+      if(!ts) return "—";
+      const d = new Date(ts);
+      return d.toISOString().replace("T"," ").slice(0,19) + "Z";
+    }
+
+    function toast(msg){
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(()=>t.classList.remove("show"), 1800);
+    }
+
+    function renderHUD(){
+      document.getElementById("xp").textContent = State.xp|0;
+      document.getElementById("actions").textContent = State.actions|0;
+      document.getElementById("modules").textContent = State.modules|0;
+      document.getElementById("notes").textContent = State.notes|0;
+      document.getElementById("lastSave").textContent = fmtTime(State.lastSave);
+    }
+
+    /* =========================================================
+      TOOLTIP: CLIENT-SIDE SEARCH
+      What: Highlights matches and scrolls to the first hit.
+      How to extend: Add filter chips or scoped search by section.
+      Outcome: Policy readers can find what they need in seconds.
+    ========================================================== */
+    const q = document.getElementById("q");
+    let lastMarks = [];
+    function clearMarks(){
+      for(const el of lastMarks){
+        el.outerHTML = el.textContent;
+      }
+      lastMarks = [];
+    }
+    function markMatches(term){
+      clearMarks();
+      if(!term || term.length < 2) return;
+      const rx = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"), "ig");
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode(node){
+          if(!node.parentElement) return NodeFilter.FILTER_REJECT;
+          const tag = node.parentElement.tagName;
+          if(["SCRIPT","STYLE","NOSCRIPT"].includes(tag)) return NodeFilter.FILTER_REJECT;
+          if(node.nodeValue && rx.test(node.nodeValue)) return NodeFilter.FILTER_ACCEPT;
+          return NodeFilter.FILTER_REJECT;
+        }
+      });
+      const hits = [];
+      while(walker.nextNode()) hits.push(walker.currentNode);
+
+      for(const n of hits.slice(0, 120)){
+        const frag = document.createElement("span");
+        const parts = n.nodeValue.split(rx);
+        const matches = n.nodeValue.match(rx) || [];
+        for(let i=0;i<parts.length;i++){
+          frag.append(parts[i]);
+          if(matches[i]){
+            const m = document.createElement("mark");
+            m.style.background = "#FFC85755";
+            m.style.color = "inherit";
+            m.style.padding = "0 2px";
+            m.style.borderRadius = "6px";
+            m.textContent = matches[i];
+            frag.append(m);
+            lastMarks.push(m);
+          }
+        }
+        n.parentNode.replaceChild(frag, n);
+      }
+      if(lastMarks[0]) lastMarks[0].scrollIntoView({behavior:"smooth", block:"center"});
+    }
+
+    document.addEventListener("keydown", (e)=>{
+      if((e.ctrlKey || e.metaKey) && e.key.toLowerCase()==="k"){
+        e.preventDefault(); q.focus();
+      }
+      if(e.key === "Escape"){
+        hideSplash();
+      }
+    });
+
+    q.addEventListener("input", ()=>{
+      if(!Rate.ok("search", 120)) return;
+      const term = q.value.trim();
+      markMatches(term);
+    });
+
+    /* =========================================================
+      TOOLTIP: STARS + PARALLAX
+      What: Lightweight animation; respects reduced motion preference.
+      How to extend: Change star count or drift speed.
+      Outcome: Mood without performance pain.
+    ========================================================== */
+    const prefersReduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const stars = document.getElementById("stars");
+    const sctx = stars.getContext("2d");
+    function resizeStars(){
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      stars.width = Math.floor(innerWidth * dpr);
+      stars.height = Math.floor(innerHeight * dpr);
+      stars.style.width = innerWidth + "px";
+      stars.style.height = innerHeight + "px";
+      sctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    window.addEventListener("resize", resizeStars);
+    resizeStars();
+
+    const STAR_COUNT = 140;
+    const starField = Array.from({length: STAR_COUNT}, () => ({
+      x: Math.random()*innerWidth,
+      y: Math.random()*innerHeight,
+      r: Math.random()*1.8 + .2,
+      v: Math.random()*0.18 + 0.04,
+      a: Math.random()*0.65 + 0.2
+    }));
+
+    function tickStars(){
+      sctx.clearRect(0,0,innerWidth,innerHeight);
+      for(const s of starField){
+        sctx.globalAlpha = s.a;
+        sctx.beginPath();
+        sctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+        sctx.fillStyle = "#EAF0FF";
+        sctx.fill();
+        if(!prefersReduced){
+          s.y += s.v;
+          if(s.y > innerHeight + 10){ s.y = -10; s.x = Math.random()*innerWidth; }
+        }
+      }
+      sctx.globalAlpha = 1;
+      requestAnimationFrame(tickStars);
+    }
+    tickStars();
+
+    const par = document.getElementById("parallax");
+    window.addEventListener("mousemove", (e)=>{
+      if(prefersReduced) return;
+      const x = (e.clientX/innerWidth - .5);
+      const y = (e.clientY/innerHeight - .5);
+      par.style.transform = `translate3d(${x*-18}px, ${y*-14}px, 0)`;
+    });
+
+    /* =========================================================
+      TOOLTIP: CONSTELLATION VISUALIZER
+      What: A tiny canvas that turns state into a “star map”.
+      How to extend: Add more nodes for more state variables.
+      Outcome: A subtle, nerdy feedback loop for progress.
+    ========================================================== */
+    const c = document.getElementById("constellation");
+    const cctx = c.getContext("2d");
+    function drawConstellation(){
+      const w = c.width, h = c.height;
+      cctx.clearRect(0,0,w,h);
+
+      // background
+      cctx.fillStyle = "#050812";
+      cctx.fillRect(0,0,w,h);
+
+      // nodes based on state
+      const nodes = [
+        {name:"XP", v: Math.min(1, (State.xp||0)/120), x:.18, y:.45},
+        {name:"Actions", v: Math.min(1, (State.actions||0)/30), x:.42, y:.30},
+        {name:"Modules", v: Math.min(1, (State.modules||0)/10), x:.62, y:.52},
+        {name:"Notes", v: Math.min(1, (State.notes||0)/20), x:.82, y:.36},
+      ].map(n => ({
+        ...n,
+        px: n.x*w,
+        py: n.y*h,
+        r: 6 + n.v*14
+      }));
+
+      // links
+      cctx.globalAlpha = 0.55;
+      cctx.strokeStyle = "#8aa8ff";
+      cctx.lineWidth = 2;
+      for(let i=0;i<nodes.length-1;i++){
+        cctx.beginPath();
+        cctx.moveTo(nodes[i].px, nodes[i].py);
+        cctx.lineTo(nodes[i+1].px, nodes[i+1].py);
+        cctx.stroke();
+      }
+      cctx.globalAlpha = 1;
+
+      // draw nodes
+      for(const n of nodes){
+        const glow = cctx.createRadialGradient(n.px,n.py,0,n.px,n.py,n.r*2.2);
+        glow.addColorStop(0, "rgba(124,247,212,0.35)");
+        glow.addColorStop(1, "rgba(124,247,212,0.0)");
+        cctx.fillStyle = glow;
+        cctx.beginPath(); cctx.arc(n.px,n.py,n.r*2.2,0,Math.PI*2); cctx.fill();
+
+        cctx.fillStyle = "#EAF0FF";
+        cctx.beginPath(); cctx.arc(n.px,n.py,n.r,0,Math.PI*2); cctx.fill();
+
+        cctx.fillStyle = "#0B1022";
+        cctx.font = "16px " + getComputedStyle(document.body).fontFamily;
+        cctx.fillText(n.name, n.px + n.r + 10, n.py + 6);
+      }
+    }
+
+    /* =========================================================
+      TOOLTIP: UI ACTIONS
+      What: Buttons update state locally.
+      How to extend: Add new achievements or badges.
+      Outcome: A gentle “do the work” loop.
+    ========================================================== */
+    document.getElementById("logActionBtn").addEventListener("click", async ()=>{
+      if(!Rate.ok("action", 450)) return;
+      State.actions += 1;
+      State.xp += 5;
+      await State.save();
+      toast("Action logged. +5 XP ✅");
+    });
+
+    document.querySelectorAll("button[data-xp]").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        if(!Rate.ok("module", 450)) return;
+        const amt = parseInt(btn.getAttribute("data-xp"), 10) || 0;
+        State.modules += 1;
+        State.xp += amt;
+        await State.save();
+        toast(`Module reviewed. +${amt} XP ✨`);
+      });
+    });
+
+    document.getElementById("addNoteBtn").addEventListener("click", async ()=>{
+      if(!Rate.ok("note", 450)) return;
+      const text = prompt("Local note (stored only on this device):");
+      if(!text) return;
+      await DB.addNote(text);
+      State.notes += 1;
+      State.xp += 2;
+      await State.save();
+      toast("Note saved locally. +2 XP 🗒️");
+    });
+
+    document.getElementById("viewNotesBtn").addEventListener("click", async ()=>{
+      if(!Rate.ok("viewNotes", 450)) return;
+      const notes = await DB.listNotes(25);
+      const lines = notes.map(n => `• ${new Date(n.ts).toISOString().slice(0,19)}Z — ${n.text.replace(/\s+/g," ").slice(0,160)}`).join("\n");
+      alert(notes.length ? lines : "No local notes yet.");
+    });
+
+    document.getElementById("exportBtn").addEventListener("click", async ()=>{
+      if(!Rate.ok("export", 800)) return;
+      const notes = await DB.listNotes(500);
+      const payload = {
+        exported_at: new Date().toISOString(),
+        state: { xp:State.xp, actions:State.actions, modules:State.modules, notes:State.notes, lastSave:State.lastSave },
+        notes
+      };
+      const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "northbound_atlas_local_export.json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast("Exported local notes as JSON 📦");
+    });
+
+    async function wipeAll(){
+      await DB.wipeAll();
+      State.xp = 0; State.actions = 0; State.modules = 0; State.notes = 0; State.lastSave = null;
+      await State.save();
+      toast("Local data wiped 🧼");
+    }
+    document.getElementById("wipeBtn").addEventListener("click", ()=>{
+      if(confirm("Wipe local data for this page on this device?")) wipeAll();
+    });
+    document.getElementById("resetBtn").addEventListener("click", ()=>{
+      if(confirm("Reset local data (this device only)?")) wipeAll();
+    });
+
+    /* =========================================================
+      TOOLTIP: SPLASH CONTROL
+      What: Load ritual + explicit buttons.
+      How to extend: Add a “what’s new” panel.
+      Outcome: Controlled entry, no dark patterns.
+    ========================================================== */
+    const splash = document.getElementById("splash");
+    const splashBar = document.getElementById("splashBar");
+    let splashTimer = null;
+
+    function hideSplash(){
+      splash.classList.add("hidden");
+      if(splashTimer) clearInterval(splashTimer);
+      setTimeout(()=>splash.remove(), 650);
+    }
+
+    document.getElementById("enterBtn").addEventListener("click", hideSplash);
+    document.getElementById("loadLocalBtn").addEventListener("click", async ()=>{
+      await State.load();
+      toast("Local state loaded 🔒");
+    });
+
+    // splash progress animation
+    (function(){
+      let p = 0;
+      splashTimer = setInterval(async ()=>{
+        p = Math.min(100, p + (Math.random()*10 + 5));
+        splashBar.style.width = p.toFixed(0) + "%";
+        if(p >= 100){
+          clearInterval(splashTimer);
+          await State.load();
+          if(!prefersReduced) setTimeout(hideSplash, 250);
+          else hideSplash();
+        }
+      }, 160);
+    })();
+
+    // Initial load (fails gracefully)
+    State.load().catch(()=>{ /* ignore */ });
+
+    // Save on visibility change
+    document.addEventListener("visibilitychange", ()=>{ if(document.hidden) State.save().catch(()=>{}); });
+
+  </script>
+</body>
+</html>
