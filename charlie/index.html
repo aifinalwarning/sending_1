@@ -1,0 +1,1684 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Northbound Benevolence & Security Atlas v2 | USA Bottlenecks → Canadian Policy Levers</title>
+  <meta name="description" content="Offline-first, citation-backed atlas of 9 shared US government + institutional bottlenecks blocking planetary benevolence—translated into sovereign Canadian policy levers for policymakers and CPOs. Updated Feb 2026." />
+  <style>
+    /* =========================================================
+      DESIGN SYSTEM — Bioluminescent Observatory aesthetic.
+      Edit :root variables to retheme. No external deps.
+    ========================================================== */
+    :root{
+      --deep:#020A18; --surface:#061426; --panel:#081830;
+      --glass:rgba(6,20,42,0.78); --glass2:rgba(4,14,32,0.88);
+      --teal:#00F5D4; --teal-dim:#00B89A; --teal-glow:rgba(0,245,212,0.18);
+      --blue:#5B8DEF; --blue-dim:#3A5FBF; --blue-glow:rgba(91,141,239,0.18);
+      --amber:#FFB627; --amber-glow:rgba(255,182,39,0.18);
+      --rose:#FF4D6D; --rose-glow:rgba(255,77,109,0.18);
+      --jade:#50FA7B; --jade-glow:rgba(80,250,123,0.18);
+      --violet:#BD93F9; --violet-glow:rgba(189,147,249,0.18);
+      --text:#E2EEF9; --muted:#8AABCC; --faint:#4A6B8A;
+      --border:rgba(255,255,255,0.10); --border-hi:rgba(255,255,255,0.20);
+      --shadow:0 24px 80px rgba(0,0,0,0.60);
+      --shadow-sm:0 8px 32px rgba(0,0,0,0.40);
+      --r:20px; --r-sm:14px; --r-xs:10px;
+      --max:1160px;
+      --serif:"Book Antiqua","Palatino Linotype","Palatino",Georgia,"Times New Roman",serif;
+      --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+      --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;font-size:15px}
+    body{
+      color:var(--text);font-family:var(--sans);
+      background:var(--deep);overflow-x:hidden;min-height:100vh;
+      background-image:
+        radial-gradient(ellipse 1200px 700px at 10% 0%, rgba(0,60,90,0.35) 0%, transparent 60%),
+        radial-gradient(ellipse 900px 600px at 90% 15%, rgba(0,245,212,0.05) 0%, transparent 55%),
+        radial-gradient(ellipse 700px 500px at 50% 90%, rgba(91,141,239,0.06) 0%, transparent 55%);
+    }
+    @media print{
+      body{background:#fff;color:#000}
+      .splash,.hud,.stars-canvas,.parallax,.nav-sticky,.toast,.signal-board-anim,button{display:none!important}
+      .card{box-shadow:none;border:1px solid #ddd;background:#fff}
+      a{color:#000}
+    }
+    a{color:var(--teal);text-decoration:none}
+    a:hover{color:var(--blue);text-decoration:underline}
+    code,kbd,pre{font-family:var(--mono)}
+    .sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+    .wrap{max-width:var(--max);margin:0 auto;padding:0 18px 120px}
+
+    /* ─── BACKGROUND LAYERS ─── */
+    .stars-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.85}
+    .parallax{position:fixed;inset:-15vh -15vw;z-index:0;pointer-events:none;
+      background:
+        radial-gradient(ellipse 700px 500px at 20% 30%, rgba(0,245,212,0.07),transparent 55%),
+        radial-gradient(ellipse 600px 400px at 82% 60%, rgba(91,141,239,0.07),transparent 55%),
+        radial-gradient(ellipse 500px 350px at 45% 85%, rgba(255,182,39,0.05),transparent 50%);
+      will-change:transform;}
+
+    /* ─── SPLASH ─── */
+    .splash{
+      position:fixed;inset:0;z-index:9999;
+      display:grid;place-items:center;
+      background:radial-gradient(ellipse 1200px 700px at 50% 35%, rgba(4,20,60,0.97) 0%, rgba(2,8,22,0.99) 100%);
+      transition:opacity .6s ease,visibility .6s ease;
+    }
+    .splash.gone{opacity:0;visibility:hidden;pointer-events:none}
+    .splash-card{
+      width:min(780px,94vw);padding:28px 24px 22px;position:relative;overflow:hidden;
+      border:1px solid var(--border-hi);border-radius:26px;
+      background:linear-gradient(160deg,rgba(8,28,68,0.95),rgba(4,14,38,0.95));
+      box-shadow:0 0 0 1px rgba(0,245,212,0.12),var(--shadow);
+    }
+    .splash-ring{
+      position:absolute;inset:-80px;border-radius:50%;
+      background:radial-gradient(circle at 50% 45%,rgba(0,245,212,0.12),transparent 55%);
+      animation:ring 3.5s ease-in-out infinite;pointer-events:none;
+    }
+    .splash-ring2{animation-delay:-1.75s;background:radial-gradient(circle at 50% 45%,rgba(91,141,239,0.10),transparent 55%)}
+    @keyframes ring{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.07);opacity:1}}
+    .splash-head{position:relative;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+    .splash-title{font-family:var(--serif);font-size:22px;letter-spacing:.3px;line-height:1.25;color:var(--text)}
+    .splash-title em{font-style:normal;color:var(--teal)}
+    .splash-sub{margin-top:10px;color:var(--muted);line-height:1.5;font-size:14px;position:relative}
+    .splash-sub b{color:var(--text)}
+    .splash-bar-wrap{margin-top:16px;height:6px;border-radius:999px;background:rgba(255,255,255,0.07);overflow:hidden;position:relative}
+    .splash-bar{height:100%;width:0%;border-radius:999px;
+      background:linear-gradient(90deg,var(--teal-dim),var(--teal),var(--blue));
+      box-shadow:0 0 20px rgba(0,245,212,0.6);transition:width .15s linear}
+    .splash-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;position:relative;align-items:center}
+    .splash-badges{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;position:relative}
+    .micro{font-size:11px;color:var(--faint);font-family:var(--mono)}
+
+    /* ─── BUTTONS ─── */
+    .btn{
+      display:inline-flex;align-items:center;gap:7px;
+      appearance:none;cursor:pointer;font-family:var(--sans);font-size:13px;
+      border:1px solid var(--border);background:rgba(255,255,255,0.05);color:var(--text);
+      padding:9px 14px;border-radius:var(--r-xs);
+      box-shadow:var(--shadow-sm);
+      transition:transform .12s,border-color .12s,background .12s,box-shadow .12s;
+    }
+    .btn:hover{transform:translateY(-1px);border-color:var(--border-hi);background:rgba(255,255,255,0.09);box-shadow:0 12px 40px rgba(0,0,0,0.45)}
+    .btn:active{transform:translateY(0)}
+    .btn-teal{border-color:rgba(0,245,212,0.3);background:linear-gradient(135deg,rgba(0,60,60,0.5),rgba(0,30,50,0.5))}
+    .btn-teal:hover{border-color:rgba(0,245,212,0.6);box-shadow:0 0 24px rgba(0,245,212,0.2)}
+    .btn-blue{border-color:rgba(91,141,239,0.3);background:linear-gradient(135deg,rgba(20,40,100,0.5),rgba(10,20,60,0.5))}
+    .btn-danger{border-color:rgba(255,77,109,0.3);background:linear-gradient(135deg,rgba(60,10,20,0.5),rgba(40,5,15,0.5))}
+    .btn-amber{border-color:rgba(255,182,39,0.3);background:linear-gradient(135deg,rgba(60,40,0,0.5),rgba(40,25,0,0.5))}
+
+    /* ─── NAV ─── */
+    .nav-sticky{
+      position:sticky;top:0;z-index:80;
+      backdrop-filter:blur(16px) saturate(1.5);
+      background:linear-gradient(180deg,rgba(2,10,24,0.92),rgba(2,10,24,0.78));
+      border-bottom:1px solid var(--border);
+    }
+    .nav-inner{max-width:var(--max);margin:0 auto;padding:10px 18px;
+      display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);flex-shrink:0}
+    .brand-orb{
+      width:36px;height:36px;border-radius:12px;
+      background:radial-gradient(circle at 35% 30%,var(--teal),transparent 55%),
+        radial-gradient(circle at 72% 72%,var(--blue),transparent 55%),
+        linear-gradient(180deg,#0a1e40,#04100a);
+      border:1px solid var(--border-hi);box-shadow:0 0 20px rgba(0,245,212,0.25),var(--shadow-sm);
+    }
+    .brand-txt{display:flex;flex-direction:column;line-height:1.1}
+    .brand-txt b{font-size:13px;font-family:var(--serif);letter-spacing:.3px}
+    .brand-txt span{font-size:11px;color:var(--muted)}
+    .nav-chips{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+    .chip{
+      border:1px solid var(--border);background:rgba(255,255,255,0.04);
+      color:var(--muted);padding:7px 11px;border-radius:999px;font-size:12px;
+      text-decoration:none;white-space:nowrap;
+      transition:border-color .12s,color .12s,transform .12s;
+    }
+    .chip:hover{border-color:var(--border-hi);color:var(--text);transform:translateY(-1px);text-decoration:none}
+    .chip.active{border-color:rgba(0,245,212,0.4);color:var(--teal);background:rgba(0,245,212,0.07)}
+    .search-bar{
+      display:flex;align-items:center;gap:8px;
+      border:1px solid var(--border);border-radius:999px;
+      padding:7px 12px;background:rgba(6,20,42,0.7);
+      width:min(360px,40vw);transition:border-color .2s,box-shadow .2s;
+    }
+    .search-bar:focus-within{border-color:rgba(0,245,212,0.4);box-shadow:0 0 0 3px rgba(0,245,212,0.08)}
+    .search-bar input{width:100%;border:0;outline:0;background:transparent;color:var(--text);font-size:13px}
+    .search-bar input::placeholder{color:rgba(138,171,204,0.5)}
+    .kbd{font-family:var(--mono);font-size:10px;color:var(--faint);border:1px solid var(--border);
+      border-bottom-color:rgba(255,255,255,0.06);border-radius:5px;padding:1px 5px;background:rgba(0,0,0,0.2)}
+
+    /* ─── LAYOUT ─── */
+    main{position:relative;z-index:1}
+    .section-gap{margin-top:20px}
+    .card{
+      border:1px solid var(--border);
+      background:var(--glass);
+      backdrop-filter:blur(12px);
+      border-radius:var(--r);padding:20px;
+      box-shadow:var(--shadow);
+      transition:border-color .2s;
+    }
+    .card:hover{border-color:var(--border-hi)}
+    .card h2{font-family:var(--serif);font-size:19px;font-weight:700;letter-spacing:.2px;margin-bottom:10px}
+    .card h3{font-family:var(--serif);font-size:16px;font-weight:600;margin:14px 0 8px}
+    .card p{color:var(--muted);line-height:1.6;margin-bottom:10px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+    @media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}.nav-chips{display:none}}
+    @media(max-width:700px){.search-bar{width:160px}}
+
+    /* ─── HERO ─── */
+    .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin-top:20px}
+    @media(max-width:960px){.hero-grid{grid-template-columns:1fr}}
+    .h1{font-family:var(--serif);font-size:27px;font-weight:700;line-height:1.25;letter-spacing:.2px;margin-bottom:10px}
+    .h1 em{font-style:normal;color:var(--teal)}
+    .lead{color:var(--muted);line-height:1.6;font-size:14px}
+    .badges-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .badge{
+      display:inline-flex;align-items:center;gap:7px;
+      border:1px solid var(--border);background:rgba(255,255,255,0.04);
+      border-radius:999px;padding:6px 10px;font-size:12px;color:var(--muted);
+    }
+    .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .dot-teal{background:var(--teal);box-shadow:0 0 10px rgba(0,245,212,0.7)}
+    .dot-amber{background:var(--amber);box-shadow:0 0 10px rgba(255,182,39,0.7)}
+    .dot-blue{background:var(--blue);box-shadow:0 0 10px rgba(91,141,239,0.7)}
+    .dot-rose{background:var(--rose);box-shadow:0 0 10px rgba(255,77,109,0.7)}
+    .dot-jade{background:var(--jade);box-shadow:0 0 10px rgba(80,250,123,0.7)}
+    .hr{height:1px;background:var(--border);margin:14px 0}
+
+    /* ─── KPIS ─── */
+    .kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+    @media(max-width:700px){.kpi-row{grid-template-columns:1fr}}
+    .kpi{border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;background:rgba(255,255,255,0.03)}
+    .kpi b{display:block;font-size:13px;color:var(--text);margin-bottom:4px}
+    .kpi span{color:var(--muted);font-size:12px;line-height:1.45;display:block}
+
+    /* ─── SIGNAL BOARD ─── */
+    .signal-board{
+      border:1px solid var(--border);border-radius:var(--r);
+      background:var(--glass2);backdrop-filter:blur(12px);
+      padding:18px;box-shadow:var(--shadow);margin-top:20px;
+    }
+    .signal-board h2{font-family:var(--serif);font-size:17px;margin-bottom:4px}
+    .signal-board p{color:var(--muted);font-size:13px;margin-bottom:14px}
+    .signal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    @media(max-width:800px){.signal-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:500px){.signal-grid{grid-template-columns:1fr}}
+    .sig-node{
+      border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;
+      background:rgba(255,255,255,0.03);position:relative;overflow:hidden;
+      transition:border-color .2s,transform .15s;cursor:default;
+    }
+    .sig-node:hover{transform:translateY(-2px);border-color:var(--border-hi)}
+    .sig-node-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+    .sig-orb{
+      width:28px;height:28px;border-radius:50%;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;font-size:13px;
+      position:relative;
+    }
+    .sig-orb::after{
+      content:"";position:absolute;inset:-4px;border-radius:50%;
+      animation:orb-pulse 2s ease-in-out infinite;opacity:.55;
+    }
+    @keyframes orb-pulse{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.6);opacity:.25}}
+    .orb-critical{background:rgba(255,77,109,0.3);border:1px solid rgba(255,77,109,0.5)}.orb-critical::after{background:rgba(255,77,109,0.4)}
+    .orb-high{background:rgba(255,182,39,0.3);border:1px solid rgba(255,182,39,0.5)}.orb-high::after{background:rgba(255,182,39,0.4)}
+    .orb-medium{background:rgba(91,141,239,0.3);border:1px solid rgba(91,141,239,0.5)}.orb-medium::after{background:rgba(91,141,239,0.4)}
+    .orb-watch{background:rgba(80,250,123,0.2);border:1px solid rgba(80,250,123,0.4)}.orb-watch::after{background:rgba(80,250,123,0.3)}
+    .sig-meta{flex:1;min-width:0}
+    .sig-label{font-size:12px;font-weight:600;color:var(--text)}
+    .sig-domain{font-size:11px;color:var(--faint);font-family:var(--mono)}
+    .sig-level{
+      display:inline-block;font-size:10px;font-family:var(--mono);font-weight:700;
+      padding:2px 7px;border-radius:999px;letter-spacing:.5px;margin-top:4px;
+    }
+    .level-critical{background:rgba(255,77,109,0.2);color:#FF4D6D;border:1px solid rgba(255,77,109,0.35)}
+    .level-high{background:rgba(255,182,39,0.2);color:#FFB627;border:1px solid rgba(255,182,39,0.35)}
+    .level-medium{background:rgba(91,141,239,0.2);color:#5B8DEF;border:1px solid rgba(91,141,239,0.35)}
+    .level-watch{background:rgba(80,250,123,0.15);color:#50FA7B;border:1px solid rgba(80,250,123,0.3)}
+    .sig-note{font-size:11px;color:var(--muted);line-height:1.4;margin-top:6px}
+    .sig-glow{position:absolute;inset:0;pointer-events:none;border-radius:inherit}
+
+    /* ─── DETAILS / ACCORDIONS ─── */
+    details{
+      border:1px solid var(--border);background:rgba(255,255,255,0.025);
+      border-radius:var(--r-sm);padding:12px;
+    }
+    details+details{margin-top:10px}
+    details[open]{border-color:var(--border-hi)}
+    summary{
+      cursor:pointer;list-style:none;display:flex;gap:10px;align-items:flex-start;
+      user-select:none;
+    }
+    summary::-webkit-details-marker{display:none}
+    .sum-chevron{font-size:10px;color:var(--faint);margin-top:3px;transition:transform .2s;flex-shrink:0}
+    details[open] .sum-chevron{transform:rotate(90deg)}
+    .sum-title{font-weight:650;color:var(--text);flex:1}
+    .sum-domain{
+      font-family:var(--mono);font-size:10px;color:var(--faint);
+      border:1px solid var(--border);padding:2px 7px;border-radius:999px;
+      background:rgba(255,255,255,0.04);flex-shrink:0;white-space:nowrap;align-self:flex-start;margin-top:1px;
+    }
+    details p{color:var(--muted);line-height:1.6;font-size:13.5px;margin-top:10px}
+    .callout{
+      border-left:3px solid var(--teal);padding:10px 12px;
+      background:linear-gradient(90deg,rgba(0,245,212,0.08),transparent);
+      border-radius:0 var(--r-xs) var(--r-xs) 0;margin:10px 0;
+    }
+    .callout b{color:var(--text);font-size:13px}
+    .callout p{margin:4px 0 0;font-size:12.5px}
+    .callout-amber{border-left-color:var(--amber);background:linear-gradient(90deg,rgba(255,182,39,0.08),transparent)}
+    .callout-rose{border-left-color:var(--rose);background:linear-gradient(90deg,rgba(255,77,109,0.08),transparent)}
+    .callout-blue{border-left-color:var(--blue);background:linear-gradient(90deg,rgba(91,141,239,0.08),transparent)}
+    .list{padding-left:16px;color:var(--muted);line-height:1.65;font-size:13.5px}
+    .list li{margin-bottom:5px}
+    .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+    .tag{
+      display:inline-block;font-family:var(--mono);font-size:10px;color:var(--faint);
+      border:1px solid var(--border);background:rgba(255,255,255,0.03);
+      padding:3px 8px;border-radius:999px;
+    }
+    pre{
+      margin:10px 0 0;padding:14px;border-radius:var(--r-sm);
+      background:rgba(2,8,20,0.7);border:1px solid var(--border);
+      overflow-x:auto;color:#C8D8F0;font-size:12.5px;line-height:1.6;
+    }
+    mark{background:rgba(255,182,39,0.25);color:var(--text);padding:0 3px;border-radius:4px}
+
+    /* ─── PLATFORM CARDS ─── */
+    .plat-card{
+      border:1px solid var(--border);border-radius:var(--r-sm);
+      padding:14px;background:rgba(255,255,255,0.03);
+      transition:border-color .2s,transform .15s;
+    }
+    .plat-card:hover{border-color:var(--border-hi);transform:translateY(-2px)}
+    .plat-card h3{font-family:var(--serif);font-size:15px;margin-bottom:8px}
+    .plat-card p{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:8px}
+
+    /* ─── SCENARIO CARDS ─── */
+    .scenario-engine{margin-top:20px}
+    .scenario-card{
+      border:1px solid var(--border-hi);border-radius:var(--r);padding:20px;
+      background:linear-gradient(135deg,rgba(8,28,68,0.7),rgba(4,14,38,0.85));
+      display:none;
+    }
+    .scenario-card.show{display:block}
+    .scenario-card h3{font-family:var(--serif);font-size:18px;margin-bottom:8px;color:var(--amber)}
+    .scenario-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+    .scenario-meta span{font-size:11px;font-family:var(--mono);padding:3px 8px;border-radius:999px;border:1px solid var(--border);color:var(--faint)}
+    .scenario-body{color:var(--muted);line-height:1.65;font-size:14px;margin-bottom:14px}
+    .scenario-questions{list-style:decimal;padding-left:18px;color:var(--text);font-size:13.5px;line-height:1.8}
+    .scenario-ctas{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+    /* ─── AI ADVISOR ─── */
+    .ai-advisor{
+      border:1px solid rgba(189,147,249,0.25);border-radius:var(--r);padding:20px;
+      background:linear-gradient(135deg,rgba(15,10,40,0.7),rgba(8,6,28,0.85));
+      box-shadow:0 0 0 1px rgba(189,147,249,0.08),var(--shadow);margin-top:20px;
+    }
+    .ai-advisor h2{font-family:var(--serif);font-size:19px;margin-bottom:4px;color:var(--violet)}
+    .ai-advisor p{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:14px}
+    .ai-input-row{display:flex;gap:10px;flex-wrap:wrap}
+    .ai-input{
+      flex:1;min-width:200px;border:1px solid rgba(189,147,249,0.3);border-radius:var(--r-xs);
+      background:rgba(255,255,255,0.05);color:var(--text);padding:10px 14px;font-size:13px;
+      font-family:var(--sans);outline:none;transition:border-color .2s;
+    }
+    .ai-input:focus{border-color:rgba(189,147,249,0.6)}
+    .ai-presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .ai-preset{
+      font-size:11px;border:1px solid var(--border);background:rgba(189,147,249,0.06);
+      color:var(--muted);padding:6px 10px;border-radius:999px;cursor:pointer;
+      transition:border-color .15s,color .15s;font-family:var(--sans);
+    }
+    .ai-preset:hover{border-color:rgba(189,147,249,0.35);color:var(--text)}
+    .ai-output{
+      margin-top:14px;border:1px solid var(--border);border-radius:var(--r-sm);
+      padding:14px;background:rgba(2,8,20,0.5);min-height:60px;
+      color:var(--muted);font-size:13.5px;line-height:1.65;
+      display:none;
+    }
+    .ai-output.show{display:block}
+    .ai-thinking{display:flex;align-items:center;gap:10px;color:var(--violet);font-size:13px}
+    .ai-dots span{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--violet);
+      animation:ai-dot .8s ease-in-out infinite;margin:0 2px}
+    .ai-dots span:nth-child(2){animation-delay:.15s}
+    .ai-dots span:nth-child(3){animation-delay:.30s}
+    @keyframes ai-dot{0%,80%,100%{transform:scale(0.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+
+    /* ─── COLS ─── */
+    .cols2{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+    @media(max-width:900px){.cols2{grid-template-columns:1fr}}
+
+    /* ─── HUD ─── */
+    .hud{
+      position:fixed;right:14px;bottom:14px;z-index:70;
+      width:min(380px,94vw);
+      border:1px solid var(--border-hi);border-radius:22px;
+      background:rgba(2,10,26,0.92);backdrop-filter:blur(16px);
+      box-shadow:var(--shadow),0 0 0 1px rgba(0,245,212,0.08);
+      padding:12px;
+    }
+    .hud-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+    .hud-top b{font-size:12px;color:var(--text)}
+    .hud-top .mini{font-size:11px;color:var(--muted)}
+    .hud-kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+    .hud-tile{border:1px solid var(--border);border-radius:14px;padding:9px;background:rgba(255,255,255,0.03)}
+    .hud-tile b{display:block;font-size:12px;color:var(--text)}
+    .hud-tile span{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+    .hud-xp{
+      display:flex;align-items:center;gap:8px;border-radius:14px;
+      border:1px solid rgba(0,245,212,0.2);background:rgba(0,245,212,0.04);
+      padding:8px 12px;margin-bottom:10px;
+    }
+    .hud-xp-bar-wrap{flex:1;height:6px;border-radius:999px;background:rgba(255,255,255,0.07);overflow:hidden}
+    .hud-xp-bar{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--teal-dim),var(--teal));box-shadow:0 0 10px rgba(0,245,212,0.5);transition:width .4s ease}
+    .hud-xp-label{font-family:var(--mono);font-size:11px;color:var(--teal);white-space:nowrap}
+    .hud-btns{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+    .hud-btns .btn{padding:7px 10px;font-size:12px;border-radius:var(--r-xs)}
+    .constellation-wrap{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:rgba(2,8,18,0.8)}
+    canvas#constellation{display:block;width:100%;height:110px}
+
+    /* ─── TOAST ─── */
+    .toast{
+      position:fixed;left:50%;bottom:100px;transform:translateX(-50%);
+      background:rgba(8,24,56,0.95);border:1px solid var(--border-hi);color:var(--text);
+      padding:10px 16px;border-radius:var(--r-xs);box-shadow:var(--shadow);
+      opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:90;
+      max-width:min(600px,90vw);font-size:13px;backdrop-filter:blur(10px);
+    }
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(-3px)}
+
+    /* ─── FOOTER ─── */
+    .footer{
+      margin-top:20px;padding:16px;
+      border-top:1px solid var(--border);
+      font-size:12px;color:var(--muted);
+    }
+    .footer b{color:var(--text)}
+
+    /* ─── INLINE CITATIONS ─── */
+    .cite{font-size:11px;color:var(--blue);vertical-align:super;font-family:var(--mono)}
+    .src{color:var(--blue);font-size:13px}
+
+    /* ─── VERSION RIBBON ─── */
+    .ribbon{
+      display:inline-flex;gap:8px;align-items:center;
+      font-family:var(--mono);font-size:11px;color:var(--faint);
+      border:1px solid var(--border);background:rgba(255,255,255,0.03);
+      padding:4px 10px;border-radius:999px;
+    }
+
+    /* ─── TOC BREADCRUMB ─── */
+    .toc{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:12px;padding:10px 12px;
+      border:1px solid var(--border);border-radius:var(--r-xs);background:rgba(255,255,255,0.02)}
+    .toc span{font-size:11px;color:var(--faint);font-family:var(--mono)}
+    .toc a{font-size:11px;color:var(--muted);text-decoration:none}
+    .toc a:hover{color:var(--teal)}
+    .toc-sep{color:var(--faint);font-size:10px}
+
+    /* ─── CANADA SOVEREIGNTY LENS ─── */
+    .sovereign-stack{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+    @media(max-width:700px){.sovereign-stack{grid-template-columns:1fr 1fr}}
+    .sov-tile{
+      border:1px solid var(--border);border-radius:var(--r-sm);padding:11px;
+      background:rgba(255,255,255,0.025);text-align:center;
+    }
+    .sov-tile b{display:block;font-size:12px;color:var(--text);margin-bottom:4px}
+    .sov-tile span{font-size:11px;color:var(--muted);line-height:1.4}
+    .sov-icon{font-size:20px;margin-bottom:6px}
+
+    /* Search highlight */
+    mark.search-mark{background:rgba(255,182,39,0.3);color:var(--text);padding:0 2px;border-radius:4px}
+  </style>
+</head>
+<body>
+
+<!-- ═══ BACKGROUND LAYERS ═══ -->
+<canvas class="stars-canvas" id="stars" aria-hidden="true"></canvas>
+<div class="parallax" id="parallax" aria-hidden="true"></div>
+
+<noscript>
+  <div style="padding:14px;font-family:system-ui;background:#fff;color:#000">
+    <b>JavaScript is disabled.</b> The full policy text is still readable, but search, HUD, the AI advisor, and visual effects require JS.
+  </div>
+</noscript>
+
+<!-- ═══ SPLASH ═══ -->
+<section class="splash" id="splash" role="dialog" aria-modal="true" aria-label="Atlas loading">
+  <div class="splash-card">
+    <div class="splash-ring" aria-hidden="true"></div>
+    <div class="splash-ring splash-ring2" aria-hidden="true"></div>
+    <div class="splash-head">
+      <div>
+        <div class="splash-title"><em>Northbound</em> Benevolence &amp; Security Atlas <span style="font-family:var(--sans)">🧭</span></div>
+        <div style="font-size:11px;color:var(--faint);font-family:var(--mono);margin-top:4px">v2 · Feb 2026 · offline-first · no telemetry · local-only</div>
+      </div>
+      <div class="micro"><span class="kbd">Esc</span> skip</div>
+    </div>
+    <p class="splash-sub" style="margin-top:12px">
+      <b>9 shared US bottlenecks</b> blocking planetary benevolence—now with <b>trade sovereignty shocks</b>, civil-service erosion, and geospatial commons—translated into <b>sovereign Canadian policy levers</b>, an AI policy advisor, and tabletop scenario cards. Built for policymakers and institutional CPOs.
+    </p>
+    <div class="splash-bar-wrap"><div class="splash-bar" id="splashBar"></div></div>
+    <div class="splash-row">
+      <button class="btn btn-teal" id="enterBtn">⚡ Enter Atlas</button>
+      <button class="btn btn-blue" id="loadLocalBtn">💾 Load local state</button>
+      <button class="btn btn-danger" id="resetBtn">🧼 Reset local data</button>
+      <span class="micro">No auto-send. No tracking. Local only. ✅</span>
+    </div>
+    <div class="splash-badges">
+      <span class="ribbon">🌿 9 bottlenecks</span>
+      <span class="ribbon">🤖 AI policy advisor</span>
+      <span class="ribbon">🎲 scenario engine</span>
+      <span class="ribbon">🇨🇦 sovereignty lens</span>
+      <span class="ribbon">📦 offline-first</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ NAV ═══ -->
+<div class="nav-sticky" id="navSticky">
+  <div class="nav-inner">
+    <a class="brand" href="#top">
+      <div class="brand-orb" aria-hidden="true"></div>
+      <div class="brand-txt"><b>Northbound Atlas</b><span>USA bottlenecks → Canada levers</span></div>
+    </a>
+    <nav class="nav-chips" aria-label="Sections">
+      <a class="chip" href="#signal">Signal Board</a>
+      <a class="chip" href="#directory">Directory</a>
+      <a class="chip" href="#bottlenecks">Bottlenecks</a>
+      <a class="chip" href="#sovereignty">Canada Lens</a>
+      <a class="chip" href="#platforms">Platforms</a>
+      <a class="chip" href="#scenarios">Scenarios</a>
+      <a class="chip" href="#advisor">AI Advisor</a>
+      <a class="chip" href="#prompts">Meta-Prompts</a>
+      <a class="chip" href="#sources">Sources</a>
+    </nav>
+    <div class="search-bar" role="search">
+      <span class="kbd">⌘K</span>
+      <input id="q" type="search" placeholder="Search bottlenecks, levers, domains…" autocomplete="off" aria-label="Search this page" />
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<main class="wrap" id="top">
+
+  <!-- Table of Contents breadcrumb -->
+  <div class="toc" aria-label="Table of contents">
+    <span>Jump to:</span>
+    <a href="#signal" class="toc-sep">Signal Board</a><span class="toc-sep">›</span>
+    <a href="#bottlenecks">9 Bottlenecks</a><span class="toc-sep">›</span>
+    <a href="#sovereignty">Canada Lens</a><span class="toc-sep">›</span>
+    <a href="#platforms">Action Platforms</a><span class="toc-sep">›</span>
+    <a href="#scenarios">Scenarios</a><span class="toc-sep">›</span>
+    <a href="#advisor">AI Advisor</a><span class="toc-sep">›</span>
+    <a href="#prompts">Meta-Prompts</a><span class="toc-sep">›</span>
+    <a href="#sources">Sources</a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero-grid section-gap">
+    <div class="card">
+      <h1 class="h1">Shared Bottlenecks blocking <em>Planetary Benevolence</em> &amp; Security — USA → Canada 🌍🛡️🧭</h1>
+      <p class="lead">
+        A <b>policy-translation engine</b> for Canadian policymakers and CPOs: we study recurring U.S. implementation chokepoints and convert them into <b>sovereign Canadian risk controls</b>, procurement patterns, regulatory designs, and institutional playbooks. Updated Feb 2026 with new bottlenecks: trade sovereignty shocks, civil-service capacity erosion, and geospatial commons erosion.
+      </p>
+      <div class="badges-row">
+        <span class="badge"><span class="dot dot-teal"></span>Local-only · no telemetry</span>
+        <span class="badge"><span class="dot dot-amber"></span>9 bottlenecks mapped</span>
+        <span class="badge"><span class="dot dot-blue"></span>Built for CPOs &amp; policymakers</span>
+        <span class="badge"><span class="dot dot-rose"></span>3 new Feb 2026 bottlenecks</span>
+      </div>
+      <div class="hr"></div>
+      <div class="kpi-row">
+        <div class="kpi"><b>Implementation &gt; Intent</b><span>Systems fail in the "last mile": permitting, procurement, workforce, trust, interoperability — and now trade shocks and civil-service hollowing.</span></div>
+        <div class="kpi"><b>Infrastructure = Security</b><span>Grid capacity, interconnection queues, geospatial commons, and continuity operations are national-security issues under compounding stress.</span></div>
+        <div class="kpi"><b>Sovereignty by Design</b><span>Canada can't fix U.S. institutional friction — but can design around it: pre-clear corridors, Buy Canadian, sovereign tech stacks, and resilience-first procurement.</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-family:var(--serif);font-size:17px;margin-bottom:8px">🇨🇦 The "Northbound" Thesis</h2>
+      <p>Canada can't directly fix U.S. institutional friction — but can <b>design around it</b>: harmonize selectively, build interoperable safeguards, and reduce exposure to U.S. policy volatility.</p>
+      <div class="callout">
+        <b>Core framing:</b>
+        <p>Every U.S. bottleneck is a <mark>design test</mark> for Canadian policy: "If this fails there, how do we avoid it here?" In 2026 the test has sharpened — tariff shocks, 43-day shutdowns, and DOGE-driven cuts mean the failures are arriving faster than the lessons.</p>
+      </div>
+      <div class="hr"></div>
+      <h3 style="font-family:var(--serif);font-size:15px;margin-bottom:8px">What this atlas gives you</h3>
+      <ul class="list">
+        <li>A <b>repo directory blueprint</b> for a collection of standalone <code>index.html</code> platforms</li>
+        <li>A distilled set of <b>9 shared US bottlenecks</b> with 2026 citations</li>
+        <li>A <b>Canada Sovereignty Lens</b> with Buy Canadian, CUSMA 2026, and sovereign-stack design</li>
+        <li><b>Tabletop scenario cards</b> and an <b>AI policy advisor</b></li>
+        <li>Meta-prompt chains to delegate expansion to teams or AI systems</li>
+      </ul>
+      <div class="hr"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-teal" id="logActionBtn">📌 Log policy action (+5 XP)</button>
+        <button class="btn" id="exportBtn">📦 Export local notes</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SIGNAL BOARD -->
+  <section class="signal-board section-gap" id="signal">
+    <h2>🛰️ Live Signal Board — Bottleneck Threat Levels (Feb 2026)</h2>
+    <p>Threat levels are assessed from Feb 2026 public sources. Not real-time data — assessed once at publication. Click any node to jump to the full analysis. Hover for citation note.</p>
+    <div class="signal-grid" id="signalGrid">
+      <!-- rendered by JS -->
+    </div>
+    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <span class="ribbon">🔴 CRITICAL = active compounding failure</span>
+      <span class="ribbon">🟡 HIGH = systemic pressure, action needed</span>
+      <span class="ribbon">🔵 MEDIUM = managed risk, monitor</span>
+      <span class="ribbon">🟢 WATCH = latent, trajectory uncertain</span>
+    </div>
+  </section>
+
+  <!-- DIRECTORY -->
+  <section class="card section-gap" id="directory">
+    <h2>1) Repository Directory Structure 🗂️ — collection of actionable platforms</h2>
+    <p>Each module is a standalone <code>index.html</code>—policy-ready, offline-first, citation-backed. Three new modules added for 2026 (marked ✦).</p>
+    <pre aria-label="Proposed repo directory">northbound_benevolence_security_atlas/
+├─ 00_Orientation_Gateway/
+│  └─ index.html          # "How to use this atlas" + glossary + risk controls
+├─ 01_Bottleneck_Map/
+│  └─ index.html          # Full 9-bottleneck taxonomy + evidence + Canada mapping
+├─ 02_Permitting_Grid/
+│  └─ index.html          # Permitting + interconnection queue + electricity build speed
+├─ 03_Continuity_Procurement/
+│  └─ index.html          # Shutdown/CR shocks + procurement reform + delivery patterns
+├─ 04_Cyber_Workforce_ZeroTrust/
+│  └─ index.html          # Workforce gaps + zero trust + operational readiness
+├─ 05_AI_Governance_Safety/
+│  └─ index.html          # Standards + oversight + adoption bottlenecks
+├─ 06_Trust_Misinformation/
+│  └─ index.html          # Trust collapse + misinformation + institutional legitimacy
+├─ 07_Canada_Sovereignty_Stack/ ✦
+│  └─ index.html          # Buy Canadian + CUSMA 2026 + sovereign tech stack + trade resilience
+├─ 08_Civil_Service_Capacity/ ✦
+│  └─ index.html          # DOGE effects, talent drain, procurement capacity erosion
+├─ 09_Geospatial_Commons/ ✦
+│  └─ index.html          # NASA/NOAA/USGS cuts → Canadian data sovereignty + alternatives
+├─ 10_CPO_Playbooks/
+│  └─ index.html          # Board-ready risk registers, KPIs, audit trails, incident playbooks
+├─ 11_CrossBorder_Interoperability/
+│  └─ index.html          # Where harmonization helps (and where it imports fragility)
+├─ 12_Simulations_Scenarios/
+│  └─ index.html          # Tabletop exercises, scenario cards, red-team questions
+└─ _assets_local/
+   ├─ citations.json       # Local bibliography for offline browsing
+   ├─ icons.svg            # No external fonts; local vector icons
+   └─ templates/           # Reusable UI and policy templates</pre>
+    <div class="hr"></div>
+    <details open>
+      <summary><span class="sum-chevron">▶</span><span class="sum-title">How to split this into the collection</span><span class="sum-domain">ops</span></summary>
+      <p>Copy this <code>index.html</code> into each folder, then keep only the relevant sections per module. The shared engine (offline store, HUD, search, citations, AI advisor scaffold) stays identical across all modules.</p>
+      <ul class="list">
+        <li>Keep <b>local-only</b> IndexedDB storage for notes and KPIs (no auto-send)</li>
+        <li>Add the <b>AI Policy Advisor</b> section to each module for in-context Q&amp;A</li>
+        <li>Reference a shared <code>citations.json</code> for bibliography consistency</li>
+        <li>Use "Prompt Chain 0 — Repo-wide rules" as the base for every new module</li>
+      </ul>
+    </details>
+  </section>
+
+  <!-- BOTTLENECKS -->
+  <section class="card section-gap" id="bottlenecks">
+    <h2>2) 9 Shared Bottlenecks (USA Gov + Institutions) 🧱 <span style="font-size:12px;color:var(--rose);font-family:var(--mono);background:rgba(255,77,109,0.1);padding:3px 9px;border-radius:999px;margin-left:8px">+3 new Feb 2026</span></h2>
+    <p>These are recurring system frictions that show up across climate/security/AI/cyber/trade domains. They're <b>shared</b> — government and institutions both hit them, then blame each other, and the planet loses.</p>
+
+    <details open>
+      <summary><span class="sum-chevron">▶</span><span class="sum-title">B1 — Permitting &amp; Legal Friction (build-speed bottleneck)</span><span class="sum-domain">infrastructure</span></summary>
+      <p>Multi-agency permitting and litigation stall major infrastructure (energy, transmission, pipelines, critical facilities). The 2025 National Petroleum Council report frames permitting timelines and litigation dynamics as a core constraint on infrastructure delivery. <a class="src" href="https://www.energy.gov/sites/default/files/2025-12/NPC_Permitting_report_2025-12-3.pdf" target="_blank" rel="noopener">NPC, DOE-hosted, Dec 2025 →</a></p>
+      <div class="callout">
+        <b>Canada lever:</b><p>Pre-clear "priority corridors" with predictable timelines + transparent consultation; apply to transmission, interties, wildfire hardening, flood protection. Publish "why delayed?" dashboards.</p>
+      </div>
+      <div class="tags"><span class="tag">timeboxes</span><span class="tag">single-window coordination</span><span class="tag">litigation risk</span><span class="tag">priority corridors</span></div>
+    </details>
+
+    <details>
+      <summary><span class="sum-chevron">▶</span><span class="sum-title">B2 — Interconnection Queues &amp; Grid Capacity (physics doesn't negotiate)</span><span class="sum-domain">electricity</span></summary>
+      <p>US interconnection backlogs persist despite FERC reforms. <a class="src" href="https://www.ferc.gov/explainer-interconnection-final-rule" target="_blank" rel="noopener">FERC explainer →</a> LBNL tracks queue scale. <a class="src" href="https://emp.lbl.gov/queues" target="_blank" rel="noopener">LBNL queues →</a> AI data-centre demand is now a new load-growth pressure straining grids. <a class="src" href="https://www.reuters.com/markets/commodities/us-ai-boom-faces-electric-shock-2026-02-25/" target="_blank" rel="noopener">Reuters, Feb 2026 →</a></p>
+      <div class="callout">
+        <b>Canada lever:</b><p>Treat transmission + interconnection as a national-security enabler: queue reform, standardized studies, and accelerated intertie approvals. Canada's clean grid is a competitive advantage — protect and grow it.</p>
+      </div>
+      <div class="tags"><span class="tag">interties</span><span class="tag">queue reform</span><span class="tag">reliability</span><span class="tag">AI grid demand</span></div>
+    </details>
+
+    <details>
+      <summary><span class="sum-chevron">▶</span><span class="sum-title">B3 — Budget Volatility &amp; Continuity Shocks (shutdown / CR friction)</span><span class="sum-domain">governance</span></summary>
+      <p>The US experienced a 43-day government shutdown starting Oct 1, 2025 — the longest in modern history — followed by a second DHS shutdown in Feb 2026. <a class="src" href="https://www.crfb.org/blogs/appropriations-watch-fy-2026" target="_blank" rel="noopener">CRFB watch →</a> <a class="src" href="https://en.wikipedia.org/wiki/2026_United_States_federal_government_shutdowns" target="_blank" rel="noopener">Wikipedia: 2026 shutdowns →</a> Continuing resolutions disrupt planning, procurement, and delivery. <a class="src" href="https://www.naco.org/resource/legislative-analysis-counties-fy-2026-appropriations" target="_blank" rel="noopener">NACo FY2026 →</a></p>
+      <div class="callout">
+        <b>Canada lever:</b><p>Ring-fence "life-supporting operations" budgets (grid reliability, wildfire mitigation, public alerting, emergency management) with multi-year funding and delivery contracts that survive annual churn.</p>
+      </div>
+      <div class="tags"><span class="tag">multi-year funding</span><span class="tag">continuity minimums</span><span class="tag">delivery resilience</span></div>
+    </details>
+
+    <details>
+      <summary><span class="sum-chevron">▶</span><span class="sum-title">B4 — Cyber Workforce Shortages &amp; Operational Readiness Gaps</span><span class="sum-domain">cyber</span></summary>
+      <p>GAO identifies significant actions needed on federal cyber workforce. <a class="src" href="https://www.gao.gov/assets/gao-25-107405.pdf" target="_blank" rel="noopener">GAO Sep 2025 →</a> ISC2's 2025 study tracks barriers facing the cybersecurity profession globally. <a class="src" href="https://www.isc2.org/Insights/2025/12/2025-ISC2-Cybersecurity-Workforce-Study" target="_blank" rel="noopener">ISC2 Dec 2025 →</a></p>
+      <div class="callout">
+        <b>Canada lever:</b><p>Treat cyber staffing like essential services: standardized roles, national talent pipelines, secure-by-default procurement requirements, and publicly reportable readiness KPIs.</p>
+      </div>
+      <div class="tags"><span class="tag">talent pipelines</span><span class="tag">secure-by-default</span><span class="tag">readiness KPIs</span></div>
+    </details>
+
+    <details>
+      <summary><span class="sum-chevron">▶</span><span class="sum-title">B5 — AI Governance &amp; Adoption Friction (standards, oversight, procurement)</span><span class="sum-domain">AI</span></summary>
+      <p>The US is pushing AI strategy via federal planning documents. <a class="src" href="https://www.whitehouse.gov/wp-content/uploads/2025/07/Americas-AI-Action-Plan.pdf" target="_blank" rel="noopener">White House AI Action Plan, Jul 2025 →</a> GAO examined GenAI use + management challenges at federal agencies. <a class="src" href="https://www.gao.gov/products/gao-25-107653" target="_blank" rel="noopener">GAO GenAI →</a> International synthesis on advanced AI risks continues. <a class="src" href="https://internationalaisafetyreport.org/sites/default/files/2026-02/international-ai-safety-report-2026_1.pdf" target="_blank" rel="noopener">Intl AI Safety Report 2026 →</a></p>
+      <div class="callout">
+        <b>Canada lever:</b><p>Require model risk management, audit trails, and incident response in procurement. Fund the "boring plumbing": evaluation, red-teaming, monitoring, and secure deployment infrastructure.</p>
+      </div>
+      <div class="tags"><span class="tag">AI risk management</span><span class="tag">auditability</span><span class="tag">public procurement</span><span class="tag">red-teaming</span></div>
+    </details>
+
+    <details>
+      <summary><span class="sum-chevron">▶</span><span class="sum-title">B6 — Trust Erosion &amp; Misinformation (social license collapse)</span><span class="sum-domain">legitimacy</span></summary>
+      <p>Polarization-linked trust problems undermine the social license for public-interest action. National Academies research covers trust, polarization, and misinformation about science. <a class="src" href="https://www.nationalacademies.org/read/27894/chapter/5" target="_blank" rel="noopener">Natl Academies →</a> In 2026 the US NSS reflects a shift from shared-values diplomacy to leverage-based statecraft, further eroding institutional credibility with allies. <a class="src" href="https://apcoworldwide.com/blog/reading-power-in-2026-what-the-u-s-national-security-strategy-signals-for-global-business/" target="_blank" rel="noopener">APCO, 2026 NSS analysis →</a></p>
+      <div class="callout">
+        <b>Canada lever:</b><p>Pre-bunking + transparency-by-design: publish assumptions, uncertainty ranges, and "what would change our mind?" triggers in public dashboards. Maintain institutional credibility as a comparative advantage.</p>
+      </div>
+      <div class="tags"><span class="tag">prebunking</span><span class="tag">transparency</span><span class="tag">trust metrics</span><span class="tag">institutional legitimacy</span></div>
+    </details>
+
+    <!-- NEW B7 -->
+    <details>
+      <summary>
+        <span class="sum-chevron">▶</span>
+        <span class="sum-title">B7 — Trade Sovereignty Shock &amp; Tariff Volatility <span style="font-size:10px;background:rgba(255,77,109,0.2);color:#FF4D6D;padding:2px 6px;border-radius:999px;margin-left:6px">NEW Feb 2026</span></span>
+        <span class="sum-domain">sovereignty</span>
+      </summary>
+      <p>The Trump administration has applied 10% global import tariffs (Feb 2026, working toward 15%) plus sector-specific tariffs on steel, aluminum, and automotive goods. <a class="src" href="https://www.bnnbloomberg.ca/business/2026/02/24/new-us-tariffs-start-at-10-trump-administration-working-to-hike-them-to-15/" target="_blank" rel="noopener">BNN Bloomberg, Feb 2026 →</a> CUSMA is up for formal review in July 2026; the US has signalled it may use the review as leverage. <a class="src" href="https://www.lexology.com/library/detail.aspx?g=d143471d-228f-442d-afff-849683a18756" target="_blank" rel="noopener">Lexology trade analysis, Feb 2026 →</a> Canada introduced Buy Canadian procurement policy (Dec 2025) in response. <a class="src" href="https://www.lexology.com/library/detail.aspx?g=d143471d-228f-442d-afff-849683a18756" target="_blank" rel="noopener">same source →</a> Canada survived Year 1 "mostly intact sovereignly" but cracks are appearing. <a class="src" href="https://www.theglobeandmail.com/business/international-business/article-2026-in-charts-trade/" target="_blank" rel="noopener">Globe &amp; Mail, 2026 charts →</a></p>
+      <div class="callout callout-rose">
+        <b>Canada lever:</b><p>Accelerate trade diversification (recover the $18.5B US export loss through 27+ trading partners already underway). Treat Buy Canadian as a demand-side industrial policy, not just a defensive reflex. Build CUSMA 2026 review scenarios into procurement contracts and investment plans. Fund export diversification infrastructure (ports, digital trade corridors, missions in fast-growth markets).</p>
+      </div>
+      <div class="callout callout-amber">
+        <b>Systemic risk note:</b><p>The US is increasingly using tariffs as a "cudgel" in negotiations; Canada should design contracts, supply chains, and strategic reserves that survive a worst-case CUSMA withdrawal scenario. The threat is explicit, not hypothetical.</p>
+      </div>
+      <div class="tags"><span class="tag">Buy Canadian</span><span class="tag">CUSMA 2026 review</span><span class="tag">trade diversification</span><span class="tag">tariff resilience</span><span class="tag">sovereign procurement</span></div>
+    </details>
+
+    <!-- NEW B8 -->
+    <details>
+      <summary>
+        <span class="sum-chevron">▶</span>
+        <span class="sum-title">B8 — Civil Service Capacity Erosion (DOGE + talent drain) <span style="font-size:10px;background:rgba(255,77,109,0.2);color:#FF4D6D;padding:2px 6px;border-radius:999px;margin-left:6px">NEW Feb 2026</span></span>
+        <span class="sum-domain">governance</span>
+      </summary>
+      <p>The proposed FY2026 budget targets a 22.6% reduction in non-defense discretionary spending ($163B cut), devastating civilian agency capacity. <a class="src" href="https://projectgeospatial.org/geospatial-frontiers/nation-at-a-crossroads-fy2026-budget-proposal-threatens-to-dismantle-us-geospatial-supremacy-risking-economic-and-infrastructural-integrity" target="_blank" rel="noopener">Project Geospatial, May 2025 →</a> The Federation of American Scientists identifies institutional complexity and bureaucratic bottlenecks as a persistent barrier to government capacity. <a class="src" href="https://fas.org/issue/government-capacity/" target="_blank" rel="noopener">FAS, Gov Capacity →</a> Executive branch restructuring (DOGE-style) is reducing expertise and institutional memory across agencies that Canada depends on for data, standards, and emergency coordination.</p>
+      <div class="callout callout-rose">
+        <b>Canada lever:</b><p>Audit every federal program that depends on US agency capacity (NOAA weather data, CDC epidemiology, EPA environmental monitoring, USGS mapping). For each dependency: (1) develop a domestic or multilateral alternative, (2) negotiate direct data-sharing with subnational US partners (states, labs), (3) fund Canadian institutional capacity to fill the gap. Treat US agency erosion as a Canadian risk-management problem.</p>
+      </div>
+      <div class="callout callout-blue">
+        <b>CPO note:</b><p>Procurement contracts that depend on US federal agency standards, certifications, or data streams should now include "governing-body instability" clauses and alternative compliance pathways.</p>
+      </div>
+      <div class="tags"><span class="tag">institutional memory</span><span class="tag">dependency mapping</span><span class="tag">data sovereignty</span><span class="tag">procurement resilience</span></div>
+    </details>
+
+    <!-- NEW B9 -->
+    <details>
+      <summary>
+        <span class="sum-chevron">▶</span>
+        <span class="sum-title">B9 — Geospatial Commons Erosion (NOAA, NASA, USGS cuts) <span style="font-size:10px;background:rgba(255,77,109,0.2);color:#FF4D6D;padding:2px 6px;border-radius:999px;margin-left:6px">NEW Feb 2026</span></span>
+        <span class="sum-domain">data commons</span>
+      </summary>
+      <p>The FY2026 budget proposal targets NOAA, NASA, and USGS with deep cuts — the agencies underpinning weather forecasting, environmental monitoring, wildfire tracking, and geospatial intelligence. <a class="src" href="https://projectgeospatial.org/geospatial-frontiers/nation-at-a-crossroads-fy2026-budget-proposal-threatens-to-dismantle-us-geospatial-supremacy-risking-economic-and-infrastructural-integrity" target="_blank" rel="noopener">Project Geospatial, May 2025 →</a> Canada's wildfire, flood, and climate monitoring systems have deep dependencies on US-shared satellite, weather, and geospatial data commons. These are not hypothetical risks: if NOAA's observational networks degrade, Canadian weather forecasting accuracy degrades too.</p>
+      <div class="callout callout-amber">
+        <b>Canada lever:</b><p>Accelerate investment in: (1) Canadian satellite and remote-sensing capacity (RADARSAT next-gen, Arctic monitoring), (2) partnerships with European (ESA, Copernicus) and allied (UK, Australia, Japan) geospatial networks, (3) open-data mirrors and Canadian-hosted caches of critical US datasets. Frame as a sovereignty and emergency-management investment, not a science discretionary.</p>
+      </div>
+      <div class="tags"><span class="tag">RADARSAT</span><span class="tag">ESA/Copernicus</span><span class="tag">data mirrors</span><span class="tag">wildfire monitoring</span><span class="tag">geospatial sovereignty</span></div>
+    </details>
+  </section>
+
+  <!-- CANADA SOVEREIGNTY LENS -->
+  <section class="card section-gap" id="sovereignty">
+    <h2>3) Canada Sovereignty Lens 🇨🇦 — Designing Around US Volatility</h2>
+    <p>A dedicated section for the 2026 Canadian context. The US is no longer a reliably stable partner across trade, data, standards, or institutions. Canada's response requires <b>sovereign-stack design</b> — not just bilateral management.</p>
+
+    <div class="sovereign-stack">
+      <div class="sov-tile"><div class="sov-icon">🏭</div><b>Buy Canadian</b><span>In force since Dec 2025; prioritizes Canadian suppliers + domestic content in major federal procurements</span></div>
+      <div class="sov-tile"><div class="sov-icon">🤝</div><b>CUSMA 2026</b><span>Formal review July 2026; all parties preparing. US may use as leverage; design contracts to survive worst-case withdrawal</span></div>
+      <div class="sov-tile"><div class="sov-icon">💹</div><b>Trade Diversification</b><span>Canadian firms have recovered ~$11B of $18.5B US export loss via 27+ new markets; accelerate digital trade corridors</span></div>
+      <div class="sov-tile"><div class="sov-icon">🛰️</div><b>Data Sovereignty</b><span>Audit dependencies on NOAA, NASA, USGS, CDC, EPA; build domestic + allied alternatives before they fail</span></div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="grid2">
+      <div>
+        <h3>The Sovereign Stack Framework</h3>
+        <p>A layered approach to reducing asymmetric dependency on US institutional capacity:</p>
+        <ul class="list">
+          <li><b>Layer 1 — Data independence:</b> Mirror and cache critical US datasets (weather, geospatial, health); fund Canadian observation networks</li>
+          <li><b>Layer 2 — Standards independence:</b> Where US agencies are being hollowed out, align with EU/ISO/allied standards instead of waiting for US convergence</li>
+          <li><b>Layer 3 — Procurement independence:</b> Buy Canadian + Commonwealth + allied procurement panels; reduce single-source US vendor dependency</li>
+          <li><b>Layer 4 — Financial independence:</b> Reduce tariff exposure through trade diversification + supply-chain redundancy for critical inputs (steel, aluminum, critical minerals)</li>
+          <li><b>Layer 5 — Institutional independence:</b> Build Canadian expertise in domains where US federal capacity is being dismantled; offer to host regional multilateral bodies</li>
+        </ul>
+      </div>
+      <div>
+        <h3>CUSMA 2026 Review — Policy Actions</h3>
+        <div class="callout callout-amber">
+          <b>Scenario A — Extension agreed:</b><p>Continue with current framework; use review window to address supply-chain vulnerabilities identified in 2025 tariff shocks.</p>
+        </div>
+        <div class="callout callout-rose" style="margin-top:10px">
+          <b>Scenario B — US withdraws threat / instability:</b><p>All contracts, procurement programs, and investment plans should already have alternative compliance pathways. Model the 6-month notice period now.</p>
+        </div>
+        <div class="callout callout-blue" style="margin-top:10px">
+          <b>Scenario C — Renegotiated with new terms:</b><p>Digital services, AI governance, and supply-chain rules will be contested. Build negotiating leverage through completed diversification moves.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <details>
+      <summary><span class="sum-chevron">▶</span><span class="sum-title">Canadian CPO Quick-Start Checklist (2026 Edition)</span><span class="sum-domain">copy/paste</span></summary>
+      <ul class="list">
+        <li><b>Procurement:</b> Require audit logs, incident response, and evaluation artifacts before deployment (especially AI/cyber). Apply Buy Canadian criteria.</li>
+        <li><b>Trade exposure:</b> Map your top 10 US-sourced inputs; identify alternatives in allied markets; model the 35% tariff scenario on your supply chain.</li>
+        <li><b>Data dependencies:</b> List every external data feed you rely on; flag US federal agency sources; build alternatives or caches.</li>
+        <li><b>Delivery:</b> Timebox permitting steps; publish "why delayed?" dashboards; use CUSMA-neutral delivery partners where possible.</li>
+        <li><b>Workforce:</b> Standardize roles; fund pipelines; measure readiness monthly; don't assume US talent mobility continues at historic rates.</li>
+        <li><b>Continuity:</b> Ring-fence essential services in multi-year budgets; run annual tabletop exercises modelling US partner unavailability.</li>
+        <li><b>Trust:</b> Publish uncertainty ranges; prebunk; show "what would change our mind?" Distinguish Canadian institutions from US volatility explicitly in public comms.</li>
+      </ul>
+    </details>
+  </section>
+
+  <!-- ACTION PLATFORMS -->
+  <section class="card section-gap" id="platforms">
+    <h2>4) Actionable Platforms (modules you can ship) 🧰</h2>
+    <p>Each platform is a "policy machine" — a small, auditable UI that turns research into repeatable decisions. Three new platforms added for 2026 bottlenecks.</p>
+    <div class="grid2">
+      <div class="plat-card">
+        <h3>Platform A — <mark>Permitting-to-Delivery</mark> Dashboard</h3>
+        <p>Converts permitting friction into measurable delivery speed. Timeline KPIs, consultation checkpoints, litigation risk flags, fast-track corridor templates.</p>
+        <ul class="list"><li>Evidence: NPC permitting blueprint (Dec 2025) <a class="src" href="https://www.energy.gov/sites/default/files/2025-12/NPC_Permitting_report_2025-12-3.pdf" target="_blank" rel="noopener">→</a></li><li>Canada lever: timeboxes, single-window coordination, environmental data commons</li></ul>
+        <div style="margin-top:10px"><button class="btn btn-teal" data-xp="8">✓ Mark A reviewed (+8 XP)</button></div>
+      </div>
+      <div class="plat-card">
+        <h3>Platform B — <mark>Grid Queue &amp; Intertie</mark> Acceleration Board</h3>
+        <p>Queue-reform and intertie acceleration view: where projects stall, why, and what unblocks them. AI data-centre load pressure context added.</p>
+        <ul class="list"><li>FERC reforms <a class="src" href="https://www.ferc.gov/explainer-interconnection-final-rule" target="_blank" rel="noopener">→</a></li><li>LBNL queue tracking <a class="src" href="https://emp.lbl.gov/queues" target="_blank" rel="noopener">→</a></li><li>AI grid stress: Reuters Feb 2026 <a class="src" href="https://www.reuters.com/markets/commodities/us-ai-boom-faces-electric-shock-2026-02-25/" target="_blank" rel="noopener">→</a></li></ul>
+        <div style="margin-top:10px"><button class="btn btn-teal" data-xp="8">✓ Mark B reviewed (+8 XP)</button></div>
+      </div>
+      <div class="plat-card">
+        <h3>Platform C — <mark>Continuity &amp; Delivery Resilience</mark> (Budget/CR/Shock)</h3>
+        <p>Models the operational impact of funding disruptions and creates "continuity minimums" for essential functions. Updated for 43-day Oct 2025 shutdown context.</p>
+        <ul class="list"><li>CRFB FY2026 watch <a class="src" href="https://www.crfb.org/blogs/appropriations-watch-fy-2026" target="_blank" rel="noopener">→</a></li><li>2026 US shutdown history <a class="src" href="https://en.wikipedia.org/wiki/2026_United_States_federal_government_shutdowns" target="_blank" rel="noopener">→</a></li></ul>
+        <div style="margin-top:10px"><button class="btn btn-teal" data-xp="8">✓ Mark C reviewed (+8 XP)</button></div>
+      </div>
+      <div class="plat-card">
+        <h3>Platform D — <mark>AI &amp; Cyber Procurement Guardrails</mark> for CPOs</h3>
+        <p>A procurement-grade checklist system: evaluation, audit trails, incident response, and workforce readiness. Includes GenAI management framework.</p>
+        <ul class="list"><li>GAO GenAI <a class="src" href="https://www.gao.gov/products/gao-25-107653" target="_blank" rel="noopener">→</a></li><li>White House AI Action Plan <a class="src" href="https://www.whitehouse.gov/wp-content/uploads/2025/07/Americas-AI-Action-Plan.pdf" target="_blank" rel="noopener">→</a></li><li>Intl AI Safety Report 2026 <a class="src" href="https://internationalaisafetyreport.org/sites/default/files/2026-02/international-ai-safety-report-2026_1.pdf" target="_blank" rel="noopener">→</a></li></ul>
+        <div style="margin-top:10px"><button class="btn btn-teal" data-xp="8">✓ Mark D reviewed (+8 XP)</button></div>
+      </div>
+      <div class="plat-card">
+        <h3>Platform E — <mark>Trust, Misinformation, Social License</mark></h3>
+        <p>A credibility engine for public communication: prebunking, transparent uncertainty, feedback loops, and institutional legitimacy management.</p>
+        <ul class="list"><li>Natl Academies: trust + misinformation <a class="src" href="https://www.nationalacademies.org/read/27894/chapter/5" target="_blank" rel="noopener">→</a></li><li>2026 NSS leverage-vs-values shift analysis <a class="src" href="https://apcoworldwide.com/blog/reading-power-in-2026-what-the-u-s-national-security-strategy-signals-for-global-business/" target="_blank" rel="noopener">→</a></li></ul>
+        <div style="margin-top:10px"><button class="btn btn-teal" data-xp="8">✓ Mark E reviewed (+8 XP)</button></div>
+      </div>
+      <div class="plat-card" style="border-color:rgba(255,77,109,0.2)">
+        <h3>Platform F — <mark>Trade Sovereignty Intelligence</mark> ✦ NEW</h3>
+        <p>A real-time-feeling tariff and CUSMA exposure map: current tariff rates, supply-chain dependency scores, and "sovereign alternatives" for critical inputs.</p>
+        <ul class="list"><li>BNN Bloomberg tariff update Feb 2026 <a class="src" href="https://www.bnnbloomberg.ca/business/2026/02/24/new-us-tariffs-start-at-10-trump-administration-working-to-hike-them-to-15/" target="_blank" rel="noopener">→</a></li><li>Lexology: Buy Canadian + CUSMA <a class="src" href="https://www.lexology.com/library/detail.aspx?g=d143471d-228f-442d-afff-849683a18756" target="_blank" rel="noopener">→</a></li><li>Globe &amp; Mail 2026 charts <a class="src" href="https://www.theglobeandmail.com/business/international-business/article-2026-in-charts-trade/" target="_blank" rel="noopener">→</a></li></ul>
+        <div style="margin-top:10px"><button class="btn btn-teal" data-xp="10">✓ Mark F reviewed (+10 XP)</button></div>
+      </div>
+      <div class="plat-card" style="border-color:rgba(255,77,109,0.2)">
+        <h3>Platform G — <mark>Civil Service Capacity</mark> Resilience Monitor ✦ NEW</h3>
+        <p>Tracks US agency capacity erosion and maps Canadian dependencies. Generates a "sovereign capacity gap" register and fills with domestic/allied alternatives.</p>
+        <ul class="list"><li>FAS government capacity <a class="src" href="https://fas.org/issue/government-capacity/" target="_blank" rel="noopener">→</a></li><li>FY2026 budget cuts to civilian agencies <a class="src" href="https://projectgeospatial.org/geospatial-frontiers/nation-at-a-crossroads-fy2026-budget-proposal-threatens-to-dismantle-us-geospatial-supremacy-risking-economic-and-infrastructural-integrity" target="_blank" rel="noopener">→</a></li></ul>
+        <div style="margin-top:10px"><button class="btn btn-teal" data-xp="10">✓ Mark G reviewed (+10 XP)</button></div>
+      </div>
+      <div class="plat-card" style="border-color:rgba(255,77,109,0.2)">
+        <h3>Platform H — <mark>Geospatial Commons</mark> Sovereignty Board ✦ NEW</h3>
+        <p>Maps Canadian geospatial data dependencies on NOAA/NASA/USGS. Identifies redundancy gaps. Tracks Canadian + allied alternatives (RADARSAT, Copernicus, ESA).</p>
+        <ul class="list"><li>Geospatial supremacy risk analysis <a class="src" href="https://projectgeospatial.org/geospatial-frontiers/nation-at-a-crossroads-fy2026-budget-proposal-threatens-to-dismantle-us-geospatial-supremacy-risking-economic-and-infrastructural-integrity" target="_blank" rel="noopener">→</a></li><li>ESA Copernicus programme (alternative)</li></ul>
+        <div style="margin-top:10px"><button class="btn btn-teal" data-xp="10">✓ Mark H reviewed (+10 XP)</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENARIO ENGINE -->
+  <section class="card section-gap" id="scenarios">
+    <h2>5) Tabletop Scenario Engine 🎲 — Policy Stress Tests</h2>
+    <p>Draw a scenario card to run a structured tabletop exercise. Each card gives you a crisis framing, 5 "inversion questions," and 3 Canadian response levers to stress test. All local; no network calls.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+      <button class="btn btn-amber" id="drawScenarioBtn">🎲 Draw scenario card</button>
+      <button class="btn" id="nextScenarioBtn">→ Next scenario</button>
+      <button class="btn btn-teal" id="saveScenarioBtn">💾 Save scenario note (+3 XP)</button>
+    </div>
+    <div class="scenario-card" id="scenarioCard"></div>
+  </section>
+
+  <!-- AI ADVISOR -->
+  <section class="ai-advisor section-gap" id="advisor">
+    <h2>6) AI Policy Advisor 🤖 — Powered by Claude</h2>
+    <p>Ask a policy question about the bottlenecks, Canadian levers, or sovereign-stack design. The AI advisor draws on this atlas's research framing. This makes a live call to the Anthropic API — requires internet connection.</p>
+    <div class="ai-presets" id="aiPresets">
+      <button class="ai-preset" data-q="What are the most urgent Canadian policy actions given the 2026 US tariff situation?">Urgent Canada tariff actions?</button>
+      <button class="ai-preset" data-q="How should a Canadian CPO design AI procurement to account for US governance instability?">AI procurement for CPOs?</button>
+      <button class="ai-preset" data-q="What does geospatial data sovereignty mean in practice for Canada in 2026?">Geospatial sovereignty?</button>
+      <button class="ai-preset" data-q="How does the 43-day US shutdown affect Canadian emergency management planning?">Shutdown → Canada risk?</button>
+      <button class="ai-preset" data-q="What is the CUSMA 2026 review scenario Canada should be most worried about, and how to prepare?">CUSMA worst-case prep?</button>
+    </div>
+    <div class="ai-input-row">
+      <input class="ai-input" id="aiInput" type="text" placeholder="Ask about bottlenecks, Canadian levers, sovereign-stack design, CPO actions…" maxlength="400" />
+      <button class="btn btn-blue" id="aiAskBtn">⚡ Ask Claude</button>
+    </div>
+    <div class="ai-output" id="aiOutput"></div>
+  </section>
+
+  <!-- META-PROMPTS -->
+  <section class="card section-gap" id="prompts">
+    <h2>7) Meta-Prompt Chains v2 — Expand the Repository 🧬</h2>
+    <p>These prompts are intentionally thin but sharp: they tell an editor/AI what to build, what to cite, and how to keep it safe. Updated with three new modules for 2026.</p>
+
+    <details open>
+      <summary><span class="sum-chevron">▶</span><span class="sum-title">Prompt Chain 0 — Repo-wide rules (apply to EVERY module)</span><span class="sum-domain">foundation</span></summary>
+      <pre>[ROLE]
+You are a policy + systems analyst building a standalone offline-first index.html 
+platform for Canadian policymakers and CPOs.
+
+[NON-NEGOTIABLES]
+- No external JS/CSS/fonts; no tracking; no auto-send.
+- Cite every factual claim that might change over time.
+- Translate US bottlenecks into Canadian levers: procurement, regulation, 
+  budget design, standards, sovereign-stack design.
+- Include: glossary, KPIs, risks, mitigations, "next 10 actions" list.
+- Include a "Sovereign alternative" column for every US dependency cited.
+- Include the AI Policy Advisor component (Anthropic API) for in-context Q&amp;A.
+
+[OUTPUT]
+One complete index.html with: sticky nav, collapsibles, client-side search, 
+print stylesheet, local-only IndexedDB storage, AI advisor, and a Sources 
+section with live links.
+
+[ZERO-HARM REQUIREMENTS]
+No surveillance tooling, coercion playbooks, automated targeting, or 
+hidden telemetry. All data local-only and user-resettable.</pre>
+    </details>
+
+    <details>
+      <summary><span class="sum-chevron">▶</span><span class="sum-title">Prompt Chain 1 — Permitting + delivery speed module (02_*)</span><span class="sum-domain">infrastructure</span></summary>
+      <pre>Build 02_Permitting_Grid/index.html.
+
+Include:
+- A "Permitting Timeline Simulator" (qualitative, not legal advice).
+- Failure modes table: multi-agency complexity, litigation delays, 
+  consultation breakdowns.
+- Canadian mapping: pre-designed corridors, timeboxed reviews, 
+  "why delayed?" dashboards.
+- A "Sovereign alternative" column: what Canadian processes avoid 
+  each US failure mode.
+
+Cite:
+- NPC permitting blueprint (DOE-hosted PDF, Dec 2025).
+- FERC interconnection final rule and LBNL queues data.
+- Reuters grid stress / AI demand (Feb 2026).</pre>
+    </details>
+
+    <details>
+      <summary><span class="sum-chevron">▶</span><span class="sum-title">Prompt Chain 2 — Trade Sovereignty + CUSMA module (07_*) — NEW</span><span class="sum-domain">sovereignty</span></summary>
+      <pre>Build 07_Canada_Sovereignty_Stack/index.html.
+
+Include:
+- A "Tariff Exposure Calculator" (qualitative; maps inputs to US tariff risk tiers).
+- A "CUSMA 2026 Review Scenario Planner": 3 scenarios 
+  (extension / instability / renegotiation) with Canadian response protocols.
+- A "Sovereign Stack Layer Checklist": data, standards, procurement, 
+  financial, and institutional independence layers.
+- A "Trade Diversification Tracker": target markets, progress indicators, 
+  remaining exposure.
+
+Cite:
+- BNN Bloomberg tariff update (Feb 2026).
+- Lexology: Buy Canadian + CUSMA review (Feb 2026).
+- Globe &amp; Mail: 2026 in charts — trade.
+- EDC Global Economic Outlook (Jan 2026).</pre>
+    </details>
+
+    <details>
+      <summary><span class="sum-chevron">▶</span><span class="sum-title">Prompt Chain 3 — Civil Service Capacity Erosion module (08_*) — NEW</span><span class="sum-domain">governance</span></summary>
+      <pre>Build 08_Civil_Service_Capacity/index.html.
+
+Include:
+- A "US Agency Dependency Audit" template: list every federal program 
+  that depends on US agency capacity (data, standards, coordination).
+- A "Capacity Gap Register": current dependency, US agency status, 
+  Canadian/allied alternative, action to close gap.
+- A "Sovereign Capacity Investment" prioritisation tool: impact vs 
+  cost vs urgency.
+
+Cite:
+- FAS government capacity analysis.
+- FY2026 budget proposal: $163B civilian cuts (Project Geospatial, May 2025).
+- GAO cyber workforce (Sep 2025) and GenAI management reports.</pre>
+    </details>
+
+    <details>
+      <summary><span class="sum-chevron">▶</span><span class="sum-title">Prompt Chain 4 — Geospatial Commons Sovereignty module (09_*) — NEW</span><span class="sum-domain">data commons</span></summary>
+      <pre>Build 09_Geospatial_Commons/index.html.
+
+Include:
+- A "Geospatial Dependency Map": Canadian systems that rely on NOAA, 
+  NASA, USGS data with threat assessment per source.
+- A "Sovereign Alternative Tracker": Canadian (RADARSAT, MSC), European 
+  (ESA/Copernicus), and allied (UK Met Office, JMA) alternatives per use case.
+- An "Emergency Monitoring Resilience Checklist": wildfire, flood, 
+  extreme weather, Arctic.
+
+Cite:
+- Project Geospatial FY2026 cuts analysis (May 2025).
+- NGA paradox (same source): civilian cuts undermine defence geospatial.
+- ESA Copernicus programme documentation.
+- Canadian Space Agency RADARSAT Constellation Mission.</pre>
+    </details>
+
+    <details>
+      <summary><span class="sum-chevron">▶</span><span class="sum-title">Prompt Chain 5 — AI Governance + Safety module (05_*)</span><span class="sum-domain">AI</span></summary>
+      <pre>Build 05_AI_Governance_Safety/index.html.
+
+Include:
+- An "AI procurement guardrails" checklist: evaluation, audit logs, 
+  incident response, model risk management.
+- A "deployment gating" framework: pilot → limited → scaled.
+- Canadian mapping: domestic regulator alignment, cross-border 
+  interoperability risks, sovereign model hosting options.
+- A "US governance instability" section: what happens when NIST, 
+  OSTP, or federal AI standards erode — Canadian responses.
+
+Cite:
+- White House AI Action Plan (Jul 2025).
+- GAO GenAI use + management at federal agencies.
+- International AI Safety Report 2026 (Feb 2026).</pre>
+    </details>
+
+    <details>
+      <summary><span class="sum-chevron">▶</span><span class="sum-title">Prompt Chain 6 — CPO Playbooks module (10_*)</span><span class="sum-domain">CPO</span></summary>
+      <pre>Build 10_CPO_Playbooks/index.html.
+
+Include:
+- Board-ready templates: risk register, procurement checklist, 
+  incident response flow, continuity plan.
+- KPIs: time-to-deliver, audit coverage, workforce readiness, 
+  resilience test cadence, tariff exposure score.
+- "Red-team questions" — including new: "What happens to this 
+  program if the US agency it depends on loses 30% of staff?"
+- A 2026-specific section: "Designing for US institutional volatility."
+
+Cite:
+- GAO cyber workforce (Sep 2025).
+- GAO GenAI management.
+- FY2026 civilian cuts context (Project Geospatial).
+- Lexology Buy Canadian (Feb 2026).</pre>
+    </details>
+  </section>
+
+  <!-- SOURCES -->
+  <section class="card section-gap" id="sources">
+    <h2>8) Sources — Selected, Load-bearing 📚</h2>
+    <p>All links open in a new tab when online. Offline mode keeps the full text readable; links won't fetch. New 2026 sources marked ✦.</p>
+    <div class="cols2">
+      <div>
+        <h3>Infrastructure, permitting, grid</h3>
+        <ul class="list">
+          <li>DOE/NPC: <i>Bottleneck to Breakthrough: A Permitting Blueprint</i> (Dec 2025) — <a class="src" href="https://www.energy.gov/sites/default/files/2025-12/NPC_Permitting_report_2025-12-3.pdf" target="_blank" rel="noopener">link →</a></li>
+          <li>FERC: Explainer on Interconnection Final Rule — <a class="src" href="https://www.ferc.gov/explainer-interconnection-final-rule" target="_blank" rel="noopener">link →</a></li>
+          <li>LBNL: Queued Up (interconnection queue tracking) — <a class="src" href="https://emp.lbl.gov/queues" target="_blank" rel="noopener">link →</a></li>
+          <li>Reuters: US AI boom faces electric shock ✦ (Feb 2026) — <a class="src" href="https://www.reuters.com/markets/commodities/us-ai-boom-faces-electric-shock-2026-02-25/" target="_blank" rel="noopener">link →</a></li>
+        </ul>
+        <h3>Budget volatility &amp; continuity</h3>
+        <ul class="list">
+          <li>CRFB: Appropriations Watch FY2026 ✦ — <a class="src" href="https://www.crfb.org/blogs/appropriations-watch-fy-2026" target="_blank" rel="noopener">link →</a></li>
+          <li>Wikipedia: 2026 US federal government shutdowns ✦ — <a class="src" href="https://en.wikipedia.org/wiki/2026_United_States_federal_government_shutdowns" target="_blank" rel="noopener">link →</a></li>
+          <li>NACo: FY2026 appropriations analysis ✦ — <a class="src" href="https://www.naco.org/resource/legislative-analysis-counties-fy-2026-appropriations" target="_blank" rel="noopener">link →</a></li>
+        </ul>
+        <h3>Trade sovereignty &amp; Canada ✦</h3>
+        <ul class="list">
+          <li>BNN Bloomberg: Tariffs start at 10% (Feb 2026) — <a class="src" href="https://www.bnnbloomberg.ca/business/2026/02/24/new-us-tariffs-start-at-10-trump-administration-working-to-hike-them-to-15/" target="_blank" rel="noopener">link →</a></li>
+          <li>Lexology: Buy Canadian + CUSMA 2026 review (Feb 2026) — <a class="src" href="https://www.lexology.com/library/detail.aspx?g=d143471d-228f-442d-afff-849683a18756" target="_blank" rel="noopener">link →</a></li>
+          <li>Globe &amp; Mail: 2026 in charts — trade — <a class="src" href="https://www.theglobeandmail.com/business/international-business/article-2026-in-charts-trade/" target="_blank" rel="noopener">link →</a></li>
+          <li>EDC: Global economy 2026 (Jan 2026) — <a class="src" href="https://www.edc.ca/en/trade-matters/global-economy-trade-tensions-2026.html" target="_blank" rel="noopener">link →</a></li>
+          <li>CBC: Canada resilience under tariffs (Aug 2025) — <a class="src" href="https://www.cbc.ca/news/business/canada-resilience-us-tariffs-1.7600931" target="_blank" rel="noopener">link →</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>AI, cyber, governance</h3>
+        <ul class="list">
+          <li>White House OSTP: <i>America's AI Action Plan</i> (Jul 2025) — <a class="src" href="https://www.whitehouse.gov/wp-content/uploads/2025/07/Americas-AI-Action-Plan.pdf" target="_blank" rel="noopener">link →</a></li>
+          <li>GAO: Generative AI Use and Management at Federal Agencies — <a class="src" href="https://www.gao.gov/products/gao-25-107653" target="_blank" rel="noopener">link →</a></li>
+          <li>GAO: Cyber Workforce — Actions Needed (Sep 2025) — <a class="src" href="https://www.gao.gov/assets/gao-25-107405.pdf" target="_blank" rel="noopener">link →</a></li>
+          <li>International AI Safety Report 2026 (Feb 2026) — <a class="src" href="https://internationalaisafetyreport.org/sites/default/files/2026-02/international-ai-safety-report-2026_1.pdf" target="_blank" rel="noopener">link →</a></li>
+          <li>ISC2: 2025 Cybersecurity Workforce Study (Dec 2025) — <a class="src" href="https://www.isc2.org/Insights/2025/12/2025-ISC2-Cybersecurity-Workforce-Study" target="_blank" rel="noopener">link →</a></li>
+        </ul>
+        <h3>Civil service &amp; geospatial ✦</h3>
+        <ul class="list">
+          <li>FAS: Government Capacity issue page — <a class="src" href="https://fas.org/issue/government-capacity/" target="_blank" rel="noopener">link →</a></li>
+          <li>Project Geospatial: FY2026 budget threatens geospatial supremacy (May 2025) — <a class="src" href="https://projectgeospatial.org/geospatial-frontiers/nation-at-a-crossroads-fy2026-budget-proposal-threatens-to-dismantle-us-geospatial-supremacy-risking-economic-and-infrastructural-integrity" target="_blank" rel="noopener">link →</a></li>
+          <li>APCO: Reading power in 2026 — NSS analysis — <a class="src" href="https://apcoworldwide.com/blog/reading-power-in-2026-what-the-u-s-national-security-strategy-signals-for-global-business/" target="_blank" rel="noopener">link →</a></li>
+        </ul>
+        <h3>Trust &amp; misinformation</h3>
+        <ul class="list">
+          <li>National Academies (trust + polarization chapter) — <a class="src" href="https://www.nationalacademies.org/read/27894/chapter/5" target="_blank" rel="noopener">link →</a></li>
+          <li>National Academies publication hub — <a class="src" href="https://www.nationalacademies.org/publications/27894" target="_blank" rel="noopener">link →</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+    <details>
+      <summary><span class="sum-chevron">▶</span><span class="sum-title">Attributions &amp; Licensing</span><span class="sum-domain">legal</span></summary>
+      <p>This file is original code and text synthesis. It links to public sources for verification. No proprietary code is copied. If you adapt this repo publicly, add your preferred open-source license and keep citations intact. All source links are to publicly accessible materials.</p>
+    </details>
+
+    <div class="footer">
+      <b>Zero-Harm &amp; Anti-Coercion Note:</b> This atlas supports life, dignity, and lawful democratic governance. No surveillance tooling, coercion playbooks, automated targeting, or hidden telemetry is included. All storage is local-only, transparent, and user-resettable. Every feature that touches data has a visible reset button.
+      <br/><br/>
+      <span style="color:var(--faint);font-family:var(--mono);font-size:11px">
+        Northbound Atlas v2 · Feb 2026 · offline-first · Foster + Navi collaboration ·
+        <span class="kbd">⌘K</span> to search · <span class="kbd">Esc</span> to dismiss overlays
+      </span>
+    </div>
+    <!--
+      Zero-Harm & Anti-Inversion Note (comment):
+      This project is designed to strengthen benevolent, life-supporting outcomes
+      and reduce systemic risks. It avoids surveillance enablement, coercive tactics,
+      hidden telemetry, auto-sending, and any features that could be repurposed for harm.
+      All data is local-only and user-resettable. Input is sanitized and rate-limited.
+    -->
+  </section>
+
+</main>
+
+<!-- ═══ HUD ═══ -->
+<aside class="hud" aria-label="Local HUD — state stays on this device">
+  <div class="hud-top">
+    <div><b>Local HUD</b> <span class="mini">🛰️ this device only</span></div>
+    <div class="hud-xp-label" id="xpLabel">XP: 0</div>
+  </div>
+  <div class="hud-xp">
+    <span style="font-size:11px;color:var(--muted)">Progress</span>
+    <div class="hud-xp-bar-wrap"><div class="hud-xp-bar" id="xpBar" style="width:0%"></div></div>
+    <span class="hud-xp-label" id="xpPct">0%</span>
+  </div>
+  <div class="hud-kpis">
+    <div class="hud-tile"><b>Actions logged</b><span id="hudActions">0</span></div>
+    <div class="hud-tile"><b>Modules reviewed</b><span id="hudModules">0</span></div>
+    <div class="hud-tile"><b>Notes saved</b><span id="hudNotes">0</span></div>
+    <div class="hud-tile"><b>Last save</b><span id="hudLastSave">—</span></div>
+  </div>
+  <div class="hud-btns">
+    <button class="btn" id="addNoteBtn">📝 Add note (+2 XP)</button>
+    <button class="btn" id="viewNotesBtn">👁 View notes</button>
+    <button class="btn btn-danger" id="wipeBtn">🧼 Wipe data</button>
+  </div>
+  <div class="constellation-wrap">
+    <canvas id="constellation" width="720" height="220" aria-label="State constellation visualizer"></canvas>
+  </div>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   RATE LIMITER — gentle throttle to keep UI stable
+   Extend: add new keys for new actions
+══════════════════════════════════════════════════════════════ */
+const Rate = (()=>{
+  const b = new Map();
+  return { ok(k, ms=600){ const n=Date.now(), l=b.get(k)||0; if(n-l<ms) return false; b.set(k,n); return true; } };
+})();
+
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+/* ══════════════════════════════════════════════════════════════
+   INDEXEDDB LOCAL STORE — offline-first persistence
+   Extend: add stores in open(), bump version
+══════════════════════════════════════════════════════════════ */
+const DB = {
+  name:"northbound_v2", ver:2, db:null,
+  async open(){
+    if(this.db) return this.db;
+    return new Promise((res,rej)=>{
+      const r = indexedDB.open(this.name, this.ver);
+      r.onupgradeneeded = e => {
+        const d = r.result;
+        if(!d.objectStoreNames.contains("kv")) d.createObjectStore("kv");
+        if(!d.objectStoreNames.contains("notes")){ const s=d.createObjectStore("notes",{keyPath:"id"}); s.createIndex("ts","ts"); }
+      };
+      r.onsuccess = () => { this.db = r.result; res(this.db); };
+      r.onerror = () => rej(r.error);
+    });
+  },
+  async get(st,k){ const d=await this.open(); return new Promise((r,j)=>{ const tx=d.transaction(st,"readonly"); const q=tx.objectStore(st).get(k); q.onsuccess=()=>r(q.result); q.onerror=()=>j(q.error); }); },
+  async set(st,k,v){ const d=await this.open(); return new Promise((r,j)=>{ const tx=d.transaction(st,"readwrite"); const q=tx.objectStore(st).put(v,k); q.onsuccess=()=>r(true); q.onerror=()=>j(q.error); }); },
+  async addNote(t){ const d=await this.open(); const n={id:crypto.randomUUID(),ts:Date.now(),text:String(t).slice(0,2000)}; return new Promise((r,j)=>{ const tx=d.transaction("notes","readwrite"); const q=tx.objectStore("notes").add(n); q.onsuccess=()=>r(n); q.onerror=()=>j(q.error); }); },
+  async listNotes(lim=50){ const d=await this.open(); return new Promise((r,j)=>{ const tx=d.transaction("notes","readonly"); const out=[]; tx.objectStore("notes").index("ts").openCursor(null,"prev").onsuccess=e=>{ const c=e.target.result; if(c&&out.length<lim){out.push(c.value);c.continue();}else r(out); }; tx.onerror=()=>j(tx.error); }); },
+  async wipeAll(){ const d=await this.open(); return new Promise((r,j)=>{ const tx=d.transaction(["kv","notes"],"readwrite"); tx.objectStore("kv").clear(); tx.objectStore("notes").clear(); tx.oncomplete=()=>r(true); tx.onerror=()=>j(tx.error); }); }
+};
+
+/* ══════════════════════════════════════════════════════════════
+   APP STATE — single source of truth for HUD + constellation
+   Extend: add fields here + in renderHUD() + drawConstellation()
+══════════════════════════════════════════════════════════════ */
+const State = {
+  xp:0, actions:0, modules:0, notes:0, scenarios:0, lastSave:null,
+  async load(){
+    const kv = await DB.get("kv","state").catch(()=>null);
+    if(kv && typeof kv === "object") Object.assign(this, kv);
+    const ns = await DB.listNotes(200).catch(()=>[]);
+    this.notes = ns.length;
+    renderHUD(); drawConstellation();
+  },
+  async save(){
+    this.lastSave = Date.now();
+    await DB.set("kv","state",{xp:this.xp,actions:this.actions,modules:this.modules,notes:this.notes,scenarios:this.scenarios,lastSave:this.lastSave}).catch(()=>{});
+    renderHUD(); drawConstellation();
+  }
+};
+
+function fmtTs(t){ if(!t) return "—"; return new Date(t).toISOString().replace("T"," ").slice(0,19)+"Z"; }
+
+function toast(msg, dur=2200){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"), dur);
+}
+
+function renderHUD(){
+  const MAX_XP = 200;
+  const pct = Math.min(100, Math.round((State.xp/MAX_XP)*100));
+  document.getElementById("xpLabel").textContent = `XP: ${State.xp}`;
+  document.getElementById("xpPct").textContent = pct+"%";
+  document.getElementById("xpBar").style.width = pct+"%";
+  document.getElementById("hudActions").textContent = State.actions;
+  document.getElementById("hudModules").textContent = State.modules;
+  document.getElementById("hudNotes").textContent = State.notes;
+  document.getElementById("hudLastSave").textContent = fmtTs(State.lastSave);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SIGNAL BOARD — bottleneck threat levels
+   Extend: update nodes array with new bottlenecks
+══════════════════════════════════════════════════════════════ */
+const SIGNALS = [
+  { id:"b2", label:"Grid / Interconnection", domain:"electricity", level:"critical", icon:"⚡", note:"AI data-centre load surge + persistent interconnection backlog. Reuters Feb 2026." },
+  { id:"b7", label:"Trade / Sovereignty Shock", domain:"sovereignty", level:"critical", icon:"🛡️", note:"10–15% global tariffs live Feb 2026; CUSMA review July 2026. Active compounding stress." },
+  { id:"b8", label:"Civil Service Erosion", domain:"governance", level:"critical", icon:"🏛️", note:"$163B civilian cuts proposed FY2026; DOGE restructuring hollows agency expertise." },
+  { id:"b3", label:"Budget / CR Volatility", domain:"governance", level:"high", icon:"💸", note:"43-day Oct 2025 shutdown + Feb 2026 DHS shutdown. Longest in modern history." },
+  { id:"b4", label:"Cyber Workforce Gaps", domain:"cyber", level:"high", icon:"🔐", note:"GAO Sep 2025 + ISC2 Dec 2025: systemic hiring and retention failures." },
+  { id:"b6", label:"Trust / Misinformation", domain:"legitimacy", level:"high", icon:"📡", note:"Leverage-based NSS 2025 shifts US from values-based diplomacy; erodes allied trust." },
+  { id:"b9", label:"Geospatial Commons", domain:"data commons", level:"high", icon:"🛰️", note:"NOAA/NASA/USGS targeted in FY2026 budget; Canadian monitoring dependencies at risk." },
+  { id:"b5", label:"AI Governance Friction", domain:"AI", level:"medium", icon:"🤖", note:"Federal plans exist but adoption + oversight bottlenecks persist across agencies." },
+  { id:"b1", label:"Permitting & Legal", domain:"infrastructure", level:"medium", icon:"📋", note:"NPC Dec 2025: permitting timelines and litigation are core build-speed constraints." },
+];
+
+function renderSignalBoard(){
+  const grid = document.getElementById("signalGrid");
+  if(!grid) return;
+  grid.innerHTML = SIGNALS.map(s => {
+    const orbClass = `orb-${s.level}`;
+    const lvlClass = `level-${s.level}`;
+    const glowColor = s.level==="critical"?"rgba(255,77,109,0.06)":s.level==="high"?"rgba(255,182,39,0.06)":s.level==="medium"?"rgba(91,141,239,0.06)":"rgba(80,250,123,0.06)";
+    return `<a href="#bottlenecks" class="sig-node" title="${esc(s.note)}" style="text-decoration:none">
+      <div class="sig-glow" style="background:${glowColor}"></div>
+      <div class="sig-node-top">
+        <div class="sig-orb ${orbClass}">${s.icon}</div>
+        <div class="sig-meta">
+          <div class="sig-label">${esc(s.label)}</div>
+          <div class="sig-domain">${esc(s.domain)}</div>
+        </div>
+      </div>
+      <span class="sig-level ${lvlClass}">${s.level.toUpperCase()}</span>
+      <div class="sig-note">${esc(s.note)}</div>
+    </a>`;
+  }).join("");
+}
+renderSignalBoard();
+
+/* ══════════════════════════════════════════════════════════════
+   STARS + PARALLAX — lightweight animated background
+   Tune: STAR_COUNT, drift speed, parallax sensitivity
+══════════════════════════════════════════════════════════════ */
+const prefersReduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const starsEl = document.getElementById("stars");
+const sc = starsEl.getContext("2d");
+function resizeStars(){
+  const dpr = Math.min(2, devicePixelRatio||1);
+  starsEl.width = Math.floor(innerWidth*dpr);
+  starsEl.height = Math.floor(innerHeight*dpr);
+  starsEl.style.width = innerWidth+"px";
+  starsEl.style.height = innerHeight+"px";
+  sc.setTransform(dpr,0,0,dpr,0,0);
+}
+addEventListener("resize", resizeStars);
+resizeStars();
+
+// Layer 1: small distant stars
+const stars1 = Array.from({length:180}, ()=>({
+  x:Math.random()*innerWidth, y:Math.random()*innerHeight,
+  r:Math.random()*.9+.15, v:Math.random()*.08+.02, a:Math.random()*.45+.12
+}));
+// Layer 2: medium glowing stars
+const stars2 = Array.from({length:35}, ()=>({
+  x:Math.random()*innerWidth, y:Math.random()*innerHeight,
+  r:Math.random()*2+.8, v:Math.random()*.12+.04, a:Math.random()*.6+.25,
+  hue: Math.random()>.6?"#7CF7D4":Math.random()>.5?"#5B8DEF":"#EAF0FF"
+}));
+// Layer 3: nebula blobs (big, very soft)
+const nebulae = Array.from({length:5}, ()=>({
+  x:Math.random()*innerWidth, y:Math.random()*innerHeight,
+  rx:Math.random()*350+200, ry:Math.random()*250+120,
+  vx:(Math.random()-.5)*.04, vy:(Math.random()-.5)*.03,
+  hue:Math.random()>.5?"rgba(0,245,212,0.032)":"rgba(91,141,239,0.028)"
+}));
+
+function tickStars(){
+  sc.clearRect(0,0,innerWidth,innerHeight);
+  // nebulae
+  for(const n of nebulae){
+    const g = sc.createRadialGradient(n.x,n.y,0,n.x,n.y,n.rx);
+    g.addColorStop(0,n.hue);
+    g.addColorStop(1,"transparent");
+    sc.fillStyle = g;
+    sc.beginPath();
+    sc.ellipse(n.x,n.y,n.rx,n.ry,0,0,Math.PI*2);
+    sc.fill();
+    if(!prefersReduced){n.x+=n.vx;n.y+=n.vy;if(n.x<-n.rx)n.x=innerWidth+n.rx;if(n.x>innerWidth+n.rx)n.x=-n.rx;if(n.y<-n.ry)n.y=innerHeight+n.ry;if(n.y>innerHeight+n.ry)n.y=-n.ry;}
+  }
+  // small stars
+  for(const s of stars1){
+    sc.globalAlpha=s.a; sc.beginPath(); sc.arc(s.x,s.y,s.r,0,Math.PI*2);
+    sc.fillStyle="#EAF0FF"; sc.fill();
+    if(!prefersReduced){s.y+=s.v; if(s.y>innerHeight+4){s.y=-4;s.x=Math.random()*innerWidth;}}
+  }
+  // glowing medium stars
+  for(const s of stars2){
+    const g=sc.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*4);
+    g.addColorStop(0,s.hue.replace(/[\d.]+\)$/,"0.8)").replace("#","rgba(").replace("rgba(","rgba("));
+    try{
+      sc.globalAlpha=s.a*.5; sc.beginPath(); sc.arc(s.x,s.y,s.r*3.5,0,Math.PI*2);
+      sc.fillStyle=s.hue==="rgba"?s.hue:s.hue+"55"; sc.fill();
+    }catch(e){}
+    sc.globalAlpha=s.a; sc.beginPath(); sc.arc(s.x,s.y,s.r,0,Math.PI*2);
+    sc.fillStyle=s.hue; sc.fill();
+    if(!prefersReduced){s.y+=s.v; if(s.y>innerHeight+8){s.y=-8;s.x=Math.random()*innerWidth;}}
+  }
+  sc.globalAlpha=1;
+  requestAnimationFrame(tickStars);
+}
+tickStars();
+
+const par = document.getElementById("parallax");
+addEventListener("mousemove", e=>{
+  if(prefersReduced) return;
+  par.style.transform=`translate3d(${(e.clientX/innerWidth-.5)*-16}px,${(e.clientY/innerHeight-.5)*-12}px,0)`;
+});
+
+/* ══════════════════════════════════════════════════════════════
+   CONSTELLATION — state-to-starmap visualizer
+   Extend: add nodes[] entries for new state variables
+══════════════════════════════════════════════════════════════ */
+const cEl = document.getElementById("constellation");
+const cctx = cEl.getContext("2d");
+function drawConstellation(){
+  const W=cEl.width, H=cEl.height;
+  cctx.clearRect(0,0,W,H);
+  cctx.fillStyle="#020A18"; cctx.fillRect(0,0,W,H);
+  // tiny bg stars
+  for(let i=0;i<60;i++){
+    cctx.globalAlpha=Math.random()*.3+.1;
+    cctx.beginPath(); cctx.arc(Math.random()*W,Math.random()*H,Math.random()+.3,0,Math.PI*2);
+    cctx.fillStyle="#EAF0FF"; cctx.fill();
+  }
+  cctx.globalAlpha=1;
+
+  const MAX_XP=200;
+  const nodes=[
+    {k:"XP", v:Math.min(1,(State.xp||0)/MAX_XP), x:.13, y:.50, col:"#00F5D4"},
+    {k:"Actions", v:Math.min(1,(State.actions||0)/30), x:.33, y:.28, col:"#5B8DEF"},
+    {k:"Modules", v:Math.min(1,(State.modules||0)/16), x:.54, y:.55, col:"#FFB627"},
+    {k:"Notes", v:Math.min(1,(State.notes||0)/20), x:.73, y:.32, col:"#BD93F9"},
+    {k:"Scenarios", v:Math.min(1,(State.scenarios||0)/12), x:.88, y:.56, col:"#50FA7B"},
+  ].map(n=>({...n, px:n.x*W, py:n.y*H, r:5+n.v*14}));
+
+  // lines
+  for(let i=0;i<nodes.length-1;i++){
+    const a=nodes[i], b=nodes[i+1];
+    const mix=Math.min(a.v,b.v);
+    cctx.globalAlpha=0.25+mix*0.35;
+    const lg=cctx.createLinearGradient(a.px,a.py,b.px,b.py);
+    lg.addColorStop(0,a.col); lg.addColorStop(1,b.col);
+    cctx.strokeStyle=lg; cctx.lineWidth=1.5+mix*1;
+    cctx.beginPath(); cctx.moveTo(a.px,a.py); cctx.lineTo(b.px,b.py); cctx.stroke();
+  }
+  cctx.globalAlpha=1;
+
+  // nodes
+  for(const n of nodes){
+    // glow
+    const g=cctx.createRadialGradient(n.px,n.py,0,n.px,n.py,n.r*3);
+    g.addColorStop(0,n.col.replace("rgb","rgba").replace(")",",0.3)").replace("#","rgba("));
+    g.addColorStop(1,"transparent");
+    try{ cctx.fillStyle=g; cctx.beginPath(); cctx.arc(n.px,n.py,n.r*3,0,Math.PI*2); cctx.fill(); }catch(e){}
+    // dot
+    cctx.fillStyle=n.col; cctx.beginPath(); cctx.arc(n.px,n.py,n.r,0,Math.PI*2); cctx.fill();
+    // label
+    cctx.fillStyle="rgba(226,238,249,0.75)"; cctx.font=`11px ${getComputedStyle(document.body).fontFamily}`;
+    cctx.fillText(n.k, n.px+n.r+5, n.py+4);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SEARCH — client-side highlight + scroll
+   Extend: Add filter chips or scoped search by section
+══════════════════════════════════════════════════════════════ */
+let marks=[];
+function clearMarks(){ marks.forEach(m=>{ if(m.parentNode) m.outerHTML=m.textContent; }); marks=[]; }
+function doSearch(term){
+  clearMarks();
+  if(!term||term.length<2) return;
+  const rx=new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"ig");
+  const walker=document.createTreeWalker(document.getElementById("top"),NodeFilter.SHOW_TEXT,{
+    acceptNode(n){ const t=n.parentElement?.tagName; if(["SCRIPT","STYLE","NOSCRIPT"].includes(t)) return NodeFilter.FILTER_REJECT; return rx.test(n.nodeValue)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT; }
+  });
+  const hits=[]; while(walker.nextNode()) hits.push(walker.currentNode);
+  for(const n of hits.slice(0,100)){
+    const f=document.createElement("span");
+    const parts=n.nodeValue.split(rx), ms=n.nodeValue.match(rx)||[];
+    for(let i=0;i<parts.length;i++){
+      f.append(parts[i]);
+      if(ms[i]){ const m=document.createElement("mark"); m.className="search-mark"; m.textContent=ms[i]; f.append(m); marks.push(m); }
+    }
+    n.parentNode?.replaceChild(f,n);
+  }
+  if(marks[0]) marks[0].scrollIntoView({behavior:"smooth",block:"center"});
+}
+const qEl=document.getElementById("q");
+qEl.addEventListener("input",()=>{ if(Rate.ok("search",120)) doSearch(qEl.value.trim()); });
+document.addEventListener("keydown",e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){ e.preventDefault(); qEl.focus(); }
+  if(e.key==="Escape") hideSplash();
+});
+
+/* ══════════════════════════════════════════════════════════════
+   SCENARIO ENGINE — tabletop scenario card generator
+   Extend: add entries to SCENARIOS array
+══════════════════════════════════════════════════════════════ */
+const SCENARIOS = [
+  {
+    title:"Operation Quiet Grid — AI Load Spike",
+    tags:["critical","electricity","AI"],
+    body:"A cluster of 12 new hyperscale AI data centres in the US Pacific Northwest comes online simultaneously, creating a sudden demand spike that triggers cascading interconnection failures. The Canadian grid operator receives a call from NERC at 2am. Three large Canadian industrial customers are at risk of voltage reduction orders.",
+    questions:["What immediate cross-border coordination protocols does your organization have for grid emergencies?","Which of your critical services depends on US grid stability in the next 4 hours?","How would you communicate service interruptions to the public without triggering panic?","What's your organization's authority to call emergency demand-side reduction in the next 30 minutes?","Where is your continuity-of-operations plan for a 72-hour cross-border grid event?"]
+  },
+  {
+    title:"CUSMA Zero Day — Trade Shock",
+    tags:["critical","sovereignty","trade"],
+    body:"The US formally notifies Canada of CUSMA withdrawal with 6 months' notice in September 2026. The Canadian dollar drops 8% overnight. Your organization's top 5 suppliers are US-based. 35% tariffs will apply to all goods after 180 days.",
+    questions:["Which of your current contracts survive CUSMA withdrawal and which don't — do you know?","What's your 30-60-90 day procurement pivot plan for US-sourced critical inputs?","How does your organization's funding change if CAD/USD drops 10% for a full year?","Where are your alternate suppliers in Allied markets (EU, UK, Japan, Australia)?","What's the communication plan to your board, funders, and beneficiaries?"]
+  },
+  {
+    title:"The Silent Weatherman — Geospatial Data Loss",
+    tags:["high","geospatial","data"],
+    body:"NOAA announces a 60-day service interruption to its global weather model outputs due to server decommissioning under FY2026 budget cuts. Environment and Climate Change Canada's 5-day forecast accuracy degrades by 40%. A Category 2 wildfire season is underway in BC.",
+    questions:["Which of your organization's decisions depend on NOAA-derived forecasts in the next 30 days?","Does your organization have a direct relationship with Environment Canada's data infrastructure — or are you downstream?","What's your fallback for wildfire risk assessment if 5-day forecasts are unavailable?","Have you explored European alternatives like the ECMWF or Copernicus Climate Data Store?","How would you triage and communicate reduced forecast confidence to decision-makers?"]
+  },
+  {
+    title:"Ghost Agency — Civil Service Hollowing",
+    tags:["critical","governance","procurement"],
+    body:"The US EPA's enforcement and technical assistance division has lost 42% of its staff through a combination of layoffs and attrition. The Canadian environmental permitting process for a joint border infrastructure project now has no US counterpart with signing authority. A bilateral agreement pauses.",
+    questions:["Which of your active cross-border collaborations depend on a specific US agency contact who could be gone?","Do your contracts with US counterparts have clauses for governing-body instability?","What alternative routes exist to maintain the project's momentum (state-level, academic, multilateral)?","Have you conducted a dependency audit of US agencies vs. independent bodies (NIST, USGS, labs)?","What's the escalation path if the bilateral agreement is paused for 6+ months?"]
+  },
+  {
+    title:"Trust Collapse — Institutional Legitimacy Crisis",
+    tags:["high","legitimacy","communications"],
+    body:"A major infrastructure project you're overseeing becomes the target of a coordinated misinformation campaign. Fabricated documents claiming environmental harm go viral. Community approval for the project drops from 68% to 31% in 10 days. Three months before a federal funding decision.",
+    questions:["Do you have a 'prebunking' communication protocol ready before the next project launch?","Where are your 'what we know and what we don't' transparency documents publicly accessible?","Who is your designated trusted-voice spokesperson for escalated misinformation events?","What would you need to show the community to demonstrate your evidence base is credible?","How do you distinguish legitimate public concern from coordinated manipulation in your response protocol?"]
+  },
+  {
+    title:"Shutdown Cascade — Continuity of Essential Services",
+    tags:["high","governance","continuity"],
+    body:"A US government shutdown in its 34th day triggers cascading delays: FEMA mutual aid agreements are in limbo, cross-border hazmat coordination teams are unpaid, EPA environmental monitoring is suspended. A joint Canada-US pipeline corridor crosses through an affected zone.",
+    questions:["Which of your organization's essential operations depend on active US federal counterparts?","What's your continuity minimum — the floor below which your organization cannot function — and is it funded for 60 days without external inputs?","Where do your emergency coordination agreements need US federal authority vs. state/provincial authority?","Have you run a 'shutdown simulation' tabletop in the last 18 months?","What would you tell your board if this scenario persisted for 90 days?"]
+  },
+];
+
+let currentScenario = -1;
+const scenarioCard = document.getElementById("scenarioCard");
+
+function showScenario(idx){
+  const s = SCENARIOS[idx];
+  if(!s) return;
+  scenarioCard.className = "scenario-card show";
+  scenarioCard.innerHTML = `
+    <h3>🎲 Scenario: "${esc(s.title)}"</h3>
+    <div class="scenario-meta">${s.tags.map(t=>`<span>${esc(t)}</span>`).join("")}</div>
+    <div class="scenario-body">${esc(s.body)}</div>
+    <b style="font-size:13px;color:var(--text)">Tabletop Inversion Questions:</b>
+    <ol class="scenario-questions">${s.questions.map(q=>`<li>${esc(q)}</li>`).join("")}</ol>
+    <div class="scenario-ctas">
+      <button class="btn btn-amber" id="drawScenarioBtn2">🎲 New card</button>
+      <button class="btn btn-teal" id="saveScenarioNote">💾 Save as note (+3 XP)</button>
+    </div>`;
+  document.getElementById("drawScenarioBtn2")?.addEventListener("click", nextScenario);
+  document.getElementById("saveScenarioNote")?.addEventListener("click", async ()=>{
+    if(!Rate.ok("scenNote",600)) return;
+    const txt = `Scenario: ${s.title}\n\n${s.body}\n\nQuestions:\n${s.questions.map((q,i)=>`${i+1}. ${q}`).join("\n")}`;
+    await DB.addNote(txt);
+    State.notes+=1; State.scenarios+=1; State.xp+=3;
+    await State.save();
+    toast("Scenario saved as local note. +3 XP 🎲");
+  });
+}
+
+function nextScenario(){
+  currentScenario = (currentScenario+1) % SCENARIOS.length;
+  showScenario(currentScenario);
+}
+
+document.getElementById("drawScenarioBtn")?.addEventListener("click", ()=>{
+  currentScenario = Math.floor(Math.random()*SCENARIOS.length);
+  showScenario(currentScenario);
+  State.scenarios+=1; State.xp+=2;
+  State.save();
+  toast("Scenario drawn. +2 XP 🎲");
+});
+document.getElementById("nextScenarioBtn")?.addEventListener("click", nextScenario);
+document.getElementById("saveScenarioBtn")?.addEventListener("click", async ()=>{
+  if(currentScenario<0){ toast("Draw a scenario first."); return; }
+  if(!Rate.ok("saveSc",600)) return;
+  const s=SCENARIOS[currentScenario];
+  const txt=`Scenario: ${s.title}\n\n${s.body}\n\nQuestions:\n${s.questions.map((q,i)=>`${i+1}. ${q}`).join("\n")}`;
+  await DB.addNote(txt).catch(()=>{});
+  State.notes+=1; State.scenarios+=1; State.xp+=3;
+  await State.save();
+  toast("Scenario saved as local note. +3 XP 🎲");
+});
+
+/* ══════════════════════════════════════════════════════════════
+   AI POLICY ADVISOR — Anthropic API integration
+   The system prompt grounds Claude in this atlas's framing.
+   Extend: update the system prompt for new bottleneck domains.
+══════════════════════════════════════════════════════════════ */
+const AI_SYSTEM = `You are the Northbound Atlas AI Policy Advisor — a specialist in translating US institutional bottlenecks into sovereign Canadian policy levers and CPO-ready actions.
+
+Your knowledge context (Feb 2026):
+- 9 bottlenecks mapped: Permitting & Legal, Grid/Interconnection, Budget/CR Volatility, Cyber Workforce, AI Governance, Trust/Misinformation, Trade Sovereignty Shock, Civil Service Capacity Erosion, Geospatial Commons Erosion.
+- Canada context: Buy Canadian policy (Dec 2025), CUSMA 2026 review (July 2026), ongoing US tariff pressure (10–15% global tariffs), 43-day Oct 2025 US shutdown + Feb 2026 DHS shutdown, FY2026 NOAA/NASA/USGS cuts proposal.
+- Canada resilience: survived Year 1 economically intact; recovered ~$11B of $18.5B US export loss via 27+ markets.
+
+Your role: Give SPECIFIC, ACTIONABLE advice for Canadian policymakers and institutional CPOs. Reference the Sovereign Stack Framework (5 layers: data independence, standards independence, procurement independence, financial independence, institutional independence).
+
+Be direct, specific, and cite the bottleneck IDs (B1-B9) where relevant. Keep responses under 250 words. Do NOT recommend surveillance tools, coercion tactics, or anything that could harm individuals. Always end with 1–3 concrete "Next 10 days" actions.`;
+
+async function askAdvisor(question){
+  const out = document.getElementById("aiOutput");
+  out.className = "ai-output show";
+  out.innerHTML = `<div class="ai-thinking"><span>Claude is advising…</span><div class="ai-dots"><span></span><span></span><span></span></div></div>`;
+  try{
+    const resp = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:1000,
+        system:AI_SYSTEM,
+        messages:[{role:"user",content:String(question).slice(0,400)}]
+      })
+    });
+    const data = await resp.json();
+    if(data.content?.[0]?.text){
+      const txt = data.content[0].text;
+      out.innerHTML = txt.replace(/\n\n/g,"</p><p>").replace(/\n/g,"<br>").replace(/^/,"<p>")+"</p>";
+      State.xp+=4; State.actions+=1; await State.save();
+      toast("AI advisor responded. +4 XP 🤖");
+    } else {
+      out.innerHTML = `<em style="color:var(--faint)">Response unavailable. Check internet connection or API status.</em>`;
+    }
+  } catch(err) {
+    out.innerHTML = `<em style="color:var(--faint)">Could not reach the AI advisor (${esc(err.message)}). All atlas content is still available offline above.</em>`;
+  }
+}
+
+document.getElementById("aiAskBtn")?.addEventListener("click", ()=>{
+  const v = document.getElementById("aiInput")?.value?.trim();
+  if(!v) return;
+  if(!Rate.ok("aiAsk",2000)) return toast("Please wait a moment before asking again.");
+  askAdvisor(v);
+});
+document.getElementById("aiInput")?.addEventListener("keydown", e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); document.getElementById("aiAskBtn")?.click(); } });
+
+document.querySelectorAll(".ai-preset").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const q=btn.dataset.q;
+    const inp=document.getElementById("aiInput");
+    if(inp) inp.value=q;
+    if(!Rate.ok("aiAsk",2000)) return toast("Please wait a moment before asking again.");
+    askAdvisor(q);
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════
+   UI ACTIONS — XP, notes, export, wipe
+   Extend: add new btn[data-xp] elements in HTML
+══════════════════════════════════════════════════════════════ */
+document.getElementById("logActionBtn")?.addEventListener("click", async ()=>{
+  if(!Rate.ok("act",500)) return;
+  State.actions+=1; State.xp+=5;
+  await State.save(); toast("Policy action logged. +5 XP ✅");
+});
+
+document.querySelectorAll("button[data-xp]").forEach(btn=>{
+  btn.addEventListener("click", async()=>{
+    if(!Rate.ok("mod",500)) return;
+    const amt = parseInt(btn.dataset.xp)||0;
+    State.modules+=1; State.xp+=amt;
+    await State.save(); toast(`Module reviewed. +${amt} XP ✨`);
+  });
+});
+
+document.getElementById("addNoteBtn")?.addEventListener("click", async ()=>{
+  if(!Rate.ok("note",500)) return;
+  const txt = prompt("Local note (stored only on this device, max 2000 chars):");
+  if(!txt?.trim()) return;
+  await DB.addNote(txt).catch(()=>{});
+  State.notes+=1; State.xp+=2;
+  await State.save(); toast("Note saved locally. +2 XP 🗒️");
+});
+
+document.getElementById("viewNotesBtn")?.addEventListener("click", async ()=>{
+  if(!Rate.ok("view",500)) return;
+  const ns = await DB.listNotes(25).catch(()=>[]);
+  const lines = ns.map(n=>`• ${new Date(n.ts).toISOString().slice(0,19)}Z\n  ${n.text.replace(/\s+/g," ").slice(0,200)}`).join("\n\n");
+  alert(ns.length ? lines : "No local notes yet. Add some using the 'Add note' button.");
+});
+
+document.getElementById("exportBtn")?.addEventListener("click", async ()=>{
+  if(!Rate.ok("exp",800)) return;
+  const notes = await DB.listNotes(500).catch(()=>[]);
+  const payload = {
+    exported_at:new Date().toISOString(),
+    version:"v2",
+    state:{xp:State.xp,actions:State.actions,modules:State.modules,notes:State.notes,scenarios:State.scenarios,lastSave:State.lastSave},
+    notes
+  };
+  const blob = new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement("a"),{href:url,download:"northbound_atlas_v2_export.json"});
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  toast("Exported local notes as JSON 📦");
+});
+
+async function wipeAll(){
+  await DB.wipeAll().catch(()=>{});
+  Object.assign(State,{xp:0,actions:0,modules:0,notes:0,scenarios:0,lastSave:null});
+  await State.save(); toast("Local data wiped 🧼");
+}
+document.getElementById("wipeBtn")?.addEventListener("click", ()=>{ if(confirm("Wipe all local data for this page on this device?")) wipeAll(); });
+document.getElementById("resetBtn")?.addEventListener("click", ()=>{ if(confirm("Reset local data (this device only)?")) wipeAll(); });
+
+/* ══════════════════════════════════════════════════════════════
+   SPLASH — load ritual with progress animation
+   Extend: add "what's new" panel or changelog panel
+══════════════════════════════════════════════════════════════ */
+const splash = document.getElementById("splash");
+const splashBar = document.getElementById("splashBar");
+let splashTimer;
+
+function hideSplash(){
+  if(!splash) return;
+  splash.classList.add("gone");
+  if(splashTimer) clearInterval(splashTimer);
+  setTimeout(()=>splash.remove(), 700);
+}
+document.getElementById("enterBtn")?.addEventListener("click", hideSplash);
+document.getElementById("loadLocalBtn")?.addEventListener("click", async ()=>{
+  await State.load(); toast("Local state loaded 🔒");
+});
+
+(async function(){
+  let p=0;
+  splashTimer = setInterval(async ()=>{
+    p = Math.min(100, p+(Math.random()*9+4));
+    splashBar.style.width = p.toFixed(0)+"%";
+    if(p>=100){
+      clearInterval(splashTimer);
+      await State.load().catch(()=>{});
+      if(!prefersReduced) setTimeout(hideSplash,300);
+      else hideSplash();
+    }
+  },140);
+})();
+
+State.load().catch(()=>{});
+document.addEventListener("visibilitychange",()=>{ if(document.hidden) State.save().catch(()=>{}); });
+
+/* ═══ Active nav chip highlight on scroll ═══ */
+const sections=["signal","directory","bottlenecks","sovereignty","platforms","scenarios","advisor","prompts","sources"];
+const navChips=document.querySelectorAll(".nav-chips .chip");
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      navChips.forEach(c=>c.classList.toggle("active",c.getAttribute("href")==="#"+e.target.id));
+    }
+  });
+},{threshold:.25});
+sections.forEach(id=>{ const el=document.getElementById(id); if(el) obs.observe(el); });
+</script>
+</body>
+</html>
